@@ -217,7 +217,7 @@ export default function AboutPage() {
                         <div className="relative aspect-video lg:aspect-square rounded-[40px] overflow-hidden">
                             <div className="absolute inset-0 bg-accent/20 mix-blend-overlay z-10" />
                             <img
-                                src="/images/UNICA_Morning_Front_view.jpg"
+                                src="/Images/UNICA_Morning_Front_view.jpg"
                                 alt="UNICA Lifestyle"
                                 className="w-full h-full object-cover grayscale opacity-50"
                             />

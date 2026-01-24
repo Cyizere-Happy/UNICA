@@ -21,12 +21,12 @@ export const rooms: Room[] = [
         capacity: 2,
         size: '25m²',
         features: ['King Size Bed', 'En-suite Bathroom', 'High-speed WiFi', 'AC', '4K TV'],
-        mainImage: '/images/UNICA_Bedroom_view.jpg',
+        mainImage: '/Images/UNICA_Bedroom_view.jpg',
         gallery: [
-            '/images/UNICA_Bedroom_view2.jpg',
-            '/images/UNICA_Bedroom_view3.jpg',
-            '/images/UNICA_Bedroom_Bed_view.jpg',
-            '/images/UNICA_Bedroom_Bathroom.jpg'
+            '/Images/UNICA_Bedroom_view2.jpg',
+            '/Images/UNICA_Bedroom_view3.jpg',
+            '/Images/UNICA_Bedroom_Bed_view.jpg',
+            '/Images/UNICA_Bedroom_Bathroom.jpg'
         ]
     },
     {
@@ -38,8 +38,8 @@ export const rooms: Room[] = [
         capacity: 2,
         size: '30m²',
         features: ['Queen Size Bed', 'Work Desk', 'En-suite Bathroom', 'WiFi', 'AC'],
-        mainImage: '/images/UNICA_Bedroom2_view.jpg',
-        gallery: ['/images/UNICA_Bedroom2_Bathroom_view.jpg']
+        mainImage: '/Images/UNICA_Bedroom2_view.jpg',
+        gallery: ['/Images/UNICA_Bedroom2_Bathroom_view.jpg']
     },
     {
         id: 'room-3',
@@ -50,8 +50,8 @@ export const rooms: Room[] = [
         capacity: 2,
         size: '35m²',
         features: ['King Size Bed', 'Balcony Access', 'Luxury Bathroom', 'WiFi', 'Mini Bar'],
-        mainImage: '/images/UNICA_Bedroom3_view.jpg',
-        gallery: ['/images/UNICA_Bedroom3_Bathroom_view.jpg']
+        mainImage: '/Images/UNICA_Bedroom3_view.jpg',
+        gallery: ['/Images/UNICA_Bedroom3_Bathroom_view.jpg']
     },
     {
         id: 'room-4',
@@ -62,7 +62,7 @@ export const rooms: Room[] = [
         capacity: 2,
         size: '22m²',
         features: ['Queen Size Bed', 'Smart TV', 'WiFi', 'AC'],
-        mainImage: '/images/UNICA_Bedroom4_view.jpg',
+        mainImage: '/Images/UNICA_Bedroom4_view.jpg',
         gallery: []
     },
     {
@@ -74,7 +74,7 @@ export const rooms: Room[] = [
         capacity: 2,
         size: '38m²',
         features: ['King Size Bed', 'Terrace', 'Premium Sound System', 'WiFi', 'Luxury Bath'],
-        mainImage: '/images/UNICA_House_Bedroom5_view.jpg',
+        mainImage: '/Images/UNICA_House_Bedroom5_view.jpg',
         gallery: []
     },
     {
@@ -86,10 +86,10 @@ export const rooms: Room[] = [
         capacity: 4,
         size: '85m²',
         features: ['Full Kitchen', 'Large Saloon', '2 Bedrooms', 'Dining Area', 'Full Laundry'],
-        mainImage: '/images/UNICA_House_Apartment_kitchen.jpg',
+        mainImage: '/Images/UNICA_House_Apartment_kitchen.jpg',
         gallery: [
-            '/images/Apartment_Kitchen_Counter_view.jpg',
-            '/images/Apartment_Kitchen_Cupboard_view.jpg'
+            '/Images/Apartment_Kitchen_Counter_view.jpg',
+            '/Images/Apartment_Kitchen_Cupboard_view.jpg'
         ]
     }
 ];
@@ -109,27 +109,27 @@ export const testimonials = [
         name: 'Sarah Johnson',
         role: 'Business Traveler',
         content: 'Unica House exceeded all my expectations. The modern design and welcoming atmosphere made my stay truly memorable.',
-        avatar: '/images/UNICA_Bedroom_view.jpg'
+        avatar: '/Images/UNICA_Bedroom_view.jpg'
     },
     {
         id: 't-2',
         name: 'Michael Chen',
         role: 'Digital Nomad',
         content: 'The 2-bedroom apartment was perfect for my long-term stay. Having a full kitchen and a dedicated work area was a game changer.',
-        avatar: '/images/Apartment_Kitchen_Counter_view.jpg'
+        avatar: '/Images/Apartment_Kitchen_Counter_view.jpg'
     },
     {
         id: 't-3',
         name: 'Elena Rodriguez',
         role: 'Retreat Guest',
         content: 'A truly peaceful sanctuary. The attention to detail in the interior design creates such a calming environment.',
-        avatar: '/images/UNICA_Bedroom3_view.jpg'
+        avatar: '/Images/UNICA_Bedroom3_view.jpg'
     },
     {
         id: 't-4',
         name: 'David Wilson',
         role: 'Family Vacation',
         content: 'Fantastic service and a beautiful property. Our kids loved the space, and the location was perfect for exploring.',
-        avatar: '/images/UNICA_Morning_Front_view.jpg'
+        avatar: '/Images/UNICA_Morning_Front_view.jpg'
     }
 ];

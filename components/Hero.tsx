@@ -41,7 +41,7 @@ export const Hero = () => {
                     >
                         <div className="relative w-full h-full overflow-hidden rounded-[40px] shadow-bloom border border-black/5">
                             <Image
-                                src="/Images/UNICA_House_Evening_side_View.jpg"
+                                src="/Images/UNICA_House_Evening_side_view.jpg"
                                 alt="Unica House Front View"
                                 fill
                                 priority

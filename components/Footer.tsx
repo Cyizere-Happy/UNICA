@@ -30,10 +30,10 @@ export const Footer = () => {
                 <div className="space-y-6">
                     <h4 className="text-white font-semibold text-lg">Quick Links</h4>
                     <ul className="space-y-3">
-                        <li><Link href="#rooms" className="text-zinc-400 hover:text-white transition-colors text-sm">Our Rooms</Link></li>
-                        <li><Link href="#about" className="text-zinc-400 hover:text-white transition-colors text-sm">About Us</Link></li>
-                        <li><Link href="#facilities" className="text-zinc-400 hover:text-white transition-colors text-sm">Facilities</Link></li>
-                        <li><Link href="#contact" className="text-zinc-400 hover:text-white transition-colors text-sm">Location</Link></li>
+                        <li><Link href="/rooms" className="text-zinc-400 hover:text-white transition-colors text-sm">Our Rooms</Link></li>
+                        <li><Link href="/about" className="text-zinc-400 hover:text-white transition-colors text-sm">About Us</Link></li>
+                        <li><Link href="/#facilities" className="text-zinc-400 hover:text-white transition-colors text-sm">Facilities</Link></li>
+                        <li><Link href="/#contact" className="text-zinc-400 hover:text-white transition-colors text-sm">Location</Link></li>
                     </ul>
                 </div>
 
@@ -41,10 +41,10 @@ export const Footer = () => {
                 <div className="space-y-6">
                     <h4 className="text-white font-semibold text-lg">Stay With Us</h4>
                     <ul className="space-y-3">
-                        <li><Link href="#" className="text-zinc-400 hover:text-white transition-colors text-sm">Deluxe Bedrooms</Link></li>
-                        <li><Link href="#" className="text-zinc-400 hover:text-white transition-colors text-sm">Fully Furnished Apartments</Link></li>
-                        <li><Link href="#" className="text-zinc-400 hover:text-white transition-colors text-sm">Rooftop Experience</Link></li>
-                        <li><Link href="#" className="text-zinc-400 hover:text-white transition-colors text-sm">Booking Policy</Link></li>
+                        <li><Link href="/rooms" className="text-zinc-400 hover:text-white transition-colors text-sm">Superior Bedrooms</Link></li>
+                        <li><Link href="/rooms" className="text-zinc-400 hover:text-white transition-colors text-sm">Modern Apartments</Link></li>
+                        <li><Link href="/about" className="text-zinc-400 hover:text-white transition-colors text-sm">Unique Experience</Link></li>
+                        <li><Link href="#" className="text-zinc-400 hover:text-white transition-colors text-sm">Privacy Policy</Link></li>
                     </ul>
                 </div>
 
