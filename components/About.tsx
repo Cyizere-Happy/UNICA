@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { ArrowRight, Phone } from 'lucide-react';
 
 export const About = () => {
@@ -50,10 +51,12 @@ export const About = () => {
                             </p>
                         </div>
 
-                        <button className="bg-black text-white px-8 py-4 rounded-full font-bold flex items-center gap-3 hover:scale-105 transition-all text-sm">
-                            Explore Our Rooms
-                            <ArrowRight className="w-5 h-5" />
-                        </button>
+                        <Link href="/rooms">
+                            <button className="bg-black text-white px-8 py-4 rounded-full font-bold flex items-center gap-3 hover:scale-105 transition-all text-sm">
+                                Explore Our Rooms
+                                <ArrowRight className="w-5 h-5" />
+                            </button>
+                        </Link>
                     </motion.div>
 
                     {/* Card 2 */}
