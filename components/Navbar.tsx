@@ -20,10 +20,10 @@ export const Navbar = () => {
 
     const navLinks = [
         { name: 'Home', href: '/' },
-        { name: 'About Us', href: '#about' },
-        { name: 'Services', href: '#facilities' },
-        { name: 'Rooms', href: '#rooms' },
-        { name: 'Contact Us', href: '#footer' },
+        { name: 'About Us', href: '/about' },
+        { name: 'Rooms', href: '/rooms' },
+        { name: 'Services', href: '/#facilities' },
+        { name: 'Contact Us', href: '/#footer' },
     ];
 
     // The state that determines if we show the full menu or just the logo
@@ -82,7 +82,7 @@ export const Navbar = () => {
                                     </Link>
                                 ))}
                             </div>
-                            <button className="bg-accent text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-accent/20 hover:scale-105 transition-all active:scale-95 ml-2 whitespace-nowrap">
+                            <button className="bg-[#0e0e0e] text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-black/5 hover:scale-105 transition-all active:scale-95 ml-2 whitespace-nowrap">
                                 Get Started
                             </button>
                         </motion.div>

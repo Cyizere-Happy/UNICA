@@ -1,65 +1,89 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Phone, ArrowRight } from 'lucide-react';
+import { ArrowRight, Phone } from 'lucide-react';
 
 export const About = () => {
     return (
-        <section className="section-padding bg-white overflow-hidden" id="about">
+        <section className="bg-[#0e0e0e] py-12 md:py-20 px-6 md:px-12 lg:px-40 text-white overflow-hidden" id="about">
             <div className="container mx-auto">
-                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
 
-                    {/* Text Content */}
-                    <div className="flex-1 order-2 lg:order-1">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            viewport={{ once: true }}
-                            className="max-w-xl"
-                        >
-                            <h2 className="text-3xl md:text-4xl font-bold text-[#292f36] leading-[1.2] mb-6">
-                                We Tackle The Most <br />
-                                Challenging <span className="font-normal italic">Designs</span>
-                            </h2>
+                {/* Header Quote Style - Perfect Alignment */}
+                <div className="text-center mb-12 md:mb-16">
+                    <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-3xl md:text-5xl font-black mb-6 tracking-[-0.04em] leading-[1.1]"
+                    >
+                        "Uniqueness in Every <br /> <span className="italic font-normal text-white/90">Detail.</span>"
+                    </motion.h2>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 0.5 }}
+                        viewport={{ once: true }}
+                        className="flex items-center justify-center gap-6 text-[11px] tracking-[0.3em] uppercase font-black text-white/40"
+                    >
+                        <span>Bespoke</span>
+                        <span>·</span>
+                        <span>Modern</span>
+                        <span>·</span>
+                        <span>Exclusive</span>
+                    </motion.div>
+                </div>
 
-                            <p className="text-[#4d5053] text-base mb-8 leading-relaxed">
-                                At Unica House, every detail matters. We have an insatiable curiosity about transformative stays and how to make every guest feel unique in a modern, well-crafted environment.
+                {/* Feature Cards Style - Refined Scaling */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
+
+                    {/* Card 1 */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="bg-white text-black p-8 md:p-10 rounded-[32px] shadow-bloom flex flex-col items-start justify-between min-h-[300px]"
+                    >
+                        <div>
+                            <h3 className="text-2xl font-black mb-4 tracking-tight">Individuality First</h3>
+                            <p className="text-base leading-relaxed text-black/70 mb-8 font-medium">
+                                At UNICA House, every detail is a reflection of your unique journey. We create environments where personal style meets premium comfort.
                             </p>
+                        </div>
 
-                            {/* Contact Element */}
-                            <div className="flex items-center gap-4 mb-12 group">
-                                <div className="w-16 h-16 bg-[#f4f0ec] rounded-full flex items-center justify-center transition-colors group-hover:bg-accent/10">
-                                    <Phone className="w-7 h-7 text-accent" />
+                        <button className="bg-black text-white px-8 py-4 rounded-full font-bold flex items-center gap-3 hover:scale-105 transition-all text-sm">
+                            Explore Our Rooms
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
+                    </motion.div>
+
+                    {/* Card 2 */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="bg-[#1a1a1a] border border-white/5 text-white p-8 md:p-10 rounded-[32px] flex flex-col items-start justify-between min-h-[300px]"
+                    >
+                        <div>
+                            <h3 className="text-2xl font-black mb-4 tracking-tight">Refined Lifestyle</h3>
+                            <p className="text-base leading-relaxed text-white/50 mb-8 font-medium">
+                                Elevate your stay with our bespoke services and world-class hospitality, designed specifically for lifestyle-focused residents.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-6 w-full">
+                            <div className="flex items-center gap-4 group cursor-pointer">
+                                <div className="w-14 h-14 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+                                    <Phone className="w-6 h-6" />
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="text-xl font-bold text-[#292f36]">012345678</span>
-                                    <span className="text-[#4d5053] text-sm font-medium">Call Us Anytime</span>
+                                <div>
+                                    <p className="text-[11px] uppercase tracking-widest text-white/30 font-black">Call Us Anytime</p>
+                                    <p className="text-2xl font-black tracking-tight">012345678</p>
                                 </div>
                             </div>
 
-                            <button className="btn-dark">
-                                Get Free Estimate
-                                <ArrowRight className="w-5 h-5 text-accent" />
+                            <button className="w-fit border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white hover:text-black transition-all text-xs tracking-widest uppercase">
+                                Get a Quote
                             </button>
-                        </motion.div>
-                    </div>
-
-                    {/* Curved Image - Top Right curved */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="flex-1 order-1 lg:order-2 w-full max-w-2xl"
-                    >
-                        <div className="relative aspect-square w-full overflow-hidden rounded-interno-tr border-8 border-white shadow-xl">
-                            <Image
-                                src="/images/UNICA_House_Backyard_Entrance_view.jpg"
-                                alt="Unica House Backyard"
-                                fill
-                                className="object-cover"
-                            />
                         </div>
                     </motion.div>
 

@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #FFFAF5;
+  /* Subtle Resonate Off-White */
   --foreground: #292f36;
   --accent: #cda274;
   --accent-foreground: #ffffff;
@@ -20,7 +21,6 @@
   --color-card: var(--card);
 
   --font-jost: var(--font-jost);
-  --radius-interno: 180px;
 }
 
 body {
@@ -31,30 +31,35 @@ body {
   overflow-x: hidden;
 }
 
-/* Interno Specific Radii */
-.rounded-interno-bl {
-  border-bottom-left-radius: var(--radius-interno);
-}
-
-.rounded-interno-tr {
-  border-top-right-radius: var(--radius-interno);
-}
-
-/* Typography Scale Fixes */
+/* Typography Scales - Black Weights & Perfect Tracking */
 h1 {
-  @apply text-foreground font-bold leading-[1.2];
+  @apply text-foreground font-black leading-[1.05] tracking-[-0.04em];
+}
+
+h2 {
+  @apply text-foreground font-bold leading-[1.2] tracking-[-0.03em];
 }
 
 p {
-  @apply text-muted leading-relaxed;
+  @apply text-muted/80 leading-relaxed tracking-tight font-medium;
 }
 
 .btn-dark {
-  @apply bg-[#292f36] text-white px-8 py-5 rounded-2xl font-bold flex items-center gap-3 hover:opacity-90 transition-all text-sm;
+  @apply bg-[#0e0e0e] text-white px-9 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-black transition-all text-sm;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .section-padding {
-  @apply px-6 md:px-12 lg:px-40 py-12 md:py-20;
+  @apply px-6 md:px-12 lg:px-40 py-24 md:py-32;
+}
+
+/* Resonate "Bloom" Shadow */
+.shadow-bloom {
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15);
+}
+
+.card-rounded {
+  border-radius: 40px;
 }
 
 /* Contrast Helper */

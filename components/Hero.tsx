@@ -7,48 +7,51 @@ import { ArrowRight } from 'lucide-react';
 
 export const Hero = () => {
     return (
-        <section className="relative w-full overflow-hidden">
-            {/* Absolute top start - no padding-top */}
-            <div className="relative w-full min-h-[500px] md:min-h-[600px] lg:min-h-[750px] rounded-interno-bl overflow-hidden flex items-center">
+        <section className="relative w-full min-h-[80vh] bg-white flex items-center pt-40 pb-20 overflow-hidden">
+            <div className="container mx-auto px-6 md:px-12 lg:px-40">
+                <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-40">
 
-                {/* Background Image - Absolute Full Width */}
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src="/images/UNICA_Night_Side_View.jpg"
-                        alt="Unica House Night View"
-                        fill
-                        priority
-                        className="object-cover"
-                    />
-                    {/* Refined "White Fog" - Smooth white-to-transparent gradient for charcoal text contrast */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/40 to-transparent lg:w-3/4" />
-                </div>
+                    {/* Text Content - Resonate Bold Proportions */}
+                    <div className="flex-1 text-left z-10 lg:max-w-[60%]">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#292f36] mb-8 leading-[1.05] tracking-[-0.04em]">
+                                Live the <br />
+                                <span className="text-accent underline decoration-black/5 underline-offset-8">Unique Life.</span>
+                            </h1>
 
-                {/* Content Layer - Switched back to Charcoal (#292f36) with fog support */}
-                <div className="relative z-10 w-full px-6 md:px-12 lg:px-40">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-12">
+                                <button className="btn-dark text-lg px-10 py-5">
+                                    Explore UNICA House
+                                    <ArrowRight className="w-5 h-5 ml-4" />
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    {/* Image Content - Precise Mockup Aspect Ratio & Shadow */}
                     <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="max-w-2xl"
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
+                        className="flex-shrink-0 w-full lg:w-[40%] relative aspect-[4/5]"
                     >
-                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-[#292f36] mb-3 leading-[1.1] tracking-tight">
-                            Let's Create Your <br />
-                            Dream <span className="italic font-normal">Stay</span>
-                        </h1>
-
-                        <p className="text-sm md:text-base text-[#292f36] max-w-md mb-8 leading-relaxed font-semibold">
-                            Experience the perfect blend of modern architecture and warm hospitality.
-                            Your sanctuary in the heart of the city awaits at Unica House.
-                        </p>
-
-                        <button className="btn-dark px-6 py-3 md:px-8 md:py-4 shadow-2xl hover:scale-105 transition-transform text-xs md:text-sm">
-                            Get Started
-                            <ArrowRight className="w-4 h-4 md:w-5 h-5 text-accent ml-2" />
-                        </button>
+                        <div className="relative w-full h-full overflow-hidden rounded-[40px] shadow-bloom border border-black/5">
+                            <Image
+                                src="/Images/UNICA_House_Evening_side_View.jpg"
+                                alt="Unica House Front View"
+                                fill
+                                priority
+                                className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-accent/5 mix-blend-multiply" />
+                        </div>
                     </motion.div>
-                </div>
 
+                </div>
             </div>
         </section>
     );

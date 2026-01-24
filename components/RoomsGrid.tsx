@@ -13,8 +13,8 @@ export const RoomsGrid = () => {
         <section className="section-padding bg-white" id="rooms">
             <div className="container mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-5xl font-bold text-[#292f36] mb-4 tracking-tight">Beautiful Rooms</h2>
-                    <p className="text-[#4d5053] text-lg max-w-xl mx-auto">Selected for your comfort and aesthetic satisfaction.</p>
+                    <h2 className="text-3xl md:text-5xl font-black text-[#292f36] mb-4 tracking-tight">Distinctive Stays</h2>
+                    <p className="text-[#4d5053] text-lg font-medium max-w-xl mx-auto">Discover our collection of unique rooms and apartments designed for your absolute comfort.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -37,31 +37,42 @@ export const RoomsGrid = () => {
                             </div>
 
                             {/* Content - Compact and Clean */}
-                            <div className="p-6 flex flex-col flex-1">
-                                <div className="flex justify-between items-start mb-3">
-                                    <h4 className="text-lg md:text-xl font-bold text-[#292f36]">{room.name}</h4>
+                            <div className="p-5 flex flex-col flex-1">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h4 className="text-lg font-bold text-[#292f36]">{room.name}</h4>
                                     <div className="flex flex-col items-end">
-                                        <span className="text-base font-bold text-[#292f36]">{formatPrice(room.price)}</span>
-                                        <span className="text-[9px] text-[#4d5053] uppercase font-bold tracking-widest leading-none">per night</span>
+                                        <span className="text-sm font-bold text-[#292f36]">{formatPrice(room.price)}</span>
+                                        <span className="text-[8px] text-[#4d5053] uppercase font-bold tracking-widest leading-none">per night</span>
                                     </div>
                                 </div>
 
-                                <p className="text-[#4d5053] text-[13px] mb-6 line-clamp-2 leading-relaxed">
+                                <p className="text-[#4d5053] text-[12px] mb-5 line-clamp-2 leading-relaxed opacity-80">
                                     {room.description}
                                 </p>
 
                                 <Link
                                     href={`/rooms/${room.id}`}
-                                    className="mt-auto group/btn flex items-center justify-between font-bold text-[#292f36] hover:text-accent transition-colors text-sm"
+                                    className="mt-auto group/btn flex items-center justify-between font-bold text-[#292f36] hover:text-accent transition-colors text-[13px]"
                                 >
                                     View Details
-                                    <div className="w-12 h-12 bg-[#f4f0ec] rounded-full flex items-center justify-center group-hover/btn:bg-accent group-hover/btn:text-white transition-all">
-                                        <ArrowRight className="w-5 h-5" />
+                                    <div className="w-10 h-10 bg-[#f4f0ec] rounded-full flex items-center justify-center group-hover/btn:bg-accent group-hover/btn:text-white transition-all">
+                                        <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </Link>
                             </div>
                         </motion.div>
                     ))}
+                </div>
+
+                {/* View All Button */}
+                <div className="mt-16 text-center">
+                    <Link
+                        href="/rooms"
+                        className="inline-flex items-center gap-4 bg-[#0e0e0e] text-white px-10 py-5 rounded-full font-bold hover:bg-black transition-all shadow-bloom group"
+                    >
+                        View More Rooms
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
                 </div>
             </div>
         </section>

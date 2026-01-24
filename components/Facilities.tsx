@@ -23,8 +23,8 @@ export const Facilities = () => {
         <section className="py-20 px-10 md:px-20 lg:px-40 bg-white" id="facilities">
             <div className="container mx-auto">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">World-Class Facilities</h2>
-                    <p className="text-muted max-w-xl mx-auto">Selected for your comfort.</p>
+                    <h2 className="text-3xl md:text-4xl font-black text-[#292f36] mb-4">Elevated Amenities</h2>
+                    <p className="text-[#4d5053] text-lg font-medium max-w-xl mx-auto">Everything you need for an exclusive, modern living experience.</p>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6">

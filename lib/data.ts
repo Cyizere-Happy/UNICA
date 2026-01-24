@@ -109,13 +109,27 @@ export const testimonials = [
         name: 'Sarah Johnson',
         role: 'Business Traveler',
         content: 'Unica House exceeded all my expectations. The modern design and welcoming atmosphere made my stay truly memorable.',
-        avatar: '/images/UNICA_Bedroom_view.jpg' // Placeholder
+        avatar: '/images/UNICA_Bedroom_view.jpg'
     },
     {
         id: 't-2',
         name: 'Michael Chen',
         role: 'Digital Nomad',
         content: 'The 2-bedroom apartment was perfect for my long-term stay. Having a full kitchen and a dedicated work area was a game changer.',
-        avatar: '/images/Apartment_Kitchen_Counter_view.jpg' // Placeholder
+        avatar: '/images/Apartment_Kitchen_Counter_view.jpg'
+    },
+    {
+        id: 't-3',
+        name: 'Elena Rodriguez',
+        role: 'Retreat Guest',
+        content: 'A truly peaceful sanctuary. The attention to detail in the interior design creates such a calming environment.',
+        avatar: '/images/UNICA_Bedroom3_view.jpg'
+    },
+    {
+        id: 't-4',
+        name: 'David Wilson',
+        role: 'Family Vacation',
+        content: 'Fantastic service and a beautiful property. Our kids loved the space, and the location was perfect for exploring.',
+        avatar: '/images/UNICA_Morning_Front_view.jpg'
     }
 ];
