@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
+
     ArrowLeft, Check, Users, Maximize, Calendar,
     Wifi, Tv, Coffee, Thermometer, ShieldCheck, MapPin, Star
 } from 'lucide-react';
@@ -13,12 +14,16 @@ import { rooms } from '@/lib/data';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { formatPrice } from '@/lib/utils';
+import { BookingModal } from '@/components/BookingModal';
+
 
 export default function RoomDetails() {
     const { id } = useParams();
     const router = useRouter();
     const room = rooms.find(r => r.id === id);
     const [activeImage, setActiveImage] = useState(room?.mainImage || '');
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
 
     if (!room) {
         return (
@@ -148,9 +153,17 @@ export default function RoomDetails() {
                                     </div>
                                 </div>
 
-                                <button className="w-full bg-[#0e0e0e] text-white py-4 rounded-xl text-lg font-bold hover:bg-black transition-all shadow-lg shadow-black/5 hover:-translate-y-1 active:scale-95">
+                                <button
+                                    onClick={() => {
+                                        console.log("Opening booking modal for room:", room.id);
+                                        setIsBookingModalOpen(true);
+                                    }}
+                                    className="w-full bg-[#0e0e0e] text-white py-4 rounded-xl text-lg font-bold hover:bg-black transition-all shadow-lg shadow-black/5 hover:-translate-y-1 active:scale-95"
+                                >
                                     Book This Room
                                 </button>
+
+
                                 <p className="text-center text-zinc-400 text-[10px] mt-4">No payment required now. Pay during check-in.</p>
                             </div>
                         </div>
@@ -160,6 +173,18 @@ export default function RoomDetails() {
             </section>
 
             <Footer />
+
+            <AnimatePresence>
+                {isBookingModalOpen && (
+                    <BookingModal
+                        isOpen={isBookingModalOpen}
+                        onClose={() => setIsBookingModalOpen(false)}
+                        room={room}
+                    />
+                )}
+            </AnimatePresence>
         </main>
+
     );
 }
+

@@ -20,7 +20,7 @@ export const rooms: Room[] = [
         price: 80,
         capacity: 2,
         size: '25m²',
-        features: ['King Size Bed', 'En-suite Bathroom', 'High-speed WiFi', 'AC', '4K TV'],
+        features: ['King Size Bed', 'En-suite Bathroom', 'High-speed WiFi', '4K TV'],
         mainImage: '/Images/UNICA_Bedroom_view.jpg',
         gallery: [
             '/Images/UNICA_Bedroom_view2.jpg',
@@ -37,7 +37,7 @@ export const rooms: Room[] = [
         price: 95,
         capacity: 2,
         size: '30m²',
-        features: ['Queen Size Bed', 'Work Desk', 'En-suite Bathroom', 'WiFi', 'AC'],
+        features: ['Queen Size Bed', 'Work Desk', 'En-suite Bathroom', 'WiFi'],
         mainImage: '/Images/UNICA_Bedroom2_view.jpg',
         gallery: ['/Images/UNICA_Bedroom2_Bathroom_view.jpg']
     },
@@ -61,7 +61,7 @@ export const rooms: Room[] = [
         price: 70,
         capacity: 2,
         size: '22m²',
-        features: ['Queen Size Bed', 'Smart TV', 'WiFi', 'AC'],
+        features: ['Queen Size Bed', 'Smart TV', 'WiFi'],
         mainImage: '/Images/UNICA_Bedroom4_view.jpg',
         gallery: []
     },
@@ -100,7 +100,7 @@ export const amenities = [
     { name: 'Free Parking', icon: 'Car' },
     { name: '24/7 Security', icon: 'ShieldCheck' },
     { name: 'Kitchen Facilities', icon: 'Utensils' },
-    { name: 'AC & Heating', icon: 'Thermometer' }
+    { name: 'Heating System', icon: 'Thermometer' }
 ];
 
 export const testimonials = [
