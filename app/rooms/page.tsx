@@ -19,7 +19,7 @@ export default function RoomsPage() {
             <Navbar />
 
             {/* Header Section - Resonate Style */}
-            <section className="pt-40 pb-16 px-6 md:px-12 lg:px-40">
+            <section className="pt-52 pb-16 px-6 md:px-12 lg:px-40">
                 <div className="container mx-auto">
                     <span className="text-accent font-black text-xs tracking-[0.3em] uppercase mb-4 block">
                         Our Accommodations

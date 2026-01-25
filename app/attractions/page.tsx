@@ -76,7 +76,7 @@ export default function AttractionsPage() {
             `}</style>
 
             {/* Editorial Header */}
-            <header className="relative pt-48 pb-20 px-6 overflow-hidden">
+            <header className="relative pt-60 pb-20 px-6 overflow-hidden">
                 <div className="container mx-auto">
                     <div className="relative z-10 flex flex-col items-center justify-center text-center">
                         <motion.div

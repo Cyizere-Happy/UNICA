@@ -25,7 +25,7 @@ export const Hero = () => {
     }, []);
 
     return (
-        <section className="relative w-full min-h-[80vh] bg-white flex items-center pt-40 pb-20 overflow-hidden">
+        <section className="relative w-full min-h-[80vh] bg-white flex items-center pt-52 pb-20 overflow-hidden">
             <div className="container mx-auto px-6 md:px-12 lg:px-40">
                 <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-40">
 
