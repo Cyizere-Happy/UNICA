@@ -72,18 +72,20 @@ export const Testimonials = () => {
                                 <motion.div
                                     key={item.id}
                                     layout
-                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    initial={{ opacity: 0, scale: 0.9, x: item.position * 40 }}
                                     animate={{
                                         scale: item.position === 0 ? 1 : 0.82,
-                                        opacity: item.position === 0 ? 1 : 0.3,
+                                        opacity: item.position === 0 ? 1 : 0.35,
                                         zIndex: item.position === 0 ? 20 : 10,
+                                        x: item.position * 26,
                                     }}
-                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    exit={{ opacity: 0, scale: 0.9, x: item.position * -36 }}
                                     transition={{
                                         type: "spring",
-                                        stiffness: 300,
-                                        damping: 30,
-                                        opacity: { duration: 0.2 }
+                                        stiffness: 120,
+                                        damping: 22,
+                                        mass: 0.95,
+                                        opacity: { duration: 0.35, ease: "easeInOut" }
                                     }}
                                     className={cn(
                                         "bg-white rounded-[24px] p-5 md:p-6 shadow-bloom flex flex-col items-center text-center transition-all",

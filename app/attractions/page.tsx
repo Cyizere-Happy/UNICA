@@ -68,7 +68,7 @@ export default function AttractionsPage() {
                 .marquee {
                     display: flex;
                     width: max-content;
-                    animation: marquee 40s linear infinite;
+                    animation: marquee 55s linear infinite;
                 }
                 .marquee:hover {
                     animation-play-state: paused;
@@ -76,7 +76,7 @@ export default function AttractionsPage() {
             `}</style>
 
             {/* Editorial Header */}
-            <header className="relative pt-60 pb-20 px-6 overflow-hidden">
+            <header className="relative pt-44 pb-14 px-6 overflow-hidden">
                 <div className="container mx-auto">
                     <div className="relative z-10 flex flex-col items-center justify-center text-center">
                         <motion.div
@@ -86,21 +86,21 @@ export default function AttractionsPage() {
                         >
                             <span className="text-accent font-black text-xs uppercase tracking-[0.4em] border-b-2 border-accent pb-2">Exclusive Discovery</span>
                         </motion.div>
-                        <h1 className="text-5xl md:text-8xl font-black text-[#292f36] tracking-tighter mb-4 leading-none">
+                        <h1 className="text-4xl md:text-7xl font-black text-[#292f36] tracking-tighter mb-3 leading-none">
                             Discovery
                         </h1>
                     </div>
 
                     {/* Background text */}
-                    <span className="absolute left-1/2 top-48 -translate-x-1/2 text-[18vw] font-black text-black/[0.05] select-none pointer-events-none uppercase tracking-widest whitespace-nowrap">
+                    <span className="absolute left-1/2 top-36 -translate-x-1/2 text-[16vw] font-black text-black/[0.05] select-none pointer-events-none uppercase tracking-widest whitespace-nowrap">
                         UNICA HOUSE
                     </span>
                 </div>
             </header>
 
             {/* CSS Marquee Gallery */}
-            <section className="pb-40 overflow-hidden">
-                <div className="container mx-auto mb-12 px-6">
+            <section className="pb-24 overflow-hidden">
+                <div className="container mx-auto mb-8 px-6">
                     <p className="text-zinc-400 font-medium text-sm tracking-widest uppercase">
                         Exploring Detail <span className="ml-4 animate-pulse">●</span>
                     </p>
@@ -111,31 +111,33 @@ export default function AttractionsPage() {
                         <div
                             key={`${slide.id}-${idx}`}
                             className={cn(
-                                "relative w-[85vw] md:w-[450px] border-l border-black/10 flex flex-col pt-12 pr-12 group last:border-r shrink-0",
-                                idx % 2 === 1 ? "mt-12" : "mt-0"
+                                "relative w-[74vw] sm:w-[58vw] md:w-[340px] border-l border-black/10 flex flex-col pt-7 pr-7 group last:border-r shrink-0",
+                                idx % 2 === 1 ? "mt-7" : "mt-0"
                             )}
                         >
                             {/* Slide Label */}
-                            <div className="mb-6 pl-12">
-                                <span className="text-zinc-400 font-serif italic text-sm">SLIDE {(slide.id)}</span>
+                            <div className="mb-4 pl-7">
+                                <span className="inline-flex items-center rounded-full border border-black/10 bg-white px-2.5 py-1 text-[10px] font-semibold tracking-[0.2em] text-zinc-500">
+                                    ATTRACTION {slide.id}
+                                </span>
                             </div>
 
                             {/* Image Composition - Aspect Ratio based for responsiveness */}
-                            <div className="relative pl-12">
-                                <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-2xl group-hover:rounded-[32px] transition-all duration-700 shadow-bloom border border-black/5">
+                            <div className="relative pl-7">
+                                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl group-hover:rounded-[26px] transition-all duration-500 shadow-[0_14px_34px_rgba(0,0,0,0.16)] border border-black/5">
                                     <Image
                                         src={slide.image}
                                         alt={slide.title}
                                         fill
-                                        sizes="(max-width: 768px) 85vw, 450px"
-                                        className="object-cover group-hover:scale-110 transition-transform duration-[2s] ease-out"
+                                        sizes="(max-width: 640px) 74vw, (max-width: 768px) 58vw, 340px"
+                                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                                     />
 
                                     {/* Hover Description Overlay */}
-                                    <div className="absolute inset-0 bg-[#0e0e0e]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex flex-col justify-center px-8 text-white">
-                                        <div className="space-y-4">
-                                            <h3 className="text-lg md:text-xl font-black tracking-tight">{slide.title}</h3>
-                                            <p className="text-sm md:text-base font-light leading-relaxed text-white/70 italic line-clamp-6">
+                                    <div className="absolute inset-0 bg-[#0e0e0e]/78 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center px-5 text-white">
+                                        <div className="space-y-3">
+                                            <h3 className="text-base md:text-lg font-black tracking-tight">{slide.title}</h3>
+                                            <p className="text-xs md:text-sm font-light leading-relaxed text-white/75 italic line-clamp-5">
                                                 "{slide.perfectDesc}"
                                             </p>
                                         </div>
@@ -143,21 +145,21 @@ export default function AttractionsPage() {
                                 </div>
 
                                 {/* Overlapping secondary image */}
-                                <div className="absolute -bottom-6 -left-4 w-24 h-24 md:w-32 md:h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-white z-20 hidden sm:block group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-700">
+                                <div className="absolute -bottom-4 -left-3 w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden shadow-xl border-2 border-white z-20 hidden sm:block group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-500">
                                     <Image
                                         src={slide.imageSecondary}
                                         alt="Detail"
                                         fill
-                                        sizes="(max-width: 768px) 96px, 128px"
+                                        sizes="(max-width: 768px) 80px, 96px"
                                         className="object-cover"
                                     />
                                 </div>
                             </div>
 
                             {/* Description Below */}
-                            <div className="mt-12 pl-12 max-w-sm">
-                                <h3 className="text-lg font-black text-[#292f36] mb-3 group-hover:text-accent transition-colors">{slide.title}</h3>
-                                <p className="text-zinc-500 font-medium leading-relaxed text-[12px] md:text-[13px] line-clamp-3">
+                            <div className="mt-7 pl-7 max-w-[290px]">
+                                <h3 className="text-base font-black text-[#292f36] mb-2.5 group-hover:text-accent transition-colors">{slide.title}</h3>
+                                <p className="text-zinc-500 font-medium leading-relaxed text-[11px] md:text-[12px] line-clamp-3">
                                     {slide.desc}
                                 </p>
                             </div>
