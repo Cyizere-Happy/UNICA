@@ -21,6 +21,7 @@ export const Navbar = () => {
     const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'Rooms', href: '/rooms' },
+        { name: 'Food', href: '/food-services' },
         { name: 'Attractions', href: '/attractions' },
         { name: 'Contact Us', href: '/contact' },
     ];
@@ -94,13 +95,13 @@ export const Navbar = () => {
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
                         className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] p-6 lg:hidden border border-black/10"
                     >
-                        <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-8">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.name}
                                     href={link.href}
                                     onClick={() => setIsOpen(false)}
-                                    className={cn("text-base font-semibold", pathname === link.href ? "text-accent" : "text-[#292f36]")}
+                                    className={cn("text-base font-semibold py-2", pathname === link.href ? "text-accent" : "text-[#292f36]")}
                                 >
                                     {link.name}
                                 </Link>

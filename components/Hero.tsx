@@ -25,8 +25,8 @@ export const Hero = () => {
     }, []);
 
     return (
-        <section className="relative h-screen overflow-hidden px-4 md:px-8 pt-24 pb-4 bg-[#eceff2]">
-            <div className="relative mx-auto h-full max-w-7xl overflow-hidden rounded-[32px] bg-[#37424d]">
+        <section className="relative h-screen overflow-hidden px-3 sm:px-4 md:px-8 pt-24 sm:pt-28 pb-3 sm:pb-4 bg-[#eceff2]">
+            <div className="relative mx-auto h-full max-w-7xl overflow-hidden rounded-[24px] sm:rounded-[32px] bg-[#37424d]">
                 <div className="absolute inset-0 z-0">
                     {heroImages.map((image, idx) => (
                         <motion.div
@@ -56,12 +56,12 @@ export const Hero = () => {
                     <div className="absolute inset-0 bg-gradient-to-b from-black/14 via-black/20 to-black/40" />
                 </div>
 
-                <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 md:px-8 text-center pb-44 md:pb-40 pt-8">
+                <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 text-center pb-52 sm:pb-64 md:pb-40 pt-6 sm:pt-8">
                     <div className="w-full max-w-3xl">
-                        <span className="inline-flex items-center rounded-full bg-white/14 border border-white/30 px-3 py-1 text-[10px] md:text-xs font-semibold tracking-[0.22em] uppercase text-[#e7f0ff] mb-5 md:mb-6">
+                        <span className="inline-flex items-center rounded-full bg-white/14 border border-white/30 px-3 py-1 text-[10px] md:text-xs font-semibold tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#e7f0ff] mb-4 sm:mb-5 md:mb-6">
                             Unica Signature Stay
                         </span>
-                        <h1 className="text-[2.4rem] md:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight drop-shadow-[0_10px_20px_rgba(0,0,0,0.42)]">
+                        <h1 className="text-[2.2rem] sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.08] sm:leading-[1.05] tracking-tight drop-shadow-[0_10px_20px_rgba(0,0,0,0.42)]">
                             <span style={{ color: '#d6e6ff' }}>Find Your </span>
                             <span
                                 className="text-accent italic font-normal"
@@ -71,21 +71,21 @@ export const Hero = () => {
                             </span>
                         </h1>
                         <p
-                            className="text-sm md:text-lg font-medium mt-6 max-w-xl mx-auto leading-relaxed drop-shadow-[0_8px_20px_rgba(0,0,0,0.55)] bg-black/28 backdrop-blur-[1px] rounded-xl px-4 py-2.5"
+                            className="text-[15px] sm:text-base md:text-lg font-medium mt-4 sm:mt-6 max-w-xl mx-auto leading-relaxed drop-shadow-[0_8px_20px_rgba(0,0,0,0.55)] bg-black/28 backdrop-blur-[1px] rounded-xl px-3.5 sm:px-4 py-2"
                             style={{ color: '#e4efff' }}
                         >
                             Experience the zenith of Rwandan hospitality.
-                            <br className="hidden md:block" />
+                            <br className="hidden sm:block" />
                             A house designed for the unique traveler.
                         </p>
-                        <div className="mt-7 flex flex-wrap items-center justify-center gap-3.5">
+                        <div className="mt-5 sm:mt-7 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5">
                             <Link href="/rooms">
-                                <button className="px-7 py-3.5 rounded-xl bg-[#0e0e0e] text-white text-sm md:text-base font-semibold tracking-wide shadow-[0_14px_34px_rgba(0,0,0,0.42)] hover:bg-black hover:scale-[1.02] hover:shadow-[0_18px_38px_rgba(0,0,0,0.5)] active:scale-[0.99] transition-all duration-300 ring-1 ring-white/15 min-w-[170px]">
+                                <button className="px-6 sm:px-7 py-3 rounded-xl bg-[#0e0e0e] text-white text-sm md:text-base font-semibold tracking-wide shadow-[0_14px_34px_rgba(0,0,0,0.42)] hover:bg-black hover:scale-[1.02] hover:shadow-[0_18px_38px_rgba(0,0,0,0.5)] active:scale-[0.99] transition-all duration-300 ring-1 ring-white/15 min-w-[190px] sm:min-w-[170px]">
                                     Browse Rooms
                                 </button>
                             </Link>
                             <Link href="/contact">
-                                <button className="px-6 py-3.5 rounded-xl bg-white/18 text-white text-sm md:text-base font-semibold tracking-wide border border-white/50 backdrop-blur-md hover:bg-white/26 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 shadow-[0_10px_26px_rgba(0,0,0,0.25)] min-w-[170px]">
+                                <button className="px-6 py-3 rounded-xl bg-white/18 text-white text-sm md:text-base font-semibold tracking-wide border border-white/50 backdrop-blur-md hover:bg-white/26 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 shadow-[0_10px_26px_rgba(0,0,0,0.25)] min-w-[190px] sm:min-w-[170px]">
                                     Check Availability
                                 </button>
                             </Link>
@@ -93,21 +93,21 @@ export const Hero = () => {
                     </div>
                 </div>
 
-                <div className="absolute bottom-28 md:bottom-24 left-1/2 -translate-x-1/2 z-20 w-[calc(100%-2rem)] max-w-5xl">
-                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3.5 shadow-[0_15px_45px_rgba(0,0,0,0.18)]">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <button className="px-4 py-2 rounded-xl bg-[#f7f7f7] text-[#4d5053] text-sm font-medium">Rooms</button>
-                            <button className="px-4 py-2 rounded-xl bg-[#f7f7f7] text-[#4d5053] text-sm font-medium">Apartments</button>
-                            <button className="px-4 py-2 rounded-xl bg-[#f7f7f7] text-[#4d5053] text-sm font-medium">Services</button>
+                <div className="absolute bottom-16 sm:bottom-20 md:bottom-24 left-1/2 -translate-x-1/2 z-20 w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] max-w-5xl">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl bg-white px-3 sm:px-4 py-3.5 shadow-[0_15px_45px_rgba(0,0,0,0.18)]">
+                        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                            <button className="px-3.5 sm:px-4 py-2 rounded-xl bg-[#f7f7f7] text-[#4d5053] text-sm font-medium">Rooms</button>
+                            <button className="px-3.5 sm:px-4 py-2 rounded-xl bg-[#f7f7f7] text-[#4d5053] text-sm font-medium">Apartments</button>
+                            <button className="px-3.5 sm:px-4 py-2 rounded-xl bg-[#f7f7f7] text-[#4d5053] text-sm font-medium">Services</button>
                         </div>
-                        <button className="px-5 py-2.5 rounded-xl bg-[#0e0e0e] text-white text-sm font-semibold inline-flex items-center gap-1.5">
+                        <button className="px-5 py-2.5 rounded-xl bg-[#0e0e0e] text-white text-sm font-semibold inline-flex items-center gap-1.5 w-full sm:w-auto justify-center">
                             History
                             <ChevronRight className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
 
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 w-[calc(100%-2rem)] max-w-4xl">
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 w-[calc(100%-2rem)] max-w-4xl hidden sm:block">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         <div className="rounded-2xl bg-white px-4 py-2.5 flex items-center gap-3 border border-[#e9edf2] shadow-[0_10px_22px_rgba(0,0,0,0.18)]">
                             <BedDouble className="w-5 h-5 text-accent" />
