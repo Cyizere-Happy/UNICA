@@ -31,8 +31,8 @@ export const CategoryGrid = () => {
                         transition={{ delay: idx * 0.1 }}
                         className="flex flex-col"
                     >
-                        <h3 className="text-2xl md:text-3xl font-bold mb-6 text-[#292f36] tracking-[-0.03em]">{cat.title}</h3>
-                        <p className="text-[#292f36]/70 text-lg leading-relaxed font-medium">
+                        <h3 className="text-xl md:text-2xl font-bold mb-6 text-[#292f36] tracking-[-0.03em]">{cat.title}</h3>
+                        <p className="text-[#292f36]/70 text-base leading-relaxed font-medium">
                             {cat.desc}
                         </p>
                     </motion.div>

@@ -60,7 +60,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                     >
                         {/* Header / Progress */}
                         <div className="p-8 pb-4 text-center">
-                            <h2 className="text-2xl font-black text-[#292f36] mb-8">Book Your Stay</h2>
+                            <h2 className="text-xl font-black text-[#292f36] mb-8">Book Your Stay</h2>
 
                             {/* Progress Bar */}
                             <div className="relative max-w-lg mx-auto mb-12 px-6">
@@ -90,7 +90,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                                     )}
                                                 </div>
                                                 <span className={cn(
-                                                    "text-[9px] font-black uppercase tracking-[0.15em] text-center max-w-[80px]",
+                                                    "text-[8px] font-black uppercase tracking-[0.15em] text-center max-w-[80px]",
                                                     current ? "text-accent" : "text-zinc-400"
                                                 )}>
                                                     {s.name}
@@ -123,7 +123,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                     {step === 1 && (
                                         <div className="space-y-5">
                                             <div className="space-y-2">
-                                                <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1">Full Name</label>
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Full Name</label>
                                                 <div className="relative">
                                                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                                     <input
@@ -140,7 +140,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                                 <div className="space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1">Email Address</label>
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Email Address</label>
                                                     <div className="relative">
                                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                                         <input
@@ -155,7 +155,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1">Phone Number</label>
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Phone Number</label>
                                                     <div className="relative">
                                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                                         <input
@@ -177,7 +177,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                         <div className="space-y-5">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                                 <div className="space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1">Check-in Date</label>
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Check-in Date</label>
                                                     <div className="relative cursor-pointer">
                                                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                                         <input
@@ -191,7 +191,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1">Check-out Date</label>
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Check-out Date</label>
                                                     <div className="relative">
                                                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                                         <input
@@ -207,7 +207,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                             </div>
 
                                             <div className="space-y-2">
-                                                <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1">Number of Guests</label>
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Number of Guests</label>
                                                 <div className="relative">
                                                     <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                                     <select
@@ -225,7 +225,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                             </div>
 
                                             <div className="space-y-2">
-                                                <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1">Special Requests (Optional)</label>
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Special Requests (Optional)</label>
                                                 <textarea
                                                     name="specialRequests"
                                                     value={formData.specialRequests}
@@ -286,7 +286,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                     <button
                                         type="button"
                                         onClick={prevStep}
-                                        className="flex-1 border-2 border-zinc-100 text-zinc-500 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-zinc-50 transition-all flex items-center justify-center gap-2"
+                                        className="flex-1 border-2 border-zinc-100 text-zinc-500 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-50 transition-all flex items-center justify-center gap-2"
                                     >
                                         <ArrowLeft className="w-4 h-4" /> Back
                                     </button>
@@ -295,7 +295,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                     type="submit"
                                     disabled={!isStepValid()}
                                     className={cn(
-                                        "grow bg-[#0e0e0e] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed",
+                                        "grow bg-[#0e0e0e] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed",
                                         step === 1 && "w-full"
                                     )}
                                 >

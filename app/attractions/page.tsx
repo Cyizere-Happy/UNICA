@@ -56,7 +56,7 @@ const marqueeSlides = [...slides, ...slides];
 
 export default function AttractionsPage() {
     return (
-        <main className="min-h-screen bg-[#F2EEE9]">
+        <main className="min-h-screen bg-background">
             <Navbar />
 
             {/* In-page Styles for Marquee */}
@@ -86,7 +86,7 @@ export default function AttractionsPage() {
                         >
                             <span className="text-accent font-black text-xs uppercase tracking-[0.4em] border-b-2 border-accent pb-2">Exclusive Discovery</span>
                         </motion.div>
-                        <h1 className="text-6xl md:text-9xl font-black text-[#292f36] tracking-tighter mb-4 leading-none">
+                        <h1 className="text-5xl md:text-8xl font-black text-[#292f36] tracking-tighter mb-4 leading-none">
                             Discovery
                         </h1>
                     </div>
@@ -134,7 +134,7 @@ export default function AttractionsPage() {
                                     {/* Hover Description Overlay */}
                                     <div className="absolute inset-0 bg-[#0e0e0e]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex flex-col justify-center px-8 text-white">
                                         <div className="space-y-4">
-                                            <h3 className="text-xl md:text-2xl font-black tracking-tight">{slide.title}</h3>
+                                            <h3 className="text-lg md:text-xl font-black tracking-tight">{slide.title}</h3>
                                             <p className="text-sm md:text-base font-light leading-relaxed text-white/70 italic line-clamp-6">
                                                 "{slide.perfectDesc}"
                                             </p>
@@ -169,7 +169,7 @@ export default function AttractionsPage() {
             {/* Call to Action Section */}
             <section className="py-32 px-6 md:px-12 lg:px-40 bg-[#0e0e0e] text-white">
                 <div className="container mx-auto text-center">
-                    <h2 className="text-4xl md:text-6xl font-black mb-8 leading-tight">
+                    <h2 className="text-3xl md:text-5xl font-black mb-8 leading-tight">
                         Wanna Experience the <br /> <span className="text-accent italic">Unique Life?</span>
                     </h2>
                     <p className="text-white/40 max-w-xl mx-auto mb-12 text-lg font-medium">

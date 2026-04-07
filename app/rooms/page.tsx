@@ -15,7 +15,7 @@ export default function RoomsPage() {
     const otherRooms = rooms.filter(r => r.id !== featuredRoom.id);
 
     return (
-        <main className="min-h-screen bg-[#FFFAF5]">
+        <main className="min-h-screen bg-background">
             <Navbar />
 
             {/* Header Section - Resonate Style */}
@@ -24,7 +24,7 @@ export default function RoomsPage() {
                     <span className="text-accent font-black text-xs tracking-[0.3em] uppercase mb-4 block">
                         Our Accommodations
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-black text-[#292f36] tracking-tight mb-12">
+                    <h1 className="text-3xl md:text-5xl font-black text-[#292f36] tracking-tight mb-12">
                         Comfort & <span className="italic font-normal">Style.</span>
                     </h1>
 
@@ -58,7 +58,7 @@ export default function RoomsPage() {
                                         <span>Instant Booking</span>
                                     </div>
                                 </div>
-                                <h2 className="text-3xl md:text-4xl font-black text-[#292f36] mb-6 leading-tight">
+                                <h2 className="text-2xl md:text-3xl font-black text-[#292f36] mb-6 leading-tight">
                                     {featuredRoom.name}
                                 </h2>
                                 <p className="text-[#4d5053] text-base leading-relaxed mb-10 font-medium">
@@ -106,10 +106,10 @@ export default function RoomsPage() {
                                         <span>·</span>
                                         <span>{room.capacity} Guests</span>
                                     </div>
-                                    <h3 className="text-xl font-black text-[#292f36] mb-3 group-hover:text-accent transition-colors">
+                                    <h3 className="text-lg font-black text-[#292f36] mb-3 group-hover:text-accent transition-colors">
                                         {room.name}
                                     </h3>
-                                    <p className="text-[#4d5053] text-[12px] leading-relaxed mb-6 flex-1 opacity-80 line-clamp-2">
+                                    <p className="text-[#4d5053] text-[11px] leading-relaxed mb-6 flex-1 opacity-80 line-clamp-2">
                                         {room.description}
                                     </p>
                                     <div className="flex items-center justify-between mt-auto pt-5 border-t border-black/5">

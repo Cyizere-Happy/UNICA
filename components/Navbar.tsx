@@ -21,9 +21,7 @@ export const Navbar = () => {
     const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'Rooms', href: '/rooms' },
-        { name: 'Prices', href: '/prices' },
         { name: 'Attractions', href: '/attractions' },
-        { name: 'About Us', href: '/about' },
         { name: 'Contact Us', href: '/contact' },
     ];
 
@@ -39,7 +37,7 @@ export const Navbar = () => {
                     <div className="text-accent">
                         <Home className="w-6 h-6" />
                     </div>
-                    <span className="text-xl font-black tracking-tight text-[#292f36]">
+                    <span className="text-lg font-black tracking-tight text-[#292f36]">
                         unica<span className="text-accent font-medium">house</span>
                     </span>
                 </Link>
@@ -51,7 +49,7 @@ export const Navbar = () => {
                             key={link.name}
                             href={link.href}
                             className={cn(
-                                "text-sm font-bold text-[#4d5053] hover:text-[#292f36] transition-colors relative",
+                                "text-[13px] font-bold text-[#4d5053] hover:text-[#292f36] transition-colors relative",
                                 pathname === link.href && "text-[#292f36]"
                             )}
                         >
@@ -100,7 +98,7 @@ export const Navbar = () => {
                                     href={link.href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
-                                        "text-xl font-bold tracking-tight",
+                                        "text-lg font-bold tracking-tight",
                                         pathname === link.href ? "text-accent" : "text-[#292f36]"
                                     )}
                                 >
@@ -108,7 +106,7 @@ export const Navbar = () => {
                                 </Link>
                             ))}
                             <Link href="/rooms" onClick={() => setIsOpen(false)}>
-                                <button className="bg-[#0e0e0e] text-white w-full py-5 rounded-2xl font-bold text-lg shadow-bloom">
+                                <button className="bg-[#0e0e0e] text-white w-full py-5 rounded-2xl font-bold text-base shadow-bloom">
                                     Get Started
                                 </button>
                             </Link>

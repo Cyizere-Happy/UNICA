@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { CategoryGrid } from "@/components/CategoryGrid";
-import { About } from "@/components/About";
+
 import { Testimonials } from "@/components/Testimonials";
 import { RoomsGrid } from "@/components/RoomsGrid";
 import { Facilities } from "@/components/Facilities";
@@ -13,7 +13,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <CategoryGrid />
-      <About />
+
       <Testimonials />
       <RoomsGrid />
       <Facilities />

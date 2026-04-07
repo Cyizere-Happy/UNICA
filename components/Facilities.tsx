@@ -23,8 +23,8 @@ export const Facilities = () => {
         <section className="py-20 px-10 md:px-20 lg:px-40 bg-white" id="facilities">
             <div className="container mx-auto">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-black text-[#292f36] mb-4">Elevated Amenities</h2>
-                    <p className="text-[#4d5053] text-lg font-medium max-w-xl mx-auto">Everything you need for an exclusive, modern living experience.</p>
+                    <h2 className="text-2xl md:text-3xl font-black text-[#292f36] mb-4">Elevated Amenities</h2>
+                    <p className="text-[#4d5053] text-base font-medium max-w-xl mx-auto">Everything you need for an exclusive, modern living experience.</p>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6">
@@ -37,10 +37,10 @@ export const Facilities = () => {
                             transition={{ duration: 0.3, delay: index * 0.05 }}
                             className="flex flex-col items-center gap-3"
                         >
-                            <div className="w-16 h-16 bg-beige rounded-full flex items-center justify-center group hover:bg-accent transition-all">
+                            <div className="w-16 h-16 bg-card rounded-full flex items-center justify-center group hover:bg-accent transition-all">
                                 <item.icon className="w-6 h-6 text-foreground group-hover:text-white transition-colors" />
                             </div>
-                            <span className="text-sm font-semibold text-foreground">{item.name}</span>
+                            <span className="text-[13px] font-semibold text-foreground">{item.name}</span>
                         </motion.div>
                     ))}
                 </div>

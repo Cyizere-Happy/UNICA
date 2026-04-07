@@ -11,11 +11,11 @@ export const Footer = () => {
                     <div className="space-y-4 md:space-y-6 col-span-1 sm:col-span-2 md:col-span-1">
                         <Link href="/" className="flex items-center gap-2">
                             <Home className="text-accent w-6 h-6" />
-                            <span className="text-xl md:text-2xl font-black tracking-tight text-white uppercase italic">
+                            <span className="text-lg md:text-xl font-black tracking-tight text-white uppercase italic">
                                 UNICA<span className="text-accent font-normal">HOUSE</span>
                             </span>
                         </Link>
-                        <p className="text-zinc-400 text-[13px] leading-relaxed max-w-xs font-medium opacity-80">
+                        <p className="text-zinc-400 text-[12px] leading-relaxed max-w-xs font-medium opacity-80">
                             Experience the perfect blend of modern luxury and welcoming comfort at Unica House. Your home away from home.
                         </p>
                         <div className="flex gap-5 pt-2">
@@ -29,11 +29,11 @@ export const Footer = () => {
                     <div className="space-y-4 md:space-y-6">
                         <h4 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-4">Quick Links</h4>
                         <ul className="space-y-2.5">
-                            <li><Link href="/rooms" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">Our Rooms</Link></li>
-                            <li><Link href="/attractions" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">Attractions</Link></li>
-                            <li><Link href="/about" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">About Us</Link></li>
-                            <li><Link href="/#facilities" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">Facilities</Link></li>
-                            <li><Link href="/contact" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">Location</Link></li>
+                            <li><Link href="/rooms" className="text-zinc-400 hover:text-accent transition-all text-[12px] font-medium block">Our Rooms</Link></li>
+                            <li><Link href="/attractions" className="text-zinc-400 hover:text-accent transition-all text-[12px] font-medium block">Attractions</Link></li>
+
+                            <li><Link href="/#facilities" className="text-zinc-400 hover:text-accent transition-all text-[12px] font-medium block">Facilities</Link></li>
+                            <li><Link href="/contact" className="text-zinc-400 hover:text-accent transition-all text-[12px] font-medium block">Location</Link></li>
                         </ul>
                     </div>
 
@@ -41,10 +41,10 @@ export const Footer = () => {
                     <div className="space-y-4 md:space-y-6">
                         <h4 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-4">Stay With Us</h4>
                         <ul className="space-y-2.5">
-                            <li><Link href="/rooms" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">Superior Bedrooms</Link></li>
-                            <li><Link href="/rooms" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">Modern Apartments</Link></li>
-                            <li><Link href="/about" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">Unique Experience</Link></li>
-                            <li><Link href="#" className="text-zinc-400 hover:text-accent transition-all text-[13px] font-medium block">Privacy Policy</Link></li>
+                            <li><Link href="/rooms" className="text-zinc-400 hover:text-accent transition-all text-[12px] font-medium block">Superior Bedrooms</Link></li>
+                            <li><Link href="/rooms" className="text-zinc-400 hover:text-accent transition-all text-[12px] font-medium block">Modern Apartments</Link></li>
+
+                            <li><Link href="#" className="text-zinc-400 hover:text-accent transition-all text-[12px] font-medium block">Privacy Policy</Link></li>
                         </ul>
                     </div>
 
@@ -52,15 +52,15 @@ export const Footer = () => {
                     <div className="space-y-4 md:space-y-6">
                         <h4 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-4">Contact Us</h4>
                         <ul className="space-y-3">
-                            <li className="flex items-center gap-3 text-zinc-400 text-[13px] font-medium">
+                            <li className="flex items-center gap-3 text-zinc-400 text-[12px] font-medium">
                                 <MapPin className="w-4 h-4 text-accent shrink-0" />
                                 <span>Gikondo, Kicukiro</span>
                             </li>
-                            <li className="flex items-center gap-3 text-zinc-400 text-[13px] font-medium">
+                            <li className="flex items-center gap-3 text-zinc-400 text-[12px] font-medium">
                                 <Phone className="w-4 h-4 text-accent shrink-0" />
                                 <span>0788507076 / 0788860616</span>
                             </li>
-                            <li className="flex items-center gap-3 text-zinc-400 text-[13px] font-medium">
+                            <li className="flex items-center gap-3 text-zinc-400 text-[12px] font-medium">
                                 <Mail className="w-4 h-4 text-accent shrink-0" />
                                 <span>stay@unicahouse.com</span>
                             </li>

@@ -40,10 +40,10 @@ export const Testimonials = () => {
                     </span>
                     <div className="relative inline-block">
                         {/* Background transparent text - Refined Scaling */}
-                        <span className="absolute left-1/2 -top-4 -translate-x-1/2 text-6xl md:text-8xl font-black text-black/[0.02] select-none pointer-events-none whitespace-nowrap tracking-tighter">
+                        <span className="absolute left-1/2 -top-4 -translate-x-1/2 text-5xl md:text-7xl font-black text-black/[0.02] select-none pointer-events-none whitespace-nowrap tracking-tighter">
                             Testimonials
                         </span>
-                        <h2 className="text-3xl md:text-4xl font-black text-[#292f36] relative z-10 tracking-[-0.03em]">
+                        <h2 className="text-2xl md:text-3xl font-black text-[#292f36] relative z-10 tracking-[-0.03em]">
                             Testimonials
                         </h2>
                     </div>
@@ -94,11 +94,11 @@ export const Testimonials = () => {
                                         <Image src={item.avatar} alt={item.name} fill className="object-cover" />
                                     </div>
 
-                                    <h4 className="text-xl font-black text-[#292f36] mb-1 tracking-tight">{item.name}</h4>
+                                    <h4 className="text-lg font-black text-[#292f36] mb-1 tracking-tight">{item.name}</h4>
                                     <p className="text-accent font-bold text-[10px] mb-6 tracking-widest uppercase">{item.role}</p>
 
-                                    <p className="text-[#292f36]/70 leading-relaxed italic text-lg font-medium line-clamp-4 px-4">
-                                        "{item.content}"
+                                    <p className="text-[#292f36]/70 leading-relaxed italic text-base font-medium line-clamp-4 px-4">
+                                        &quot;{item.content}&quot;
                                     </p>
                                 </motion.div>
                             ))}

@@ -36,14 +36,14 @@ export const Hero = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
                         >
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#292f36] mb-8 leading-[1.05] tracking-[-0.04em]">
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#292f36] mb-8 leading-[1.05] tracking-[-0.04em]">
                                 Live the <br />
                                 <span className="text-accent underline decoration-black/5 underline-offset-8">Unique Life.</span>
                             </h1>
 
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-12">
                                 <Link href="/rooms">
-                                    <button className="btn-dark text-lg px-10 py-5">
+                                    <button className="btn-dark text-base px-8 py-4">
                                         Explore UNICA House
                                         <ArrowRight className="w-5 h-5 ml-4" />
                                     </button>
