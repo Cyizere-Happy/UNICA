@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
 
     ArrowLeft, Check, Users, Maximize, Calendar,
-    Wifi, Tv, Coffee, Thermometer, ShieldCheck, MapPin, Star
+    Wifi, Tv, Coffee, Thermometer, ShieldCheck, Star
 } from 'lucide-react';
 import { rooms } from '@/lib/data';
 import { Navbar } from '@/components/Navbar';
