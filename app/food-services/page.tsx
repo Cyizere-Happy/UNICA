@@ -3,10 +3,11 @@
 import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Minus, Plus, ShoppingBag } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, X, Zap, Leaf, Flame, ShieldCheck } from 'lucide-react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { cn } from '@/lib/utils';
+import { AnimatePresence } from 'framer-motion';
 
 type MealType = 'Breakfast' | 'Lunch' | 'Dinner';
 
@@ -17,39 +18,157 @@ type FoodItem = {
     price: number;
     image: string;
     description: string;
+    calories?: number;
+    protein?: string;
+    fat?: string;
+    carbs?: string;
+    ingredients?: string[];
 };
 
 const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner'];
 
 const foodItems: FoodItem[] = [
-    { id: 'b1', name: 'Sunrise Omelette', meal: 'Breakfast', price: 8, image: '/food/sunrise_omelette.png', description: 'Farm eggs, herbs, toast, and seasonal fruit.' },
-    { id: 'b2', name: 'Granola Bowl', meal: 'Breakfast', price: 7, image: '/food/granola_bowl.png', description: 'Yogurt, house granola, banana, and honey drizzle.' },
-    { id: 'b3', name: 'Pancake Stack', meal: 'Breakfast', price: 9, image: '/food/pancake_stack.png', description: 'Fluffy pancakes served with syrup and berries.' },
-    { id: 'l1', name: 'Grilled Chicken Wrap', meal: 'Lunch', price: 12, image: '/food/chicken_wrap.png', description: 'Crisp greens, grilled chicken, and garlic aioli.' },
-    { id: 'l2', name: 'Garden Bowl', meal: 'Lunch', price: 11, image: '/food/garden_bowl.png', description: 'Fresh greens, avocado, roasted seeds, and dressing.' },
-    { id: 'l3', name: 'Beef Burger', meal: 'Lunch', price: 13, image: '/food/beef_burger.png', description: 'Toasted bun, premium beef patty, and fries.' },
-    { id: 'd1', name: 'Steak Plate', meal: 'Dinner', price: 21, image: '/food/steak_plate.png', description: 'Pan-seared steak, mashed potatoes, and vegetables.' },
-    { id: 'd2', name: 'Herb Salmon', meal: 'Dinner', price: 19, image: '/food/herb_salmon.png', description: 'Oven baked salmon with lemon butter and greens.' },
-    { id: 'd3', name: 'Pasta Alfredo', meal: 'Dinner', price: 16, image: '/food/pasta_alfredo.png', description: 'Creamy sauce, parmesan, and fresh parsley.' },
+    { 
+        id: 'b1', 
+        name: 'Sunrise Omelette', 
+        meal: 'Breakfast', 
+        price: 5000, 
+        image: '/food/sunrise_omelette.png', 
+        description: 'Farm eggs, herbs, toast, and seasonal fruit.',
+        calories: 340,
+        protein: '18g',
+        fat: '22g',
+        carbs: '12g',
+        ingredients: ['Farm Fresh Eggs', 'Himalayan Salt', 'Fresh Chives', 'Whole Wheat Toast', 'Mixed Berries']
+    },
+    { 
+        id: 'b2', 
+        name: 'Granola Bowl', 
+        meal: 'Breakfast', 
+        price: 4500, 
+        image: '/food/granola_bowl.png', 
+        description: 'Yogurt, house granola, banana, and honey drizzle.',
+        calories: 420,
+        protein: '12g',
+        fat: '15g',
+        carbs: '58g',
+        ingredients: ['Greek Yogurt', 'Whole Grain Oats', 'Wildflower Honey', 'Sliced Banana', 'Almonds']
+    },
+    { 
+        id: 'b3', 
+        name: 'Pancake Stack', 
+        meal: 'Breakfast', 
+        price: 6000, 
+        image: '/food/pancake_stack.png', 
+        description: 'Fluffy pancakes served with syrup and berries.',
+        calories: 510,
+        protein: '10g',
+        fat: '18g',
+        carbs: '72g',
+        ingredients: ['Organic Flour', 'Maple Syrup', 'Cultured Butter', 'Assorted Fresh Berries', 'Vanilla Bean']
+    },
+    { 
+        id: 'l1', 
+        name: 'Grilled Chicken Wrap', 
+        meal: 'Lunch', 
+        price: 8500, 
+        image: '/food/chicken_wrap.png', 
+        description: 'Crisp greens, grilled chicken, and garlic aioli.',
+        calories: 480,
+        protein: '32g',
+        fat: '14g',
+        carbs: '42g',
+        ingredients: ['Chargrilled Chicken Breast', 'Artisanal Tortilla', 'Romaine Lettuce', 'Garlic Reduction', 'Cherry Tomatoes']
+    },
+    { 
+        id: 'l2', 
+        name: 'Garden Bowl', 
+        meal: 'Lunch', 
+        price: 7000, 
+        image: '/food/garden_bowl.png', 
+        description: 'Fresh greens, avocado, roasted seeds, and dressing.',
+        calories: 310,
+        protein: '9g',
+        fat: '24g',
+        carbs: '18g',
+        ingredients: ['Baby Spinach', 'Hass Avocado', 'Pumpkin Seeds', 'Balsamic Vinaigrette', 'Cucumber']
+    },
+    { 
+        id: 'l3', 
+        name: 'Beef Burger', 
+        meal: 'Lunch', 
+        price: 9500, 
+        image: '/food/beef_burger.png', 
+        description: 'Toasted bun, premium beef patty, and fries.',
+        calories: 780,
+        protein: '45g',
+        fat: '38g',
+        carbs: '65g',
+        ingredients: ['Wagyu Beef Patty', 'Brioche Bun', 'Aged Cheddar', 'Caramelized Onions', 'Secret Sauce']
+    },
+    { 
+        id: 'd1', 
+        name: 'Steak Plate', 
+        meal: 'Dinner', 
+        price: 15000, 
+        image: '/food/steak_plate.png', 
+        description: 'Pan-seared steak, mashed potatoes, and vegetables.',
+        calories: 840,
+        protein: '58g',
+        fat: '42g',
+        carbs: '35g',
+        ingredients: ['Prime Sirloin', 'Yukon Gold Potatoes', 'Garlic Butter', 'Seasonal Asparagus', 'Vinegar Reduction']
+    },
+    { 
+        id: 'd2', 
+        name: 'Herb Salmon', 
+        meal: 'Dinner', 
+        price: 14000, 
+        image: '/food/herb_salmon.png', 
+        description: 'Oven baked salmon with lemon butter and greens.',
+        calories: 520,
+        protein: '42g',
+        fat: '28g',
+        carbs: '8g',
+        ingredients: ['Wild-Caught Salmon', 'Fresh Dill', 'Lemon Zest', 'Extra Virgin Olive Oil', 'Steamed Spinach']
+    },
+    { 
+        id: 'd3', 
+        name: 'Pasta Alfredo', 
+        meal: 'Dinner', 
+        price: 11000, 
+        image: '/food/pasta_alfredo.png', 
+        description: 'Creamy sauce, parmesan, and fresh parsley.',
+        calories: 670,
+        protein: '15g',
+        fat: '34g',
+        carbs: '68g',
+        ingredients: ['Handmade Fettuccine', 'Aged Parmesan', 'Heavy Cream', 'Fresh Parsley', 'Black Peppercorns']
+    },
 ];
+
+import { useCart } from '@/context/CartContext';
+
+import { useGuestAuth } from '@/context/GuestAuthContext';
 
 export default function FoodServicesPage() {
     const [activeMeal, setActiveMeal] = useState<MealType>('Breakfast');
-    const [quantities, setQuantities] = useState<Record<string, number>>({});
+    const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
+    const { cartItems, updateCart, toggleCart } = useCart();
+    const { isAuthenticated, isRegistered, setEntryModalOpen } = useGuestAuth();
 
     const filteredItems = useMemo(
         () => foodItems.filter((item) => item.meal === activeMeal),
         [activeMeal]
     );
 
-    const updateQty = (id: string, change: number) => {
-        setQuantities((prev) => {
-            const next = Math.max(0, (prev[id] ?? 0) + change);
-            return { ...prev, [id]: next };
-        });
+    const getItemQty = (id: string) => {
+        return cartItems.find(i => i.id === id)?.cartQuantity || 0;
     };
 
-    const totalItems = Object.values(quantities).reduce((acc, qty) => acc + qty, 0);
+    const totalItems = cartItems.reduce((acc, item) => acc + item.cartQuantity, 0);
+    
+    const isFullGuest = isAuthenticated && isRegistered;
 
     return (
         <main className="min-h-screen bg-[#f6f7f9]">
@@ -97,38 +216,62 @@ export default function FoodServicesPage() {
                         {filteredItems.map((item) => (
                             <motion.div
                                 key={item.id}
+                                layoutId={`card-${item.id}`}
                                 initial={{ opacity: 0, y: 16 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.35 }}
-                                className="bg-white rounded-2xl border border-black/5 shadow-[0_10px_24px_rgba(0,0,0,0.07)] overflow-hidden"
+                                onClick={() => setSelectedItem(item)}
+                                className="bg-white rounded-2xl border border-black/5 shadow-[0_10px_24px_rgba(0,0,0,0.07)] overflow-hidden cursor-pointer group"
                             >
-                                <div className="relative h-44">
-                                    <Image src={item.image} alt={item.name} fill className="object-cover" />
+                                <div className="relative h-44 overflow-hidden">
+                                    <Image 
+                                        src={item.image} 
+                                        alt={item.name} 
+                                        fill 
+                                        className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                                    />
+                                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="bg-white/90 backdrop-blur-md p-2 rounded-full shadow-lg">
+                                            <Zap className="w-4 h-4 text-accent" />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="p-4">
                                     <h3 className="text-lg font-black text-[#292f36] mb-1">{item.name}</h3>
-                                    <p className="text-[13px] text-[#4d5053] leading-relaxed mb-4">{item.description}</p>
+                                    <p className="text-[13px] text-[#4d5053] leading-relaxed mb-4 line-clamp-2">{item.description}</p>
 
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xl font-black text-[#292f36]">${item.price.toFixed(2)}</span>
+                                        <span className="text-xl font-black text-[#292f36]">{item.price} RWF</span>
 
-                                        <div className="flex items-center gap-2 bg-[#f5f6f8] rounded-xl p-1">
-                                            <button
-                                                onClick={() => updateQty(item.id, -1)}
-                                                className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center"
+                                        {isFullGuest ? (
+                                            <div className="flex items-center gap-2 bg-[#f5f6f8] rounded-xl p-1" onClick={(e) => e.stopPropagation()}>
+                                                <button
+                                                    onClick={() => updateCart(item, -1)}
+                                                    className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center transition-colors"
+                                                >
+                                                    <Minus className="w-4 h-4" />
+                                                </button>
+                                                <span className="w-7 text-center text-sm font-bold text-[#292f36]">
+                                                    {getItemQty(item.id)}
+                                                </span>
+                                                <button
+                                                    onClick={() => updateCart(item, 1)}
+                                                    className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center transition-colors"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setEntryModalOpen(true);
+                                                }}
+                                                className="px-4 py-2 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-accent hover:text-white transition-all"
                                             >
-                                                <Minus className="w-4 h-4" />
+                                                Member Only
                                             </button>
-                                            <span className="w-7 text-center text-sm font-bold text-[#292f36]">
-                                                {quantities[item.id] ?? 0}
-                                            </span>
-                                            <button
-                                                onClick={() => updateQty(item.id, 1)}
-                                                className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center"
-                                            >
-                                                <Plus className="w-4 h-4" />
-                                            </button>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>
@@ -136,6 +279,117 @@ export default function FoodServicesPage() {
                     </div>
                 </div>
             </section>
+
+            <AnimatePresence>
+                {selectedItem && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/40 backdrop-blur-md overflow-y-auto">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-2xl overflow-hidden relative"
+                        >
+                            <button 
+                                onClick={() => setSelectedItem(null)}
+                                className="absolute top-6 right-6 z-20 p-2.5 bg-black/5 hover:bg-black/10 rounded-full transition-colors group"
+                            >
+                                <X className="w-5 h-5 text-gray-800 transition-transform group-hover:rotate-90 duration-300" />
+                            </button>
+
+                            <div className="flex flex-col md:flex-row h-full max-h-[90vh] md:max-h-[80vh]">
+                                {/* Left Side - Image */}
+                                <div className="md:w-[45%] h-36 md:h-auto relative shrink-0">
+                                    <Image src={selectedItem.image} alt={selectedItem.name} fill className="object-cover" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
+                                </div>
+
+                                {/* Right Side - Details */}
+                                <div className="md:w-[55%] p-5 md:p-8 flex flex-col h-full overflow-y-auto">
+                                    <div className="mb-4">
+                                        <span className="text-accent font-black text-[9px] tracking-[0.2em] uppercase mb-1 block">
+                                            {selectedItem.meal} Menu
+                                        </span>
+                                        <h2 className="text-xl md:text-3xl font-black text-[#292f36] leading-tight mb-1.5">
+                                            {selectedItem.name}
+                                        </h2>
+                                        <p className="text-gray-500 text-xs md:text-[13px] font-medium leading-relaxed">
+                                            {selectedItem.description}
+                                        </p>
+                                    </div>
+
+                                    {/* Nutritional Info */}
+                                    <div className="grid grid-cols-4 gap-2 mb-4">
+                                        {[
+                                            { label: 'Cals', val: selectedItem.calories, icon: Flame },
+                                            { label: 'Prot', val: selectedItem.protein, icon: ShieldCheck },
+                                            { label: 'Carbs', val: selectedItem.carbs, icon: Zap },
+                                            { label: 'Fat', val: selectedItem.fat, icon: Leaf },
+                                        ].map((stat, i) => (
+                                            <div key={i} className="bg-gray-50 rounded-xl p-2 text-center border border-gray-100/50">
+                                                <stat.icon className="w-2.5 h-2.5 text-accent mx-auto mb-1 opacity-60" />
+                                                <p className="font-black text-[#292f36] text-[11px]">{stat.val}</p>
+                                                <p className="text-[7px] font-bold text-gray-400 uppercase tracking-wider">{stat.label}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Ingredients */}
+                                    <div className="mb-4">
+                                        <h4 className="text-[10px] font-black text-[#292f36] uppercase tracking-[0.12em] mb-2">Ingredients</h4>
+                                        <div className="flex flex-wrap gap-1">
+                                            {selectedItem.ingredients?.map((ing, i) => (
+                                                <span key={i} className="px-2 py-1 bg-[#f5f6f8] text-[#4d5053] text-[9px] font-semibold rounded-md border border-black/5">
+                                                    {ing}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Bottom Sticky Footer for Action */}
+                                    <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between shrink-0">
+                                        <div className="flex flex-col">
+                                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Price</p>
+                                            <span className="text-xl font-black text-[#292f36]">
+                                                {selectedItem.price * Math.max(1, getItemQty(selectedItem.id))} RWF
+                                            </span>
+                                        </div>
+
+                                        {isFullGuest ? (
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-2.5 bg-[#f5f6f8] rounded-xl p-1.5">
+                                                    <button
+                                                        onClick={() => updateCart(selectedItem, -1)}
+                                                        className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center shadow-sm transition-all active:scale-90"
+                                                    >
+                                                        <Minus className="w-4 h-4" />
+                                                    </button>
+                                                    <span className="w-6 text-center text-base font-black text-[#292f36]">
+                                                        {getItemQty(selectedItem.id)}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => updateCart(selectedItem, 1)}
+                                                        className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center shadow-md transition-all active:scale-90"
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <button 
+                                                onClick={() => setEntryModalOpen(true)}
+                                                className="px-6 py-3 bg-[#292f36] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-lg"
+                                            >
+                                                Register to Order
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
             <Footer />
         </main>

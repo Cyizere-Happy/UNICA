@@ -4,13 +4,26 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home } from 'lucide-react';
+import { Menu, X, Home, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCart } from '@/context/CartContext';
+
+import { useGuestAuth } from '@/context/GuestAuthContext';
 
 export const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
+    const { toggleCart, cartItems } = useCart();
+    const { isAuthenticated, isRegistered, guestUser, setEntryModalOpen } = useGuestAuth();
+
+    const cartCount = cartItems.reduce((acc, item) => acc + item.cartQuantity, 0);
+
+    const handleAuthAction = () => {
+        if (!isAuthenticated || !isRegistered) {
+            setEntryModalOpen(true);
+        }
+    };
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -69,12 +82,25 @@ export const Navbar = () => {
                 </div>
 
                 {/* Right Action Button */}
-                <div className="flex items-center gap-4">
-                    <Link href="/rooms" className="hidden md:block">
-                        <button className="px-5 py-2.5 rounded-xl font-semibold text-xs tracking-wide transition-all active:scale-95 bg-[#0e0e0e] text-white hover:bg-black">
-                            Rooms
-                        </button>
-                    </Link>
+                <div className="flex items-center gap-2 md:gap-4">
+                    <button 
+                        onClick={toggleCart}
+                        className="p-2.5 rounded-xl text-[#292f36] hover:bg-black/5 transition-all relative group"
+                    >
+                        <ShoppingBag className="w-5 h-5" />
+                        {cartCount > 0 && (
+                            <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-accent text-white text-[9px] font-black flex items-center justify-center rounded-full border-2 border-white shadow-sm group-hover:scale-110 transition-transform">
+                                {cartCount}
+                            </span>
+                        )}
+                    </button>
+
+                    <button 
+                        onClick={handleAuthAction}
+                        className="px-5 py-2.5 rounded-xl font-semibold text-xs tracking-wide transition-all active:scale-95 bg-[#0e0e0e] text-white hover:bg-black overflow-hidden max-w-[120px] truncate"
+                    >
+                        {isAuthenticated && isRegistered ? (guestUser?.name || 'Member') : 'Enter'}
+                    </button>
 
                     {/* Mobile Toggle */}
                     <button

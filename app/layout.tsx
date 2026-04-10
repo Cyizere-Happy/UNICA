@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Jost } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const jost = Jost({
@@ -12,6 +13,11 @@ export const metadata: Metadata = {
   description: "Experience luxury and comfort at Unica House Hotel. 11 premium bedrooms and 3 fully furnished apartments await you.",
 };
 
+import { CartProvider } from "@/context/CartContext";
+import { GuestAuthProvider } from "@/context/GuestAuthContext";
+import CartDrawer from "@/components/CartDrawer";
+import GuestEntryModal from "@/components/GuestEntryModal";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,7 +28,14 @@ export default function RootLayout({
       <body
         className={`${jost.variable} font-jost antialiased bg-background text-foreground`}
       >
-        {children}
+        <GuestAuthProvider>
+          <CartProvider>
+            {children}
+            <CartDrawer />
+            <GuestEntryModal />
+          </CartProvider>
+        </GuestAuthProvider>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

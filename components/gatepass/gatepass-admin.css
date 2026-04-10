@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+
+.gatepass-admin-portal {
+  font-family: 'Jost', var(--font-jost), sans-serif;
+}
+
+.gatepass-admin-portal.scrollbar-custom,
+.gatepass-admin-portal .scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #4d668f transparent;
+  overflow-y: auto;
+}
+
+.gatepass-admin-portal .scrollbar-custom::-webkit-scrollbar {
+  width: 3px;
+}
+
+.gatepass-admin-portal .scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gatepass-admin-portal .scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: #4d668f;
+  border-radius: 9999px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.gatepass-admin-portal .scrollbar-custom:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+.gatepass-admin-portal .animate-in {
+  animation-duration: 0.7s;
+  animation-fill-mode: both;
+}
+
+.gatepass-admin-portal .fade-in {
+  animation-name: gatepass-fade-in;
+}
+
+.gatepass-admin-portal .slide-in-from-left {
+  animation-name: gatepass-slide-in-left;
+}
+
+@keyframes gatepass-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes gatepass-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
