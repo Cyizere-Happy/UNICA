@@ -1,141 +1,299 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Utensils, Coffee, Sun, Moon, CheckCircle2, ChevronRight } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { 
+  Plus, Edit2, Trash2, Utensils, Coffee, Sun, Moon, 
+  Search, Filter, LayoutGrid, List, TrendingUp, 
+  ChefHat, Package, IndianRupee, Star, Settings2, MoreHorizontal
+} from 'lucide-react';
 import { operationalData } from '@/lib/gatepass/operationalData';
 import { FoodItem, MealType } from '@/lib/gatepass/types';
 import { formatPrice } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import AddFoodModal from '../AddFoodModal';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 export default function MenuManagement() {
   const [menu, setMenu] = useState<FoodItem[]>(operationalData.getMenu());
-  const [activeTab, setActiveTab] = useState<MealType>('Breakfast');
+  const [activeTab, setActiveTab] = useState<MealType | 'All'>('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
 
-  const filteredMenu = menu.filter((item) => item.meal === activeTab);
+  const filteredMenu = useMemo(() => {
+    return menu.filter((item) => {
+      const matchesTab = activeTab === 'All' || item.meal === activeTab;
+      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesTab && matchesSearch;
+    });
+  }, [menu, activeTab, searchQuery]);
 
   const mealTabs = [
-    { type: 'Breakfast', icon: Coffee },
-    { type: 'Lunch', icon: Sun },
-    { type: 'Dinner', icon: Moon },
+    { type: 'All', icon: LayoutGrid, color: 'bg-indigo-50 text-indigo-600' },
+    { type: 'Breakfast', icon: Coffee, color: 'bg-orange-50 text-orange-600' },
+    { type: 'Lunch', icon: Sun, color: 'bg-yellow-50 text-yellow-600' },
+    { type: 'Dinner', icon: Moon, color: 'bg-blue-50 text-blue-600' },
   ];
 
-  const handleAddDish = () => {
-    const newItem: FoodItem = {
-      id: `food-${Date.now()}`,
-      name: 'New Signature Dish',
-      meal: activeTab,
-      price: 15,
-      image: '/food/steak_plate.png',
-      description: 'Expertly prepared with gourmet ingredients.',
-      available: true
-    };
-    operationalData.addMenuItem(newItem);
+  const handleSaveItem = (item: FoodItem) => {
+    if (editingItem) {
+      operationalData.updateMenuItem(item);
+    } else {
+      operationalData.addMenuItem(item);
+    }
     setMenu(operationalData.getMenu());
+    setEditingItem(null);
   };
 
+  const handleDeleteItem = (id: string) => {
+    if (confirm('Are you sure you want to remove this dish from the menu?')) {
+      // Small mock delete logic
+      const updatedMenu = menu.filter(m => m.id !== id);
+      setMenu(updatedMenu);
+      // In a real app we'd update operationalData too
+    }
+  };
+
+  const getStats = () => {
+    const total = menu.length;
+    const avgPrice = menu.reduce((acc, item) => acc + item.price, 0) / (total || 1);
+    const inStock = menu.filter(m => m.available).length;
+    return { total, avgPrice, inStock };
+  };
+
+  const stats = getStats();
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[#292f36] tracking-tight">Menu Management</h1>
-          <p className="text-sm text-[#4d5053] font-medium">Control the UNICA-House food services content.</p>
-        </div>
-        <button
-          onClick={handleAddDish}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#4d668f] text-white rounded-xl font-bold hover:bg-[#3a4f6e] transition-all shadow-md group"
-        >
-          <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          Add Signature Dish
-        </button>
-      </div>
-
-      <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-gray-200 w-fit">
-        {mealTabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.type;
-          return (
+    <div className="flex gap-8">
+      {/* Main Content Area */}
+      <div className="flex-1 space-y-6 min-w-0">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-xl font-black text-[#292f36] tracking-tight flex items-center gap-2">
+              <ChefHat className="text-accent" size={24} />
+              Culinary Suite
+            </h1>
+            <p className="text-[11px] text-[#4d5053] font-medium max-w-xs">Manage the premium dining experience for guests.</p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+              <input 
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                className="pl-9 pr-4 py-2 bg-white border border-gray-100 rounded-xl text-[12px] font-bold text-[#292f36] outline-none focus:ring-2 focus:ring-accent/10 transition-all w-48 shadow-sm"
+              />
+            </div>
+            
             <button
-              key={tab.type}
-              onClick={() => setActiveTab(tab.type as MealType)}
-              className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all',
-                isActive ? 'bg-[#0e0e0e] text-white shadow-lg scale-105' : 'text-[#4d5053] hover:bg-gray-50'
-              )}
+              onClick={() => {
+                setEditingItem(null);
+                setIsModalOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-4 py-2 bg-[#292f36] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-lg group"
             >
-              <Icon className="w-4 h-4" />
-              {tab.type}
+              <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" strokeWidth={3} />
+              Add Dish
             </button>
-          );
-        })}
-      </div>
+          </div>
+        </div>
 
-      <div className="bg-white rounded-[24px] border border-gray-200 overflow-hidden shadow-sm">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-100">
-              <th className="px-6 py-4 text-left text-[11px] font-black text-[#4d5053] uppercase tracking-[0.2em]">Item Details</th>
-              <th className="px-6 py-4 text-left text-[11px] font-black text-[#4d5053] uppercase tracking-[0.2em]">Meal Service</th>
-              <th className="px-6 py-4 text-left text-[11px] font-black text-[#4d5053] uppercase tracking-[0.2em]">Pricing</th>
-              <th className="px-6 py-4 text-left text-[11px] font-black text-[#4d5053] uppercase tracking-[0.2em]">Access Status</th>
-              <th className="px-6 py-4 text-right text-[11px] font-black text-[#4d5053] uppercase tracking-[0.2em]">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filteredMenu.map((item) => (
-              <tr key={item.id} className="hover:bg-blue-50/30 transition-colors group">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm flex-shrink-0">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {mealTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.type;
+            return (
+              <button
+                key={tab.type}
+                onClick={() => setActiveTab(tab.type as MealType | 'All')}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-1.5 rounded-xl text-[11px] font-black tracking-tight transition-all shrink-0',
+                  isActive 
+                    ? 'bg-[#0e0e0e] text-white shadow-lg scale-105' 
+                    : 'bg-white text-gray-500 hover:text-[#292f36] border border-gray-100'
+                )}
+              >
+                <div className={cn("p-1 rounded-md transition-colors", isActive ? "bg-white/10" : tab.color)}>
+                    <Icon className="w-3 h-3" />
+                </div>
+                {tab.type}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Dynamic Grid View */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+          <AnimatePresence mode='popLayout'>
+            {filteredMenu.map((item, index) => (
+              <motion.div
+                layout
+                key={item.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2, delay: index * 0.05 }}
+                className="group relative bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all p-3"
+              >
+                {/* Image Container */}
+                <div className="relative h-36 w-full rounded-2xl overflow-hidden bg-gray-50">
+                  <Image 
+                    src={item.image} 
+                    alt={item.name} 
+                    fill 
+                    className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
+                  <div className="absolute top-2 right-2 flex flex-col gap-1.5">
+                    {!item.available && (
+                      <span className="bg-red-500 text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">
+                        Out of Stock
+                      </span>
+                    )}
+                    <span className="bg-white/90 backdrop-blur-md text-[#292f36] text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg shadow-sm flex items-center gap-1">
+                      <Star className="w-2.5 h-2.5 text-orange-400 fill-orange-400" />
+                      {item.meal}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="pt-3 pb-1 px-1">
+                  <div>
+                    <h3 className="text-[14px] font-black text-[#292f36] leading-tight group-hover:text-accent transition-colors">{item.name}</h3>
+                    <p className="text-[11px] text-[#4d5053] font-medium mt-0.5 line-clamp-2 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Pricing</span>
+                      <span className="text-base font-black text-[#292f36]">{formatPrice(item.price)}</span>
                     </div>
-                    <div>
-                      <p className="font-black text-[#292f36] text-[15px]">{item.name}</p>
-                      <p className="text-[12px] text-[#4d5053] line-clamp-1">{item.description}</p>
+
+                    <div className="flex items-center gap-1.5">
+                      <button 
+                         onClick={() => {
+                           setEditingItem(item);
+                           setIsModalOpen(true);
+                         }}
+                         className="p-2 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-[#292f36] rounded-lg transition-all"
+                      >
+                        <Edit2 size={13} />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteItem(item.id)}
+                        className="p-2 bg-red-50 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all border border-red-50/50"
+                      >
+                        <Trash2 size={13} />
+                      </button>
                     </div>
                   </div>
-                </td>
-                <td className="px-6 py-4 text-sm font-bold text-[#4d5053]">
-                  <span className="flex items-center gap-1.5 capitalize">
-                    {item.meal}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-black text-[#292f36]">{formatPrice(item.price)}</td>
-                <td className="px-6 py-4">
-                  {item.available ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-[10px] font-black tracking-widest uppercase rounded-full">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      In Stock
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 text-gray-500 text-[10px] font-black tracking-widest uppercase rounded-full">
-                      Sold Out
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-2 text-gray-400 hover:text-[#4d668f] hover:bg-white rounded-lg transition-all" title="Edit Item">
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-white rounded-lg transition-all" title="Delete Item">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-[#292f36] hover:bg-white rounded-lg transition-all">
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                </div>
+
+                {/* Quick Info Badges Overlay on Hover */}
+                {item.calories && (
+                    <div className="absolute left-1/2 -top-1.5 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 pointer-events-none">
+                        <div className="bg-[#292f36] text-white text-[9px] font-black px-3 py-1 rounded-full shadow-xl flex items-center gap-1.5 border border-white/20 whitespace-nowrap">
+                            <TrendingUp size={10} className="text-accent" />
+                            {item.calories} CAL
+                        </div>
+                    </div>
+                )}
+              </motion.div>
             ))}
-          </tbody>
-        </table>
+          </AnimatePresence>
+        </div>
+
         {filteredMenu.length === 0 && (
-          <div className="p-12 text-center">
-            <Utensils className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-            <p className="text-[#4d5053] font-bold">No items found for {activeTab}.</p>
+          <div className="bg-gray-50 rounded-[40px] p-20 text-center border-2 border-dashed border-gray-200">
+            <div className="w-20 h-20 bg-white border border-gray-100 rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <Utensils className="w-10 h-10 text-gray-200" />
+            </div>
+            <h3 className="text-xl font-black text-[#292f36]">No dishes discovered</h3>
+            <p className="text-[#4d5053] font-medium mt-2 max-w-sm mx-auto italic">We couldn't find any matches for your current filters or search query.</p>
           </div>
         )}
       </div>
+
+      {/* Management Sidebar (Right) */}
+      <div className="hidden xl:flex flex-col w-64 space-y-4 shrink-0">
+        <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-sm space-y-4 sticky top-6">
+            <div className="flex items-center justify-between">
+                <h2 className="text-[14px] font-black text-[#292f36]">Inventory Stats</h2>
+                <Settings2 size={14} className="text-gray-400 cursor-pointer hover:text-[#292f36] transition-colors" />
+            </div>
+
+            <div className="space-y-3">
+                <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/30">
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="p-1.5 bg-indigo-500 rounded-lg text-white">
+                            <Package size={12} />
+                        </div>
+                        <span className="text-[11px] font-black text-[#292f36]">Total Items</span>
+                    </div>
+                    <div className="flex items-end justify-between">
+                        <h4 className="text-lg font-black text-[#292f36]">{stats.total}</h4>
+                        <span className="text-[8px] font-black text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded-md uppercase tracking-wider">Live</span>
+                    </div>
+                </div>
+
+                <div className="p-3 bg-orange-50/50 rounded-xl border border-orange-100/30">
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="p-1.5 bg-orange-500 rounded-lg text-white">
+                            <Star size={12} />
+                        </div>
+                        <span className="text-[11px] font-black text-[#292f36]">In Stock</span>
+                    </div>
+                    <div className="flex items-end justify-between">
+                        <h4 className="text-lg font-black text-[#292f36]">{stats.inStock}</h4>
+                        <span className="text-[8px] font-black text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-md uppercase tracking-wider">OK</span>
+                    </div>
+                </div>
+
+                <div className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100/30">
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="p-1.5 bg-emerald-500 rounded-lg text-white">
+                            <TrendingUp size={12} />
+                        </div>
+                        <span className="text-[11px] font-black text-[#292f36]">Avg Price</span>
+                    </div>
+                    <div className="flex items-end justify-between">
+                        <h4 className="text-lg font-black text-[#292f36]">{formatPrice(Math.round(stats.avgPrice))}</h4>
+                        <span className="text-[8px] font-black text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md uppercase tracking-wider">RWF</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="pt-2">
+                <div className="p-4 bg-gradient-to-br from-[#292f36] to-[#1a1f24] rounded-2xl shadow-xl relative overflow-hidden group">
+                    <div className="relative z-10">
+                        <h4 className="text-white text-[12px] font-black mb-0.5">Menu Report</h4>
+                        <p className="text-gray-400 text-[10px] leading-relaxed mb-3">Export your inventory for kitchen staff.</p>
+                        <button className="w-full py-2 bg-white text-[#292f36] rounded-xl font-black text-[9px] uppercase tracking-widest hover:scale-105 transition-all">
+                            Download PDF
+                        </button>
+                    </div>
+                    {/* Animated background element */}
+                    <div className="absolute top-0 right-0 -mr-6 -mt-6 w-16 h-16 bg-accent/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <AddFoodModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSave={handleSaveItem}
+        editingItem={editingItem}
+      />
     </div>
   );
 }

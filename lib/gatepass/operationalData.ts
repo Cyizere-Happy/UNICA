@@ -44,12 +44,90 @@ export let MOCK_ROOMS: Room[] = [
 ];
 
 export let MOCK_MENU: FoodItem[] = [
-  { id: 'b1', name: 'Sunrise Omelette', meal: 'Breakfast', price: 8, image: '/food/sunrise_omelette.png', description: 'Farm eggs, herbs, toast, and seasonal fruit.', available: true },
-  { id: 'b2', name: 'Granola Bowl', meal: 'Breakfast', price: 7, image: '/food/granola_bowl.png', description: 'Yogurt, house granola, banana, and honey.', available: true },
-  { id: 'l1', name: 'Grilled Chicken Wrap', meal: 'Lunch', price: 12, image: '/food/chicken_wrap.png', description: 'Crisp greens, grilled chicken, and garlic aioli.', available: true },
-  { id: 'l2', name: 'Beef Burger', meal: 'Lunch', price: 14, image: '/food/beef_burger.png', description: 'Double patties, sharp cheddar, and caramelized onions.', available: true },
-  { id: 'd1', name: 'Steak Plate', meal: 'Dinner', price: 21, image: '/food/steak_plate.png', description: 'Pan-seared steak, mashed potatoes, and vegetables.', available: true },
-  { id: 'd2', name: 'Japanese Ramen', meal: 'Dinner', price: 18, image: '/food/pasta_alfredo.png', description: 'Rich pork broth with slow-cooked pork belly and marinated egg.', available: true }
+  { 
+    id: 'b1', 
+    name: 'Sunrise Omelette', 
+    meal: 'Breakfast', 
+    price: 8, 
+    image: '/food/sunrise_omelette.png', 
+    description: 'Farm eggs, herbs, toast, and seasonal fruit.', 
+    available: true,
+    calories: 340,
+    protein: '18g',
+    fat: '22g',
+    carbs: '12g',
+    ingredients: ['Farm Fresh Eggs', 'Himalayan Salt', 'Fresh Chives', 'Whole Wheat Toast', 'Mixed Berries']
+  },
+  { 
+    id: 'b2', 
+    name: 'Granola Bowl', 
+    meal: 'Breakfast', 
+    price: 7, 
+    image: '/food/granola_bowl.png', 
+    description: 'Yogurt, house granola, banana, and honey.', 
+    available: true,
+    calories: 420,
+    protein: '12g',
+    fat: '15g',
+    carbs: '58g',
+    ingredients: ['Greek Yogurt', 'Whole Grain Oats', 'Wildflower Honey', 'Sliced Banana', 'Almonds']
+  },
+  { 
+    id: 'l1', 
+    name: 'Grilled Chicken Wrap', 
+    meal: 'Lunch', 
+    price: 12, 
+    image: '/food/chicken_wrap.png', 
+    description: 'Crisp greens, grilled chicken, and garlic aioli.', 
+    available: true,
+    calories: 480,
+    protein: '32g',
+    fat: '14g',
+    carbs: '42g',
+    ingredients: ['Chargrilled Chicken Breast', 'Artisanal Tortilla', 'Romaine Lettuce', 'Garlic Reduction', 'Cherry Tomatoes']
+  },
+  { 
+    id: 'l2', 
+    name: 'Beef Burger', 
+    meal: 'Lunch', 
+    price: 14, 
+    image: '/food/beef_burger.png', 
+    description: 'Double patties, sharp cheddar, and caramelized onions.', 
+    available: true,
+    calories: 780,
+    protein: '45g',
+    fat: '38g',
+    carbs: '65g',
+    ingredients: ['Wagyu Beef Patty', 'Brioche Bun', 'Aged Cheddar', 'Caramelized Onions', 'Secret Sauce']
+  },
+  { 
+    id: 'd1', 
+    name: 'Steak Plate', 
+    meal: 'Dinner', 
+    price: 21, 
+    image: '/food/steak_plate.png', 
+    description: 'Pan-seared steak, mashed potatoes, and vegetables.', 
+    available: true,
+    calories: 840,
+    protein: '58g',
+    fat: '42g',
+    carbs: '35g',
+    ingredients: ['Prime Sirloin', 'Yukon Gold Potatoes', 'Garlic Butter', 'Seasonal Asparagus', 'Vinegar Reduction']
+  },
+  { 
+    id: 'd2', 
+    name: 'Japanese Ramen', 
+    meal: 'Dinner', 
+    price: 18, 
+    image: '/food/pasta_alfredo.png', 
+    description: 'Rich pork broth with slow-cooked pork belly and marinated egg.', 
+    available: true,
+    calories: 520,
+    protein: '42g',
+    fat: '28g',
+    carbs: '8g',
+    ingredients: ['Wild-Caught Salmon', 'Fresh Dill', 'Lemon Zest', 'Extra Virgin Olive Oil', 'Steamed Spinach']
+  }
 ];
 
 export let MOCK_ORDERS: FoodOrder[] = [

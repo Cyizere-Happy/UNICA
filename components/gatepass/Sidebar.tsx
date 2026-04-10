@@ -16,11 +16,12 @@ import {
   BarChart3,
   Puzzle,
   HelpCircle,
-  MessageSquare,
-  Package,
   ShoppingCart,
   CheckSquare,
-  Rocket
+  Rocket,
+  Utensils,
+  Package,
+  MessageSquare
 } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 import { cn } from '@/lib/utils';
@@ -46,6 +47,7 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'room-bookings', label: 'Booking Requests', icon: Package },
         { id: 'order-history', label: 'Order History', icon: ShoppingCart },
+        { id: 'menu-management', label: 'Menu Mgmt', icon: Utensils },
         { id: 'registered-parents', label: 'Guests', icon: Users },
         { id: 'messages', label: 'Message', icon: MessageSquare, badge: 33 },
       ]
