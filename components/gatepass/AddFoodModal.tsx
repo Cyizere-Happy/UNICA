@@ -67,6 +67,17 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
     });
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, image: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
@@ -155,15 +166,34 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Image Asset</label>
-                    <div className="relative">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Dish Image</label>
+                    <div className="relative group cursor-pointer">
                       <input 
-                        required
-                        value={formData.image}
-                        onChange={e => setFormData({...formData, image: e.target.value})}
-                        className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 pl-10 text-[13px] font-bold text-[#292f36] outline-none transition-all"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
                       />
-                      <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                      <div className={cn(
+                        "w-full bg-gray-50 border-2 border-dashed rounded-xl p-3 flex items-center justify-between text-[11px] font-bold text-[#292f36] transition-all",
+                        formData.image ? "border-accent/50 bg-accent/5" : "border-gray-100 hover:border-gray-200"
+                      )}>
+                        <div className="flex items-center gap-2">
+                           {formData.image ? (
+                             <div className="w-8 h-8 rounded-lg overflow-hidden border border-white/50 shadow-sm relative shrink-0">
+                               <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                             </div>
+                           ) : (
+                             <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
+                               <ImageIcon size={14} />
+                             </div>
+                           )}
+                           <span className={cn(formData.image ? "text-[#292f36]" : "text-gray-400")}>
+                             {formData.image ? "Image Selected" : "Click to Upload"}
+                           </span>
+                        </div>
+                        <Plus size={14} className="text-gray-300" />
+                      </div>
                     </div>
                   </div>
                 </div>
