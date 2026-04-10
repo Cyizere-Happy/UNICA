@@ -16,6 +16,7 @@ import {
   Building2, 
   BadgeCheck 
 } from 'lucide-react';
+import Image from 'next/image';
 import '@/components/gatepass/AuthStyles.css';
 
 type RegisterData = {
@@ -109,9 +110,30 @@ export default function AuthForm() {
           className="auth-left-content"
         >
           <div className="auth-left-logo">
-            <Home size={40} className="text-white" />
+            <Home size={32} className="text-white" />
           </div>
-          <h1>One Platform to Manage All Your House Bookings</h1>
+          
+          <div className="relative w-full aspect-square max-w-[320px] mx-auto mb-8">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={isLogin ? 'signin' : 'register'}
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                className="w-full h-full bg-white/10 backdrop-blur-md rounded-[48px] border border-white/20 shadow-2xl flex items-center justify-center p-8"
+              >
+                <Image 
+                  src={isLogin ? "/admin_mascot_signin.png" : "/admin_mascot_register.png"}
+                  alt="Admin Mascot"
+                  width={400}
+                  height={400}
+                  className="w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <h1>{isLogin ? "Welcome Back, Manager" : "Start Your Management Journey"}</h1>
           <p>
             Seamlessly coordinate visitors, staff, and resources with our all-in-one management suite.
             Experience the future of property management.
