@@ -1,4 +1,4 @@
-import { DashboardStats, Visit, Student, VisitingDay } from './types';
+import { DashboardStats, Visit, Student, VisitingDay, BookingRequest } from './types';
 
 export const MOCK_STATS: DashboardStats = {
   totalVisitsToday: 24,
@@ -176,6 +176,73 @@ export const MOCK_STUDENTS: Student[] = [
     guardianPhone: '0788000444',
     guardianEmail: 'lina@example.com',
     enrollmentDate: new Date().toISOString()
+  }
+];
+
+export const MOCK_BOOKING_REQUESTS: BookingRequest[] = [
+  {
+    id: 'BR-1001',
+    guestName: 'Cyizere Happy',
+    guestEmail: 'happy@cyizere.rw',
+    guestPhone: '+250 788 111 222',
+    roomName: 'Superior Bedroom',
+    roomType: 'Suite',
+    roomPrice: 35,
+    checkIn: '2024-07-09',
+    checkOut: '2024-07-12',
+    guests: 2,
+    totalAmount: 105,
+    status: 'PENDING',
+    rating: 5.0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'BR-1002',
+    guestName: 'Alice Uwase',
+    guestEmail: 'alice@example.com',
+    guestPhone: '+250 787 333 444',
+    roomName: 'Standard Room #10',
+    roomType: 'Standard',
+    roomPrice: 20,
+    checkIn: '2024-07-10',
+    checkOut: '2024-07-11',
+    guests: 1,
+    totalAmount: 20,
+    status: 'APPROVED',
+    rating: 4.8,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'BR-1003',
+    guestName: 'Bob Smith',
+    guestEmail: 'bob@smith.com',
+    guestPhone: '+1 555 123 4567',
+    roomName: 'Deluxe Apartment',
+    roomType: 'Apartment',
+    roomPrice: 150,
+    checkIn: '2024-07-15',
+    checkOut: '2024-07-20',
+    guests: 3,
+    totalAmount: 750,
+    status: 'REJECTED',
+    rating: 4.5,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'BR-1004',
+    guestName: 'Mark Mugabo',
+    guestEmail: 'mark@mugabo.rw',
+    guestPhone: '+250 788 555 666',
+    roomName: 'Penthouse B',
+    roomType: 'Penthouse',
+    roomPrice: 250,
+    checkIn: '2024-08-01',
+    checkOut: '2024-08-05',
+    guests: 4,
+    totalAmount: 1000,
+    status: 'PENDING',
+    rating: 4.9,
+    createdAt: new Date().toISOString()
   }
 ];
 

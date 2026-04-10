@@ -59,16 +59,18 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                         exit={{ opacity: 0 }}
                     >
                         {/* Header / Progress */}
-                        <div className="p-8 pb-4 text-center">
-                            <h2 className="text-xl font-black text-[#292f36] mb-8">Book Your Stay</h2>
+                        <div className="p-6 md:p-8 pb-4 text-center">
+                            <h2 className="text-xl font-black text-[#292f36] mb-4 md:mb-8">Book Your Stay</h2>
 
                             {/* Progress Bar */}
-                            <div className="relative max-w-lg mx-auto mb-12 px-6">
+                            <div className="relative max-w-lg mx-auto mb-8 md:mb-12 px-6">
                                 <div className="absolute top-5 left-12 right-12 h-0.5 bg-zinc-100 z-0" />
                                 <motion.div
                                     className="absolute top-5 left-12 h-0.5 bg-accent z-0"
-                                    initial={{ width: '0%' }}
-                                    animate={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }}
+                                    initial={{ right: 'auto', width: '0%' }}
+                                    animate={{ 
+                                        width: step === 1 ? '0%' : step === 2 ? 'calc(50% - 24px)' : 'calc(100% - 96px)'
+                                    }}
                                     transition={{ duration: 0.5, ease: "easeInOut" }}
                                 />
 
@@ -110,7 +112,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                 setIsSubmitted(true);
                                 setTimeout(() => onSuccess?.(), 3000);
                             }
-                        }} className="p-8 pt-0">
+                        }} className="p-6 md:p-8 pt-0">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={step}
@@ -174,9 +176,9 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                     )}
 
                                     {step === 2 && (
-                                        <div className="space-y-5">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                                <div className="space-y-2">
+                                        <div className="space-y-3 md:space-y-5">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
+                                                <div className="space-y-1.5 md:space-y-2">
                                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Check-in Date</label>
                                                     <div className="relative cursor-pointer">
                                                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -185,12 +187,12 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                                             name="checkIn"
                                                             value={formData.checkIn}
                                                             onChange={handleInputChange}
-                                                            className="w-full bg-zinc-50 border-none rounded-2xl py-4 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-accent/20 transition-all outline-none"
+                                                            className="w-full bg-zinc-50 border-none rounded-xl md:rounded-2xl py-3 md:py-4 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-accent/20 transition-all outline-none"
                                                             required
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="space-y-2">
+                                                <div className="space-y-1.5 md:space-y-2">
                                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Check-out Date</label>
                                                     <div className="relative">
                                                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -199,14 +201,14 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                                             name="checkOut"
                                                             value={formData.checkOut}
                                                             onChange={handleInputChange}
-                                                            className="w-full bg-zinc-50 border-none rounded-2xl py-4 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-accent/20 transition-all outline-none"
+                                                            className="w-full bg-zinc-50 border-none rounded-xl md:rounded-2xl py-3 md:py-4 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-accent/20 transition-all outline-none"
                                                             required
                                                         />
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div className="space-y-2">
+ 
+                                            <div className="space-y-1.5 md:space-y-2">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Number of Guests</label>
                                                 <div className="relative">
                                                     <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -214,7 +216,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                                         name="guests"
                                                         value={formData.guests}
                                                         onChange={handleInputChange}
-                                                        className="w-full bg-zinc-50 border-none rounded-2xl py-4 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-accent/20 transition-all outline-none appearance-none"
+                                                        className="w-full bg-zinc-50 border-none rounded-xl md:rounded-2xl py-3 md:py-4 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-accent/20 transition-all outline-none appearance-none"
                                                     >
                                                         {[1, 2, 3, 4, 5, 6].map(n => (
                                                             <option key={n} value={n}>{n} {n === 1 ? 'Guest' : 'Guests'}</option>
@@ -223,56 +225,56 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                                     <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 rotate-90" />
                                                 </div>
                                             </div>
-
-                                            <div className="space-y-2">
+ 
+                                            <div className="space-y-1.5 md:space-y-2">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Special Requests (Optional)</label>
                                                 <textarea
                                                     name="specialRequests"
                                                     value={formData.specialRequests}
                                                     onChange={handleInputChange}
                                                     placeholder="Any special requirements?"
-                                                    rows={3}
-                                                    className="w-full bg-zinc-50 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-accent/20 transition-all outline-none resize-none"
+                                                    rows={2}
+                                                    className="w-full bg-zinc-50 border-none rounded-xl md:rounded-2xl p-3 md:p-4 text-sm font-bold focus:ring-2 focus:ring-accent/20 transition-all outline-none resize-none"
                                                 />
                                             </div>
                                         </div>
                                     )}
 
                                     {step === 3 && (
-                                        <div className="space-y-6">
-                                            <div className="bg-accent/5 rounded-3xl p-6 border border-accent/10">
+                                        <div className="space-y-4 md:space-y-6">
+                                            <div className="bg-accent/5 rounded-3xl p-5 md:p-6 border border-accent/10">
                                                 <h4 className="text-[10px] font-black uppercase tracking-widest text-accent mb-4">Reservation Summary</h4>
-                                                <div className="space-y-4">
+                                                <div className="space-y-3 md:space-y-4">
                                                     <div className="flex justify-between items-center">
-                                                        <span className="text-zinc-500 text-xs font-bold">Room</span>
-                                                        <span className="text-sm font-black text-[#292f36]">{room.name}</span>
+                                                        <span className="text-zinc-500 text-[10px] md:text-xs font-bold">Room</span>
+                                                        <span className="text-xs md:text-sm font-black text-[#292f36]">{room.name}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center">
-                                                        <span className="text-zinc-500 text-xs font-bold">Guest</span>
-                                                        <span className="text-sm font-black text-[#292f36]">{formData.fullName}</span>
+                                                        <span className="text-zinc-500 text-[10px] md:text-xs font-bold">Guest</span>
+                                                        <span className="text-xs md:text-sm font-black text-[#292f36]">{formData.fullName}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center border-t border-accent/10 pt-4">
                                                         <div className="flex flex-col">
-                                                            <span className="text-zinc-500 text-xs font-bold uppercase tracking-tighter">Check-in</span>
-                                                            <span className="text-sm font-black">{formData.checkIn}</span>
+                                                            <span className="text-zinc-500 text-[9px] md:text-xs font-bold uppercase tracking-tighter">Check-in</span>
+                                                            <span className="text-xs md:text-sm font-black">{formData.checkIn}</span>
                                                         </div>
                                                         <div className="w-8 h-px bg-accent/20" />
                                                         <div className="flex flex-col text-right">
-                                                            <span className="text-zinc-500 text-xs font-bold uppercase tracking-tighter">Check-out</span>
-                                                            <span className="text-sm font-black">{formData.checkOut}</span>
+                                                            <span className="text-zinc-500 text-[9px] md:text-xs font-bold uppercase tracking-tighter">Check-out</span>
+                                                            <span className="text-xs md:text-sm font-black">{formData.checkOut}</span>
                                                         </div>
                                                     </div>
                                                     <div className="flex justify-between items-center border-t border-accent/10 pt-4">
-                                                        <span className="text-zinc-500 text-xs font-bold">Total Price</span>
-                                                        <span className="text-xl font-black text-accent">${room.price} <span className="text-[10px] text-zinc-400 uppercase tracking-widest">/ night</span></span>
+                                                        <span className="text-zinc-500 text-[10px] md:text-xs font-bold">Total Price</span>
+                                                        <span className="text-lg md:text-xl font-black text-accent">${room.price} <span className="text-[9px] text-zinc-400 uppercase tracking-widest">/ night</span></span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-3 p-4 bg-zinc-50 rounded-2xl border border-black/5">
-                                                <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center">
-                                                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                            <div className="flex items-center gap-3 p-3 md:p-4 bg-zinc-50 rounded-2xl border border-black/5">
+                                                <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-green-500/10 flex items-center justify-center">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
                                                 </div>
-                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight">
+                                                <p className="text-[9px] md:text-[10px] font-bold text-zinc-500 uppercase tracking-tight">
                                                     Free cancellation until 24h before check-in
                                                 </p>
                                             </div>
@@ -281,12 +283,12 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                 </motion.div>
                             </AnimatePresence>
 
-                            <div className="mt-10 flex gap-4">
+                            <div className="mt-8 md:mt-10 flex flex-col md:flex-row gap-3 md:gap-4">
                                 {step > 1 && (
                                     <button
                                         type="button"
                                         onClick={prevStep}
-                                        className="flex-1 border-2 border-zinc-100 text-zinc-500 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-50 transition-all flex items-center justify-center gap-2"
+                                        className="w-full md:flex-1 border-2 border-zinc-100 text-zinc-500 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-50 transition-all flex items-center justify-center gap-2 order-2 md:order-1"
                                     >
                                         <ArrowLeft className="w-4 h-4" /> Back
                                     </button>
@@ -295,7 +297,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                     type="submit"
                                     disabled={!isStepValid()}
                                     className={cn(
-                                        "grow bg-[#0e0e0e] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed",
+                                        "w-full md:grow bg-[#0e0e0e] text-white py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed order-1 md:order-2",
                                         step === 1 && "w-full"
                                     )}
                                 >

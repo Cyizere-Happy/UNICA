@@ -4,15 +4,15 @@
   font-family: 'Jost', var(--font-jost), sans-serif;
 }
 
-.gatepass-admin-portal.scrollbar-custom,
 .gatepass-admin-portal .scrollbar-custom {
   scrollbar-width: thin;
-  scrollbar-color: #4d668f transparent;
+  scrollbar-color: #292f36 transparent;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .gatepass-admin-portal .scrollbar-custom::-webkit-scrollbar {
-  width: 3px;
+  width: 4px;
 }
 
 .gatepass-admin-portal .scrollbar-custom::-webkit-scrollbar-track {
@@ -20,14 +20,14 @@
 }
 
 .gatepass-admin-portal .scrollbar-custom::-webkit-scrollbar-thumb {
-  background-color: #4d668f;
+  background-color: #292f36;
   border-radius: 9999px;
-  opacity: 0;
-  transition: opacity 0.3s;
+  border: 1px solid transparent;
+  background-clip: content-box;
 }
 
-.gatepass-admin-portal .scrollbar-custom:hover::-webkit-scrollbar-thumb {
-  opacity: 1;
+.gatepass-admin-portal .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: #1a1f24;
 }
 
 .gatepass-admin-portal .animate-in {

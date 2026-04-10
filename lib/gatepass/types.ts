@@ -168,3 +168,22 @@ export interface Room {
   gallery: string[];
   status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'CLEANING';
 }
+
+export interface BookingRequest {
+  id: string;
+  guestName: string;
+  guestEmail: string;
+  guestPhone: string;
+  guestAvatar?: string;
+  roomName: string;
+  roomType: string;
+  roomPrice: number;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  totalAmount: number;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CHECKED_IN' | 'CHECKED_OUT';
+  rating?: number;
+  specialRequests?: string;
+  createdAt: string;
+}
