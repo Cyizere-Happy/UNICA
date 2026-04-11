@@ -200,3 +200,30 @@ export interface ContactMessage {
   status: 'UNREAD' | 'READ';
   createdAt: string;
 }
+
+export interface GuestProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar?: string;
+  totalBookings: number;
+  totalSpent: number;
+  lastVisit: string;
+  status: 'VIP' | 'REGULAR' | 'BLACKLISTED';
+  registeredAt: string;
+  currentStayId?: string; // Links to an active StayRecord if checked in
+}
+
+export interface StayRecord {
+  id: string;
+  guestId: string;
+  guestName: string;
+  roomName: string;
+  roomType: string;
+  checkIn: string;
+  checkOut?: string;
+  status: 'CHECKED_IN' | 'CHECKED_OUT';
+  totalAmount: number;
+  notes?: string;
+}

@@ -41,6 +41,45 @@ export default function GuestEntryModal() {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     registerGuest(formData);
+
+    // Create a real-time stay record for the admin dashboard
+    operationalData.addStay({
+        id: `STAY-${Date.now()}`,
+        guestId: `GST-${Date.now()}`, // Temporary ID for session
+        guestName: formData.name,
+        roomName: formData.roomNumber ? `Room ${formData.roomNumber}` : 'General Access',
+        roomType: 'room',
+        checkIn: new Date().toISOString(),
+        status: 'CHECKED_IN',
+        totalAmount: 0 // Will accumulate
+    });
+  };
+
+  // Reset state when modal opens
+  React.useEffect(() => {
+    if (entryModalOpen) {
+      if (!isAuthenticated) {
+        setStep(1);
+        setCode('');
+      } else if (!isRegistered) {
+        setStep(2);
+      } else {
+        setStep(3);
+      }
+      
+      // Clear form data on open to ensure a fresh session
+      setFormData({
+        name: '',
+        email: '',
+        roomNumber: ''
+      });
+      setError('');
+    }
+  }, [entryModalOpen, isAuthenticated, isRegistered]);
+
+  const goBack = () => {
+    setStep(1);
+    logout(); // Clear stay code authentication
   };
 
   if (!entryModalOpen) return null;
@@ -229,13 +268,23 @@ export default function GuestEntryModal() {
                                     </div>
                                 </div>
 
-                                <button
-                                    type="submit"
-                                    className="w-full py-4 md:py-5 bg-accent text-white rounded-xl md:rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-accent/20 hover:bg-accent/90 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-4"
-                                >
-                                    Activate Membership
-                                    <CheckCircle2 className="w-4 h-4" />
-                                </button>
+                                <div className="flex flex-col gap-3 mt-4">
+                                    <button
+                                        type="submit"
+                                        className="w-full py-4 md:py-5 bg-accent text-white rounded-xl md:rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-accent/20 hover:bg-accent/90 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        Activate Membership
+                                        <CheckCircle2 className="w-4 h-4" />
+                                    </button>
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={goBack}
+                                        className="w-full py-3 text-gray-400 font-bold text-[10px] uppercase tracking-widest hover:text-[#292f36] transition-colors"
+                                    >
+                                        ← Change Stay Code
+                                    </button>
+                                </div>
                             </form>
                         </motion.div>
                     ) : (

@@ -1,417 +1,364 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import {
-    Search,
-    Filter,
-    Download,
-    Users,
-    Clock,
-    ChevronRight,
-    X,
-    History,
-    Loader2,
-    RefreshCw,
-    XCircle,
-    Hash,
-    User,
-    Phone,
-    CreditCard
+import React, { useState, useEffect } from 'react';
+import { 
+  Search, Filter, Star, Hash, Clock, Download, UserPlus,
+  Users, History, Bed, MoreHorizontal, ArrowUpDown, ChevronRight,
+  ShieldCheck, AlertTriangle, CheckCircle2, XCircle, Edit2
 } from 'lucide-react';
-import { apiService } from '@/lib/gatepass/api';
-import type { Visit } from '@/lib/gatepass/types';
-import NoData from '@/components/gatepass/NoData';
-import { toast } from 'sonner';
+import { operationalData } from '@/lib/gatepass/operationalData';
+import { GuestProfile, StayRecord } from '@/lib/gatepass/types';
+import { cn, formatPrice } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const MAIN = "#4d668f";
+type ActiveTab = 'IN_HOUSE' | 'GUEST_DB' | 'HISTORY';
 
-export default function RegisteredParents() {
-    const [showExportModal, setShowExportModal] = useState(false);
-    const [visits, setVisits] = useState<Visit[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('all');
-    const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
+export default function GuestManagement() {
+  const [guests, setGuests] = useState<GuestProfile[]>([]);
+  const [stays, setStays] = useState<StayRecord[]>([]);
+  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('IN_HOUSE');
+  const [loading, setLoading] = useState(true);
 
-    // Visit Code State
-    const [visitCodeSearch, setVisitCodeSearch] = useState('');
-    const [activeCode, setActiveCode] = useState('');
-    const [visitDayInfo, setVisitDayInfo] = useState<any>(null);
-
-    const loadVisits = async (code: string) => {
-        if (!code) return;
-        try {
-            setLoading(true);
-            // First try to validate/get visit day info by code
-            try {
-                const report = await apiService.getReportByCode(code.trim());
-                setVisitDayInfo(report.visitDay);
-            } catch (e) {
-                setVisitDayInfo(null);
-                // It might fail if the visit day code is invalid, but let's continue anyway
-            }
-
-            const { visits } = await apiService.getVisits({
-                limit: 500,
-                visitCode: code.trim(),
-            });
-            setVisits(visits);
-            setActiveCode(code.trim());
-
-            if (visits.length === 0) {
-                toast.info('No registered parents found for this visit code.');
-            } else {
-                toast.success(`Loaded ${visits.length} registered parents.`);
-            }
-        } catch (error) {
-            console.error('Failed to load registered parents:', error);
-            toast.error('Failed to load visitors. Please check the code.');
-        } finally {
-            setLoading(false);
-        }
+  useEffect(() => {
+    const handleSync = () => {
+      setGuests(operationalData.getGuests());
+      setStays(operationalData.getStays());
+      setLoading(false);
     };
-
-    const handleApplyCode = () => {
-        if (!visitCodeSearch.trim()) {
-            toast.error("Please provide a valid Visit Code");
-            return;
-        }
-        loadVisits(visitCodeSearch);
+    handleSync();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('fica-data-update', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('fica-data-update', handleSync);
     };
+  }, []);
 
-    const filteredVisits = useMemo(() => {
-        const query = searchTerm.toLowerCase().trim();
-        return visits.filter((visit) => {
-            if (statusFilter !== 'all' && visit.status !== statusFilter) return false;
-            if (!query) return true;
+  const inHouseStays = stays.filter(s => s.status === 'CHECKED_IN');
+  const historyStays = stays.filter(s => s.status === 'CHECKED_OUT');
 
-            // Searching specifically by Student Name as requested, plus parent name/phone
-            const fields = [
-                visit.studentName,
-                visit.parentName,
-                visit.parentPhone,
-            ]
-                .filter(Boolean)
-                .map(f => f!.toLowerCase());
+  const filteredGuests = guests.filter(g =>
+    g.name.toLowerCase().includes(search.toLowerCase()) ||
+    g.email.toLowerCase().includes(search.toLowerCase()) ||
+    g.phone.includes(search)
+  );
 
-            return fields.some(field => field.includes(query));
-        });
-    }, [visits, searchTerm, statusFilter]);
+  const filteredInHouse = inHouseStays.filter(s =>
+    s.guestName.toLowerCase().includes(search.toLowerCase()) ||
+    s.roomName.toLowerCase().includes(search.toLowerCase())
+  );
 
-    // Modern opacity-based badge system
-    const statusConfig: Record<string, { label: string; styles: string }> = {
-        PENDING: {
-            label: "Pending",
-            styles: "bg-[#153d5d22] text-[#153d5d] border border-[#153d5d33]",
-        },
-        CONFIRMED: {
-            label: "Confirmed",
-            styles: "bg-[#153d5d33] text-[#153d5d] border border-[#153d5d55]",
-        },
-        CHECKED_IN: {
-            label: "Checked In",
-            styles: "bg-[#153d5d44] text-[#153d5d] border border-[#153d5d66]",
-        },
-        CANCELLED: {
-            label: "Cancelled",
-            styles: "bg-[#153d5d66] text-white border border-[#153d5d66]",
-        },
-    };
+  const filteredHistory = historyStays.filter(s =>
+    s.guestName.toLowerCase().includes(search.toLowerCase()) ||
+    s.roomName.toLowerCase().includes(search.toLowerCase())
+  );
 
-    const getStatusStyle = (status: string) => statusConfig[status] || statusConfig.CONFIRMED;
+  const getStatusStyle = (status: GuestProfile['status']) => {
+    switch (status) {
+      case 'VIP': return 'bg-amber-50 text-amber-600 border-amber-200 ring-2 ring-amber-500/10';
+      case 'REGULAR': return 'bg-blue-50 text-blue-600 border-blue-100';
+      case 'BLACKLISTED': return 'bg-rose-50 text-rose-600 border-rose-100';
+      default: return 'bg-gray-50 text-gray-500 border-gray-100';
+    }
+  };
 
-    const handleSelectVisit = async (visit: Visit) => {
-        setSelectedVisit(visit);
-    };
+  const TabButton = ({ tab, id, icon: Icon, label, count }: { tab: ActiveTab, id: ActiveTab, icon: any, label: string, count?: number }) => (
+    <button
+      onClick={() => setActiveTab(id)}
+      className={cn(
+        "flex items-center gap-2.5 px-6 py-4 border-b-2 transition-all relative",
+        activeTab === id 
+          ? "border-[#292f36] text-[#292f36]" 
+          : "border-transparent text-gray-400 hover:text-gray-600"
+      )}
+    >
+      <Icon size={18} strokeWidth={activeTab === id ? 2.5 : 2} />
+      <span className={cn("text-xs uppercase tracking-widest font-black")}>{label}</span>
+      {count !== undefined && (
+        <span className={cn(
+          "px-1.5 py-0.5 rounded-md text-[10px] font-black",
+          activeTab === id ? "bg-[#292f36] text-white" : "bg-gray-100 text-gray-400"
+        )}>
+          {count}
+        </span>
+      )}
+      {activeTab === id && (
+        <motion.div layoutId="tab-underline" className="absolute bottom-[-2px] left-0 right-0 h-[2px] bg-[#292f36]" />
+      )}
+    </button>
+  );
 
-    const closeDetails = () => {
-        setSelectedVisit(null);
-    };
+  return (
+    <div className="max-w-7xl mx-auto space-y-6 pb-32 font-jost">
+      {/* Header section stays consistent */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
+        <div>
+          <h1 className="text-2xl font-black text-[#292f36] tracking-tight">Stay Management</h1>
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Real-time Guest Operations & Historical Data</p>
+        </div>
+        <div className="flex items-center gap-2">
+            <button className="flex items-center gap-2 px-5 py-3 bg-white border border-gray-200 text-[#292f36] rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all shadow-sm active:scale-95">
+                <Download size={14} /> Export Report
+            </button>
+            <button className="flex items-center gap-2 px-5 py-3 bg-[#292f36] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-black/10 active:scale-95">
+                <UserPlus size={14} strokeWidth={3} /> Add New Guest
+            </button>
+        </div>
+      </div>
 
-    return (
-        <>
-            <div className="min-h-screen bg-transparent">
-                <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      {/* Tabs Design */}
+      <div className="bg-white border border-gray-100 rounded-[24px] shadow-sm overflow-hidden">
+        <div className="flex border-b border-gray-100 overflow-x-auto no-scrollbar">
+          <TabButton id="IN_HOUSE" tab={activeTab} icon={Bed} label="In-House Now" count={inHouseStays.length} />
+          <TabButton id="GUEST_DB" tab={activeTab} icon={Users} label="Guest Database" count={guests.length} />
+          <TabButton id="HISTORY" tab={activeTab} icon={History} label="Stay History" count={historyStays.length} />
+        </div>
 
-                    {/* Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-                        <div>
-                            <h1 className="text-3xl font-black text-[#292f36] tracking-tight">In-House Guests</h1>
-                            <p className="mt-1 text-gray-600">
-                                Track and manage parents registered for specific visiting days
-                            </p>
-                        </div>
+        {/* Utility Bar */}
+        <div className="p-4 bg-gray-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100">
+           <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input 
+              type="text" 
+              placeholder={`Search ${activeTab.toLowerCase().replace('_',' ')}...`}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-[12px] font-bold text-[#292f36] outline-none focus:ring-4 focus:ring-accent/5 transition-all w-full"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+             <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-[11px] font-black uppercase text-gray-500 hover:text-[#292f36] transition-all">
+                <Filter size={14} /> Advanced Filter
+             </button>
+             <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-[11px] font-black uppercase text-gray-500 hover:text-[#292f36] transition-all">
+                <ArrowUpDown size={14} /> Sort
+             </button>
+          </div>
+        </div>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => activeCode && loadVisits(activeCode)}
-                                disabled={!activeCode}
-                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
-                            >
-                                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                                Refresh
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Visit Code Input Banner */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8 flex flex-col md:flex-row items-center gap-4">
+        {/* Dynamic Table Content */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-50/50">
+              {activeTab === 'IN_HOUSE' && (
+                <tr className="border-b border-gray-100">
+                  <th className="p-4 pl-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Current Occupant</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Accomodation</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Check-in Time</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Duration</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Live Status</th>
+                  <th className="p-4 pr-8"></th>
+                </tr>
+              )}
+              {activeTab === 'GUEST_DB' && (
+                <tr className="border-b border-gray-100">
+                  <th className="p-4 pl-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Guest Profile</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Contact Details</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Total Bookings</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Lifetime Spent</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Tier Status</th>
+                  <th className="p-4 pr-8"></th>
+                </tr>
+              )}
+              {activeTab === 'HISTORY' && (
+                <tr className="border-b border-gray-100">
+                  <th className="p-4 pl-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Past Guest</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Room Details</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Dates</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Final Bill</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Operational Note</th>
+                  <th className="p-4 pr-8"></th>
+                </tr>
+              )}
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+               <AnimatePresence mode="wait">
+                  {activeTab === 'IN_HOUSE' && filteredInHouse.map(stay => (
+                    <motion.tr 
+                      key={stay.id} 
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="group hover:bg-gray-50/50 transition-colors"
+                    >
+                      <td className="p-4 pl-8">
                         <div className="flex items-center gap-3">
-                            <div className="p-3 bg-blue-50 rounded-lg">
-                                <Hash className="w-6 h-6 text-[#153d5d]" />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-gray-900">Visit Code Required</h3>
-                                <p className="text-sm text-gray-500">Please provide a visit code to view registered parents</p>
-                            </div>
+                          <div className="w-10 h-10 rounded-full bg-[#4d668f]/10 flex items-center justify-center text-[#4d668f] font-black relative overflow-hidden">
+                             {stay.guestName.substring(0,2).toUpperCase()}
+                             <div className="absolute inset-0 bg-white/40 animate-pulse pointer-events-none" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-[#292f36]">{stay.guestName}</p>
+                            <p className="text-[10px] font-bold text-gray-400">Guest ID: {stay.guestId}</p>
+                          </div>
                         </div>
-
-                        <div className="flex-1 w-full flex gap-3 mt-4 md:mt-0 md:justify-end">
-                            <input
-                                type="text"
-                                placeholder="Enter Access Code (e.g., 123456)"
-                                value={visitCodeSearch}
-                                onChange={(e) => setVisitCodeSearch(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleApplyCode()}
-                                className="w-full md:w-64 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#153d5d] transition font-mono"
-                            />
-                            <button
-                                onClick={handleApplyCode}
-                                className="px-6 py-3 text-white rounded-xl text-sm font-medium transition shadow-sm"
-                                style={{ backgroundColor: MAIN }}
-                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#0f2c43"}
-                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = MAIN}
-                            >
-                                Load
-                            </button>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col">
+                          <p className="text-xs font-black text-[#292f36]">{stay.roomName}</p>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{stay.roomType}</p>
                         </div>
-                    </div>
-
-                    {!activeCode ? (
-                        <div className="bg-white/50 backdrop-blur rounded-2xl border border-dashed border-gray-300 p-12 text-center">
-                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Users className="w-8 h-8 text-[#153d5d]" />
-                            </div>
-                            <h2 className="text-xl font-bold text-gray-900 mb-2">Provide a Visit Code</h2>
-                            <p className="text-gray-500 max-w-md mx-auto">
-                                Please enter a valid visit code in the banner above to load the parents who have registered for that particular visiting day.
-                            </p>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2 text-xs font-bold text-[#292f36]">
+                           <Clock size={12} className="text-gray-400" />
+                           {new Date(stay.checkIn).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                         </div>
-                    ) : (
-                        <>
-                            {/* Information Banner for active code */}
-                            {visitDayInfo && (
-                                <div className="bg-[#153d5d] text-white p-4 rounded-xl flex items-center justify-between mb-8 shadow-sm">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-white/10 rounded">
-                                            <Clock className="w-5 h-5 text-white" />
-                                        </div>
-                                        <div>
-                                            <h2 className="font-bold text-base">{visitDayInfo.title}</h2>
-                                            <p className="text-white/70 text-sm">
-                                                Date: {new Date(visitDayInfo.date).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span className="font-mono bg-white/10 px-3 py-1 rounded text-sm tracking-wider">{activeCode}</span>
-                                </div>
-                            )}
+                      </td>
+                      <td className="p-4 text-xs font-black text-emerald-500">
+                        {/* Simulate time since checkin */}
+                        Active now
+                      </td>
+                      <td className="p-4">
+                         <div className="flex items-center justify-center">
+                            <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full text-[9px] font-black uppercase tracking-widest text-emerald-600">
+                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                               In-House
+                            </span>
+                         </div>
+                      </td>
+                      <td className="p-4 pr-8 text-right">
+                         <button className="p-2 text-gray-400 hover:text-[#292f36] transition-colors"><MoreHorizontal size={18} /></button>
+                      </td>
+                    </motion.tr>
+                  ))}
 
-                            {/* Filters */}
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-                                <div className="flex flex-col lg:flex-row gap-4">
-                                    <div className="flex-1 relative">
-                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                        <input
-                                            type="text"
-                                            placeholder="Search by guest name, host, or phone..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#153d5d] transition"
-                                        />
-                                    </div>
+                  {activeTab === 'GUEST_DB' && filteredGuests.map(guest => (
+                    <motion.tr 
+                      key={guest.id} 
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="group hover:bg-gray-50/50 transition-colors"
+                    >
+                      <td className="p-4 pl-8">
+                        <div className="flex items-center gap-3">
+                           <div className="w-10 h-10 rounded-[14px] bg-gray-100 flex items-center justify-center text-[#292f36] font-black text-xs">
+                              {guest.name.substring(0,2).toUpperCase()}
+                           </div>
+                           <div>
+                              <p className="text-sm font-black text-[#292f36]">{guest.name}</p>
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Joined {new Date(guest.registeredAt).toLocaleDateString()}</p>
+                           </div>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col text-xs font-bold text-[#292f36]">
+                           <span className="truncate max-w-[150px]">{guest.email}</span>
+                           <span className="text-gray-400 text-[10px]">{guest.phone}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 text-center">
+                        <span className="text-xs font-black text-[#292f36] bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">{guest.totalBookings}</span>
+                      </td>
+                      <td className="p-4">
+                         <div className="flex flex-col">
+                            <p className="text-xs font-black text-[#292f36]">{formatPrice(guest.totalSpent)}</p>
+                            <p className="text-[9px] font-bold text-emerald-500 uppercase">Profitable</p>
+                         </div>
+                      </td>
+                      <td className="p-4">
+                         <span className={cn(
+                           "px-3 py-1 border rounded-lg text-[9px] font-black uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm",
+                           getStatusStyle(guest.status)
+                         )}>
+                            {guest.status === 'VIP' && <Star size={10} className="fill-amber-600" />}
+                            {guest.status}
+                         </span>
+                      </td>
+                      <td className="p-4 pr-8 text-right">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <button className="p-2 bg-white border border-gray-100 rounded-lg text-gray-400 hover:text-[#292f36] hover:shadow-sm"><Edit2 size={14} /></button>
+                           <button className="p-2 bg-white border border-gray-100 rounded-lg text-gray-400 hover:text-[#292f36] hover:shadow-sm"><ChevronRight size={14} /></button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))}
 
-                                    <div className="flex gap-3">
-                                        <div className="relative">
-                                            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                                            <select
-                                                value={statusFilter}
-                                                onChange={(e) => setStatusFilter(e.target.value)}
-                                                className="pl-12 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#153d5d] appearance-none cursor-pointer transition"
-                                            >
-                                                <option value="all">All Status</option>
-                                                <option value="PENDING">Pending</option>
-                                                <option value="CONFIRMED">Confirmed</option>
-                                                <option value="CHECKED_IN">Checked In</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Cards */}
-                            {loading ? (
-                                <div className="flex justify-center py-24">
-                                    <Loader2 className="w-10 h-10 text-[#153d5d] animate-spin" />
-                                </div>
-                            ) : filteredVisits.length === 0 ? (
-                                <NoData
-                                    title="No parents found"
-                                    description="Try adjusting your search or check if the code is correct."
-                                    variant="compact"
-                                />
-                            ) : (
-                                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                                    {filteredVisits.map((visit) => {
-                                        const status = getStatusStyle(visit.status);
-                                        return (
-                                            <button
-                                                key={visit.id}
-                                                onClick={() => handleSelectVisit(visit)}
-                                                className="group bg-white rounded-2xl border border-gray-200 p-6 text-left hover:border-[#153d5d] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                                            >
-                                                <div className="flex justify-between items-start mb-4">
-                                                    <div className="flex-1">
-                                                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                                                            <User className="w-3.5 h-3.5" />
-                                                            {visit.parentName}
-                                                        </p>
-                                                        <h3 className="mt-2 text-lg font-bold text-gray-900 line-clamp-2">
-                                                            Student: {visit.studentName}
-                                                        </h3>
-                                                    </div>
-                                                    <span
-                                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${status.styles}`}
-                                                    >
-                                                        {status.label}
-                                                    </span>
-                                                </div>
-
-                                                <div className="space-y-3 text-sm text-gray-600 mt-4 pt-4 border-t border-gray-50">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-2">
-                                                            <Phone className="w-4 h-4 text-gray-400" />
-                                                            <span>{visit.parentPhone}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <Users className="w-4 h-4 text-gray-400" />
-                                                            <span>{visit.visitorMembers?.length || 1} guest{(visit.visitorMembers?.length || 1) !== 1 ? 's' : ''}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div
-                                                    className="mt-5 flex items-center gap-2 font-medium text-sm group-hover:gap-3 transition-all"
-                                                    style={{ color: MAIN }}
-                                                >
-                                                    <span>View details</span>
-                                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-                                                </div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </>
-                    )}
-
+                  {activeTab === 'HISTORY' && filteredHistory.map(stay => (
+                    <motion.tr 
+                      key={stay.id} 
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="group hover:bg-gray-50/50 transition-colors"
+                    >
+                      <td className="p-4 pl-8">
+                        <div className="flex items-center gap-3">
+                           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-black text-xs">
+                              {stay.guestName.substring(0,2).toUpperCase()}
+                           </div>
+                           <p className="text-sm font-black text-[#292f36]">{stay.guestName}</p>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col text-xs font-bold text-[#292f36]">
+                           <p>{stay.roomName}</p>
+                           <p className="text-gray-400 text-[10px] uppercase font-black tracking-widest">{stay.roomType}</p>
+                        </div>
+                      </td>
+                      <td className="p-4 text-xs font-bold text-[#292f36]">
+                        <div className="flex flex-col gap-0.5">
+                           <span className="flex items-center gap-1 text-gray-400 text-[10px]"><CheckCircle2 size={10} className="text-emerald-500" /> {new Date(stay.checkIn).toLocaleDateString()}</span>
+                           <span className="flex items-center gap-1 text-gray-400 text-[10px]"><XCircle size={10} className="text-rose-500" /> {new Date(stay.checkOut!).toLocaleDateString()}</span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="text-sm font-black text-[#292f36]">{formatPrice(stay.totalAmount)}</span>
+                      </td>
+                      <td className="p-4 text-center">
+                        <span className="px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-lg text-[9px] font-bold text-gray-400 uppercase">Check-out Complete</span>
+                      </td>
+                      <td className="p-4 pr-8 text-right">
+                         <button className="p-2 text-gray-400 hover:text-[#292f36] transition-colors"><MoreHorizontal size={18} /></button>
+                      </td>
+                    </motion.tr>
+                  ))}
+               </AnimatePresence>
+            </tbody>
+          </table>
+          
+          {(activeTab === 'IN_HOUSE' ? filteredInHouse : activeTab === 'GUEST_DB' ? filteredGuests : filteredHistory).length === 0 && !loading && (
+             <div className="p-20 text-center">
+                <div className="w-20 h-20 bg-gray-50 rounded-[28px] flex items-center justify-center text-gray-200 mx-auto mb-6">
+                    <Search size={32} />
                 </div>
-            </div>
+                <h3 className="text-lg font-black text-[#292f36]">No matches found</h3>
+                <p className="text-xs font-bold text-gray-400 max-w-xs mx-auto mt-2">Try adjusting your filters or search keywords to find what you are looking for.</p>
+             </div>
+          )}
+        </div>
 
-            {/* Detail Modal */}
-            {selectedVisit && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Dynamic Footer */}
+        <div className="bg-gray-50/50 p-6 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+           <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <Hash size={14} className="text-accent" /> Shown {(activeTab === 'IN_HOUSE' ? filteredInHouse : activeTab === 'GUEST_DB' ? filteredGuests : filteredHistory).length} of {(activeTab === 'IN_HOUSE' ? inHouseStays : activeTab === 'GUEST_DB' ? guests : historyStays).length} Total Entries
+           </p>
+           <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 rounded-xl bg-white border border-gray-200 p-1">
+                 {[1, 2, 3].map(p => (
+                   <button key={p} className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all", p === 1 ? "bg-[#292f36] text-white" : "text-gray-400 hover:bg-gray-50")}>{p}</button>
+                 ))}
+              </div>
+              <button className="p-2.5 bg-white border border-gray-200 rounded-xl text-[#292f36] hover:bg-gray-50 transition-all shadow-sm"><ChevronRight size={16} /></button>
+           </div>
+        </div>
+      </div>
 
-                        {/* Header */}
-                        <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex justify-between items-start">
-                            <div>
-                                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
-                                    Parent Visitor
-                                </p>
-                                <h2 className="mt-1 text-2xl font-bold text-gray-900">
-                                    {selectedVisit.parentName}
-                                </h2>
-                                <p className="text-gray-600 mt-1">Visiting: <span className="font-semibold">{selectedVisit.studentName}</span></p>
-                            </div>
-                            <button
-                                onClick={closeDetails}
-                                className="p-3 hover:bg-gray-100 rounded-full transition"
-                            >
-                                <X className="w-5 h-5 text-gray-500" />
-                            </button>
-                        </div>
-
-                        <div className="p-8 space-y-8">
-
-                            {/* Visit Details */}
-                            <section>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Visit Details</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {[
-                                        { icon: Phone, label: 'Contact', value: selectedVisit.parentPhone },
-                                        { icon: User, label: 'Student ID', value: selectedVisit.studentId || 'N/A' },
-                                        { icon: CreditCard, label: 'Payment', value: selectedVisit.paymentStatus },
-                                        {
-                                            icon: null, label: 'Status', value: (
-                                                <span
-                                                    className={`inline-block px-4 py-1.5 rounded-full text-sm font-semibold ${getStatusStyle(selectedVisit.status).styles}`}
-                                                >
-                                                    {getStatusStyle(selectedVisit.status).label}
-                                                </span>
-                                            )
-                                        },
-                                    ].map((item, i) => (
-                                        <div key={i} className="bg-gray-50 rounded-2xl p-5">
-                                            {item.icon && <item.icon className="w-5 h-5 text-gray-400 mb-2" />}
-                                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">{item.label}</p>
-                                            <p className="mt-1 text-gray-900 font-medium">{item.value}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-
-                            {/* Visitor Members */}
-                            <section>
-                                <div className="flex items-center gap-3 mb-4">
-                                    <Users className="w-5 h-5" style={{ color: MAIN }} />
-                                    <h3 className="text-lg font-semibold text-gray-900">
-                                        Expected Guests ({selectedVisit.visitorMembers?.length || (selectedVisit as any).visitorCount || 1})
-                                    </h3>
-                                </div>
-
-                                {selectedVisit.visitorMembers?.length ? (
-                                    <div className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
-                                        <table className="w-full text-left text-sm">
-                                            <thead className="bg-gray-100 border-b border-gray-200">
-                                                <tr>
-                                                    <th className="px-5 py-3 font-semibold text-gray-700">Name</th>
-                                                    <th className="px-5 py-3 font-semibold text-gray-700">Relationship</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {selectedVisit.visitorMembers.map((member, idx) => (
-                                                    <tr key={member.id} className="border-b border-gray-100 last:border-none bg-white">
-                                                        <td className="px-5 py-4 font-medium text-gray-900">{member.name}</td>
-                                                        <td className="px-5 py-4 text-gray-600">{member.role || (member as any).relationship || 'Guest'}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                ) : (
-                                    <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-100">
-                                        <p className="text-gray-500 font-medium">No individual guest details recorded.</p>
-                                        <p className="text-sm text-gray-400 mt-1">The parent registered for {(selectedVisit as any).visitorCount || 1} person(s) total.</p>
-                                    </div>
-                                )}
-                            </section>
-
-                        </div>
-                    </div>
-                </div>
-            )}
-
-        </>
-    );
+      {/* Optional Alerts / Info section at bottom */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div className="bg-emerald-50/50 border border-emerald-100 p-4 rounded-[20px] flex items-start gap-3">
+              <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600"><ShieldCheck size={18} /></div>
+              <div>
+                 <h4 className="text-[11px] font-black uppercase text-emerald-700 tracking-wider">Operational Health</h4>
+                 <p className="text-xs text-emerald-600/80 font-medium leading-relaxed">All active check-ins verified. {inHouseStays.length} rooms are currently occupied and reporting normal status.</p>
+              </div>
+          </div>
+          <div className="bg-amber-50/50 border border-amber-100 p-4 rounded-[20px] flex items-start gap-3">
+              <div className="p-2 bg-amber-100 rounded-lg text-amber-600"><AlertTriangle size={18} /></div>
+              <div>
+                 <h4 className="text-[11px] font-black uppercase text-amber-700 tracking-wider">Upcoming Events</h4>
+                 <p className="text-xs text-amber-600/80 font-medium leading-relaxed">System expects 3 potential check-outs in the next 24 hours. Room cleaning schedules have been updated.</p>
+              </div>
+          </div>
+      </div>
+    </div>
+  );
 }
+
+

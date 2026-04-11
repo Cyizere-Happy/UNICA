@@ -17,6 +17,7 @@ import { CartProvider } from "@/context/CartContext";
 import { GuestAuthProvider } from "@/context/GuestAuthContext";
 import CartDrawer from "@/components/CartDrawer";
 import GuestEntryModal from "@/components/GuestEntryModal";
+import CheckoutModal from "@/components/CheckoutModal";
 
 export default function RootLayout({
   children,
@@ -33,6 +34,7 @@ export default function RootLayout({
             {children}
             <CartDrawer />
             <GuestEntryModal />
+            <CheckoutModal />
           </CartProvider>
         </GuestAuthProvider>
         <Toaster position="top-center" richColors />

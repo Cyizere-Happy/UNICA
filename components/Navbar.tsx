@@ -15,13 +15,15 @@ export const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
     const { toggleCart, cartItems } = useCart();
-    const { isAuthenticated, isRegistered, guestUser, setEntryModalOpen } = useGuestAuth();
+    const { isAuthenticated, isRegistered, guestUser, setEntryModalOpen, setCheckoutModalOpen } = useGuestAuth();
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.cartQuantity, 0);
 
     const handleAuthAction = () => {
         if (!isAuthenticated || !isRegistered) {
             setEntryModalOpen(true);
+        } else {
+            setCheckoutModalOpen(true);
         }
     };
 

@@ -7,6 +7,7 @@ interface GuestUser {
   email: string;
   stayCode: string;
   roomNumber?: string;
+  checkOutDate?: string;
 }
 
 interface GuestAuthContextType {
@@ -17,6 +18,8 @@ interface GuestAuthContextType {
   verifyStayCode: (code: string) => Promise<boolean>;
   registerGuest: (data: Omit<GuestUser, 'stayCode'>) => void;
   setEntryModalOpen: (open: boolean) => void;
+  checkoutModalOpen: boolean;
+  setCheckoutModalOpen: (open: boolean) => void;
   logout: () => void;
 }
 
@@ -30,6 +33,7 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [entryModalOpen, setEntryModalOpen] = useState(false);
+  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
 
   // Load state from localStorage
   useEffect(() => {
@@ -67,7 +71,15 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
 
   const registerGuest = (data: Omit<GuestUser, 'stayCode'>) => {
     if (guestUser) {
-      setGuestUser({ ...data, stayCode: guestUser.stayCode });
+      // Simulate assigning a checkOut date 1 to 3 days in the future
+      const outDate = new Date();
+      outDate.setDate(outDate.getDate() + Math.floor(Math.random() * 3) + 1);
+
+      setGuestUser({ 
+          ...data, 
+          stayCode: guestUser.stayCode,
+          checkOutDate: outDate.toISOString()
+      });
       setIsRegistered(true);
     }
   };
@@ -87,6 +99,8 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
       verifyStayCode,
       registerGuest,
       setEntryModalOpen,
+      checkoutModalOpen,
+      setCheckoutModalOpen,
       logout
     }}>
       {children}

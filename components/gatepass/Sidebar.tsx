@@ -77,16 +77,13 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
       title: 'Tools',
       items: [
         { id: 'reports', label: 'Reports', icon: FileText },
-        { id: 'automation', label: 'Automation', icon: Zap },
         { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-        { id: 'integration', label: 'Integration', icon: Puzzle },
       ]
     },
     {
-      title: 'Workspace',
+      title: 'Stock Management',
       items: [
-        { id: 'campaign', label: 'Campaign', icon: CheckSquare, badge: 5, color: 'bg-blue-500' },
-        { id: 'product-plan', label: 'Product Plan', icon: CheckSquare, badge: 4, color: 'bg-pink-500' },
+        { id: 'stock-coming-soon', label: 'Coming Soon', icon: Package },
       ]
     }
   ];

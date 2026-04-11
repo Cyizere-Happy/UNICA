@@ -1,11 +1,13 @@
-import { Room, FoodItem, FoodOrder, ContactMessage } from './types';
+import { Room, FoodItem, FoodOrder, ContactMessage, GuestProfile } from './types';
 
 // Storage keys
 const STORAGE_KEYS = {
     ORDERS: 'unica-orders',
     ROOMS: 'unica-rooms',
     MENU: 'unica-menu',
-    MESSAGES: 'unica-messages'
+    MESSAGES: 'unica-messages',
+    GUESTS: 'unica-guests',
+    STAYS: 'unica-stays'
 };
 
 // Initial Defaults (Fallback)
@@ -221,11 +223,73 @@ const DEFAULT_MESSAGES: ContactMessage[] = [
   }
 ];
 
+const DEFAULT_GUESTS: GuestProfile[] = [
+  {
+    id: 'GST-1001',
+    name: 'Sarah Johnson',
+    email: 'sarah.j@example.com',
+    phone: '+250 788 123 456',
+    totalBookings: 12,
+    totalSpent: 4250.00,
+    lastVisit: new Date().toISOString(),
+    status: 'VIP',
+    registeredAt: '2025-01-15T08:00:00Z'
+  },
+  {
+    id: 'GST-1002',
+    name: 'Michael Brown',
+    email: 'michael.b@example.com',
+    phone: '+250 788 987 654',
+    totalBookings: 1,
+    totalSpent: 450.00,
+    lastVisit: new Date().toISOString(),
+    status: 'REGULAR',
+    registeredAt: '2026-03-20T14:30:00Z'
+  },
+  {
+    id: 'GST-1003',
+    name: 'Emily Davis',
+    email: 'emily.d@example.com',
+    phone: '+250 788 555 123',
+    totalBookings: 8,
+    totalSpent: 3200.00,
+    lastVisit: '2025-11-10T10:00:00Z',
+    status: 'VIP',
+    registeredAt: '2024-06-05T09:15:00Z'
+  }
+];
+
+const DEFAULT_STAYS: StayRecord[] = [
+  {
+    id: 'STAY-901',
+    guestId: 'GST-1001',
+    guestName: 'Sarah Johnson',
+    roomName: 'Deluxe Suite',
+    roomType: 'room',
+    checkIn: '2026-04-10T09:00:00Z',
+    status: 'CHECKED_IN',
+    totalAmount: 35.00
+  },
+  {
+    id: 'STAY-801',
+    guestId: 'GST-1003',
+    guestName: 'Emily Davis',
+    roomName: 'Luxury 2-Bedroom Apartment',
+    roomType: 'apartment',
+    checkIn: '2026-03-01T14:00:00Z',
+    checkOut: '2026-03-05T10:00:00Z',
+    status: 'CHECKED_OUT',
+    totalAmount: 400.00
+  }
+];
+
 // Memory variables that reflect current storage state
 let MEMORY_ROOMS: Room[] = DEFAULT_ROOMS;
 let MEMORY_MENU: FoodItem[] = DEFAULT_MENU;
 let MEMORY_ORDERS: FoodOrder[] = DEFAULT_ORDERS;
 let MEMORY_MESSAGES: ContactMessage[] = DEFAULT_MESSAGES;
+let MEMORY_GUESTS: GuestProfile[] = DEFAULT_GUESTS;
+let MEMORY_STAYS: StayRecord[] = DEFAULT_STAYS;
 
 // Browser-safe storage helpers
 const isBrowser = typeof window !== 'undefined';
@@ -282,6 +346,24 @@ const loadFromStorage = () => {
         const parsed = JSON.parse(savedMessages);
         if (Array.isArray(parsed)) MEMORY_MESSAGES = parsed;
     }
+
+    const savedGuests = localStorage.getItem(STORAGE_KEYS.GUESTS);
+    if (!savedGuests) {
+        localStorage.setItem(STORAGE_KEYS.GUESTS, JSON.stringify(DEFAULT_GUESTS));
+        MEMORY_GUESTS = DEFAULT_GUESTS;
+    } else {
+        const parsed = JSON.parse(savedGuests);
+        if (Array.isArray(parsed)) MEMORY_GUESTS = parsed;
+    }
+
+    const savedStays = localStorage.getItem(STORAGE_KEYS.STAYS);
+    if (!savedStays) {
+        localStorage.setItem(STORAGE_KEYS.STAYS, JSON.stringify(DEFAULT_STAYS));
+        MEMORY_STAYS = DEFAULT_STAYS;
+    } else {
+        const parsed = JSON.parse(savedStays);
+        if (Array.isArray(parsed)) MEMORY_STAYS = parsed;
+    }
   } catch (e) {
     console.warn('⚠️ Storage load fail:', e);
   }
@@ -295,6 +377,8 @@ const saveToStorage = () => {
     localStorage.setItem(STORAGE_KEYS.ROOMS, JSON.stringify(MEMORY_ROOMS));
     localStorage.setItem(STORAGE_KEYS.MENU, JSON.stringify(MEMORY_MENU));
     localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(MEMORY_MESSAGES));
+    localStorage.setItem(STORAGE_KEYS.GUESTS, JSON.stringify(MEMORY_GUESTS));
+    localStorage.setItem(STORAGE_KEYS.STAYS, JSON.stringify(MEMORY_STAYS));
     
     console.log('💾 Data persisted to LocalStorage');
     
@@ -360,6 +444,22 @@ export const operationalData = {
   },
   markMessageRead: (msgId: string) => {
     MEMORY_MESSAGES = MEMORY_MESSAGES.map(m => m.id === msgId ? { ...m, status: 'READ' } : m);
+    saveToStorage();
+  },
+
+  getGuests: () => { loadFromStorage(); return [...MEMORY_GUESTS]; },
+  
+  getStays: () => { loadFromStorage(); return [...MEMORY_STAYS]; },
+  addStay: (stay: StayRecord) => {
+    MEMORY_STAYS = [stay, ...MEMORY_STAYS];
+    saveToStorage();
+  },
+  updateStayStatus: (stayId: string, status: StayRecord['status']) => {
+    MEMORY_STAYS = MEMORY_STAYS.map(s => s.id === stayId ? { 
+        ...s, 
+        status, 
+        checkOut: status === 'CHECKED_OUT' ? new Date().toISOString() : s.checkOut 
+    } : s);
     saveToStorage();
   },
 
