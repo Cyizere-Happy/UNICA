@@ -12,6 +12,7 @@ import {
   X, 
   Search,
   Mail,
+  FileText,
   Zap,
   BarChart3,
   Puzzle,
@@ -75,7 +76,7 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
     {
       title: 'Tools',
       items: [
-        { id: 'email', label: 'Email', icon: Mail },
+        { id: 'reports', label: 'Reports', icon: FileText },
         { id: 'automation', label: 'Automation', icon: Zap },
         { id: 'analytics', label: 'Analytics', icon: BarChart3 },
         { id: 'integration', label: 'Integration', icon: Puzzle },
