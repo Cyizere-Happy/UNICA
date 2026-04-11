@@ -93,6 +93,11 @@ export default function GuestManagement() {
     operationalData.addGuest(guest);
   };
 
+  const handleCheckOut = (stayId: string) => {
+    operationalData.updateStayStatus(stayId, 'CHECKED_OUT');
+    toast.success("Guest checked out successfully");
+  };
+
   const getStatusStyle = (status: GuestProfile['status']) => {
     switch (status) {
       case 'VIP': return 'bg-amber-50 text-amber-600 border-amber-200 ring-2 ring-amber-500/10';
@@ -248,7 +253,7 @@ export default function GuestManagement() {
                         </div>
                       </td>
                       <td className="p-4">
-                         <span className="px-3 py-1 bg-[#292f36] text-white rounded-lg text-xs font-black font-mono tracking-widest">
+                         <span className="px-2 py-0.5 bg-[#292f36] text-white rounded-md text-[9px] font-black font-mono tracking-wider whitespace-nowrap">
                            {stay.stayCode || 'N/A'}
                          </span>
                       </td>
@@ -271,7 +276,15 @@ export default function GuestManagement() {
                          </div>
                       </td>
                       <td className="p-4 pr-8 text-right">
-                         <button className="p-2 text-gray-400 hover:text-[#292f36] transition-colors"><MoreHorizontal size={18} /></button>
+                         <div className="flex items-center justify-end gap-1.5">
+                            <button 
+                              onClick={() => handleCheckOut(stay.id)}
+                              className="px-2 py-1 bg-red-50 text-red-600 border border-red-100 rounded-md text-[8px] font-black uppercase tracking-tighter hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95 whitespace-nowrap"
+                            >
+                               Check Out
+                            </button>
+                            <button className="p-1.5 text-gray-300 hover:text-[#292f36] transition-colors"><MoreHorizontal size={14} /></button>
+                         </div>
                       </td>
                     </motion.tr>
                   ))}
@@ -295,11 +308,11 @@ export default function GuestManagement() {
                       </td>
                       <td className="p-4">
                          {guest.stayCode ? (
-                           <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-xs font-black font-mono tracking-widest">
+                           <span className="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-md text-[9px] font-black font-mono tracking-wider whitespace-nowrap">
                              {guest.stayCode}
                            </span>
                          ) : (
-                           <span className="text-[10px] font-bold text-gray-300 uppercase italic">No Active Code</span>
+                           <span className="text-[9px] font-bold text-gray-300 uppercase italic">No Active Code</span>
                          )}
                       </td>
                       <td className="p-4 text-center">
@@ -350,7 +363,7 @@ export default function GuestManagement() {
                         </div>
                       </td>
                       <td className="p-4">
-                         <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-lg text-xs font-black font-mono tracking-widest">
+                         <span className="px-2 py-0.5 bg-gray-100 text-gray-400 rounded-md text-[9px] font-black font-mono tracking-wider whitespace-nowrap border border-gray-200/50">
                            {stay.stayCode || 'N/A'}
                          </span>
                       </td>

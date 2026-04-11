@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { operationalData } from '@/lib/gatepass/operationalData';
 
 interface GuestUser {
   name: string;
@@ -25,8 +26,6 @@ interface GuestAuthContextType {
 
 const GuestAuthContext = createContext<GuestAuthContextType | undefined>(undefined);
 
-// Demo valid stay codes
-const VALID_STAY_CODES = ['UNICA2024', 'GUEST123', 'WELCOME_UNICA', 'ROOM_502'];
 
 export function GuestAuthProvider({ children }: { children: ReactNode }) {
   const [guestUser, setGuestUser] = useState<GuestUser | null>(null);
@@ -60,10 +59,23 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
   }, [guestUser, isAuthenticated, isRegistered]);
 
   const verifyStayCode = async (code: string) => {
-    // Simulated API call
-    if (VALID_STAY_CODES.includes(code.toUpperCase())) {
+    // Check operational data for active stay
+    const allStays = operationalData.getStays();
+    const activeStay = allStays.find(s => 
+      s.stayCode?.toUpperCase() === code.toUpperCase() && 
+      s.status === 'CHECKED_IN'
+    );
+
+    if (activeStay) {
       setIsAuthenticated(true);
-      setGuestUser(prev => prev ? { ...prev, stayCode: code } : { name: '', email: '', stayCode: code });
+      const guestObj = {
+        name: activeStay.guestName,
+        email: '', // Get from guest if needed
+        stayCode: code,
+        roomNumber: activeStay.roomName,
+        checkOutDate: activeStay.expectedCheckOutAt || '' // We may need to update types to include this in operationalData
+      };
+      setGuestUser(guestObj);
       return true;
     }
     return false;
