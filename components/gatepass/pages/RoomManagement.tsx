@@ -10,6 +10,17 @@ export default function RoomManagement() {
   const [rooms, setRooms] = useState<Room[]>(operationalData.getRooms());
   const [isAdding, setIsAdding] = useState(false);
 
+  // Real-time synchronization for simulation
+  React.useEffect(() => {
+    const handleSync = () => setRooms(operationalData.getRooms());
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('fica-data-update', handleSync);
+    return () => {
+        window.removeEventListener('storage', handleSync);
+        window.removeEventListener('fica-data-update', handleSync);
+    };
+  }, []);
+
   // Simplified Add Room for Mock UI
   const handleAddRoom = () => {
     const newRoom: Room = {
@@ -39,17 +50,20 @@ export default function RoomManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6 font-jost">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[#292f36] tracking-tight">Room Inventory</h1>
-          <p className="text-sm text-[#4d5053] font-medium">Manage UNICA-House active rooms and suites.</p>
+        <div className="space-y-0.5">
+          <h1 className="text-xl font-black text-[#292f36] tracking-tight flex items-center gap-2">
+            <Bed className="text-accent" size={24} />
+            Room Inventory
+          </h1>
+          <p className="text-[11px] text-[#4d5053] font-medium max-w-xs">Manage the selection of premium living spaces at UNICA-House.</p>
         </div>
         <button
           onClick={handleAddRoom}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#4d668f] text-white rounded-xl font-bold hover:bg-[#3a4f6e] transition-all shadow-md group"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-br from-accent to-[#3a4f6e] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg group"
         >
-          <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" strokeWidth={3} />
           Add New Room
         </button>
       </div>

@@ -31,22 +31,24 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
   const [newIngredient, setNewIngredient] = useState('');
 
   useEffect(() => {
+    const defaults = {
+      name: '',
+      meal: 'Breakfast' as MealType,
+      price: 0,
+      description: '',
+      image: '',
+      calories: 0,
+      protein: '',
+      fat: '',
+      carbs: '',
+      ingredients: [],
+      available: true
+    };
+
     if (editingItem) {
-      setFormData(editingItem);
+      setFormData({ ...defaults, ...editingItem });
     } else {
-      setFormData({
-        name: '',
-        meal: 'Breakfast',
-        price: 0,
-        description: '',
-        image: '',
-        calories: 0,
-        protein: '',
-        fat: '',
-        carbs: '',
-        ingredients: [],
-        available: true
-      });
+      setFormData(defaults);
     }
   }, [editingItem, isOpen]);
 
@@ -102,7 +104,7 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-[24px] shadow-2xl z-[151] overflow-hidden flex flex-col max-h-[90vh]"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-white rounded-[24px] shadow-2xl z-[151] overflow-hidden flex flex-col max-h-[90vh]"
           >
             {/* Header */}
             <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
@@ -123,189 +125,198 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
             </div>
 
             {/* Form Content */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
-              {/* Basic Information */}
-              <div className="space-y-3">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#292f36] border-l-3 border-accent pl-2">
-                  Essential Data
-                </h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Name</label>
-                    <input 
-                      required
-                      value={formData.name}
-                      onChange={e => setFormData({...formData, name: e.target.value})}
-                      placeholder="e.g. Avocado Toast"
-                      className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 text-[13px] font-bold text-[#292f36] outline-none transition-all"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Service</label>
-                    <select 
-                      value={formData.meal}
-                      onChange={e => setFormData({...formData, meal: e.target.value as MealType})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 text-[13px] font-bold text-[#292f36] outline-none transition-all appearance-none"
-                    >
-                      <option value="Breakfast">Breakfast</option>
-                      <option value="Lunch">Lunch</option>
-                      <option value="Dinner">Dinner</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Price (RWF)</label>
-                    <input 
-                      type="number"
-                      required
-                      value={formData.price}
-                      onChange={e => setFormData({...formData, price: Number(e.target.value)})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 text-[13px] font-bold text-[#292f36] outline-none transition-all"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Dish Image</label>
-                    <div className="relative group cursor-pointer">
-                      <input 
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                      />
-                      <div className={cn(
-                        "w-full bg-gray-50 border-2 border-dashed rounded-xl p-3 flex items-center justify-between text-[11px] font-bold text-[#292f36] transition-all",
-                        formData.image ? "border-accent/50 bg-accent/5" : "border-gray-100 hover:border-gray-200"
-                      )}>
-                        <div className="flex items-center gap-2">
-                           {formData.image ? (
-                             <div className="w-8 h-8 rounded-lg overflow-hidden border border-white/50 shadow-sm relative shrink-0">
-                               <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
-                             </div>
-                           ) : (
-                             <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                               <ImageIcon size={14} />
-                             </div>
-                           )}
-                           <span className={cn(formData.image ? "text-[#292f36]" : "text-gray-400")}>
-                             {formData.image ? "Image Selected" : "Click to Upload"}
-                           </span>
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+              <div className="grid grid-cols-2 gap-8 items-start">
+                
+                {/* Left Column: Essential Data */}
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#292f36] border-l-3 border-accent pl-2">
+                      Essential Data
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Name</label>
+                        <input 
+                          required
+                          value={formData.name}
+                          onChange={e => setFormData({...formData, name: e.target.value})}
+                          placeholder="e.g. Avocado Toast"
+                          className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 text-[13px] font-bold text-[#292f36] outline-none transition-all"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Service</label>
+                          <select 
+                            value={formData.meal}
+                            onChange={e => setFormData({...formData, meal: e.target.value as MealType})}
+                            className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 text-[13px] font-bold text-[#292f36] outline-none transition-all appearance-none"
+                          >
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Lunch">Lunch</option>
+                            <option value="Dinner">Dinner</option>
+                          </select>
                         </div>
-                        <Plus size={14} className="text-gray-300" />
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Price (RWF)</label>
+                          <input 
+                            type="number"
+                            required
+                            value={formData.price}
+                            onChange={e => setFormData({...formData, price: Number(e.target.value)})}
+                            className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 text-[13px] font-bold text-[#292f36] outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Description</label>
+                        <textarea 
+                          required
+                          value={formData.description}
+                          onChange={e => setFormData({...formData, description: e.target.value})}
+                          rows={4}
+                          className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 text-[13px] font-bold text-[#292f36] outline-none transition-all resize-none"
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Description</label>
-                  <textarea 
-                    required
-                    value={formData.description}
-                    onChange={e => setFormData({...formData, description: e.target.value})}
-                    rows={2}
-                    className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-3 text-[13px] font-bold text-[#292f36] outline-none transition-all resize-none"
-                  />
-                </div>
-              </div>
+                {/* Right Column: Image, Macros & Ingredients */}
+                <div className="space-y-6">
+                  {/* Image Upload Area */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#292f36] border-l-3 border-accent pl-2">
+                      Dish Image
+                    </h4>
+                    <div className="relative group cursor-pointer h-32">
+                        <input 
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                        />
+                        <div className={cn(
+                          "w-full h-full bg-gray-50 border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center text-[11px] font-bold text-[#292f36] transition-all gap-2",
+                          formData.image ? "border-accent/50 bg-accent/5" : "border-gray-100 hover:border-gray-200"
+                        )}>
+                             {formData.image ? (
+                               <div className="w-16 h-16 rounded-xl overflow-hidden border border-white/50 shadow-sm relative shrink-0">
+                                 <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                               </div>
+                             ) : (
+                               <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-300">
+                                 <ImageIcon size={20} />
+                               </div>
+                             )}
+                             <span className={cn(formData.image ? "text-[#292f36]" : "text-gray-400 uppercase tracking-widest text-[9px]")}>
+                               {formData.image ? "Change selected image" : "Drop or click to upload dish image"}
+                             </span>
+                        </div>
+                    </div>
+                  </div>
 
-              {/* Nutritional Information */}
-              <div className="space-y-3">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#292f36] border-l-3 border-accent pl-2">
-                  Macros
-                </h4>
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 ml-1">
-                      <Flame size={10} className="text-orange-500" />
-                      <label className="text-[8px] font-black uppercase tracking-widest text-gray-400">Cal</label>
+                  {/* Macros grid */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#292f36] border-l-3 border-accent pl-2">
+                      Nutritional Value
+                    </h4>
+                    <div className="grid grid-cols-4 gap-2">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1 ml-1">
+                          <Flame size={10} className="text-orange-500" />
+                          <label className="text-[8px] font-black uppercase tracking-widest text-gray-400">Cal</label>
+                        </div>
+                        <input 
+                          type="number"
+                          value={formData.calories}
+                          onChange={e => setFormData({...formData, calories: Number(e.target.value)})}
+                          className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-lg p-2 text-[12px] font-bold text-[#292f36] outline-none transition-all"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1 ml-1">
+                          <ShieldCheck size={10} className="text-blue-500" />
+                          <label className="text-[8px] font-black uppercase tracking-widest text-gray-400">Prot</label>
+                        </div>
+                        <input 
+                          value={formData.protein}
+                          onChange={e => setFormData({...formData, protein: e.target.value})}
+                          className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-lg p-2 text-[12px] font-bold text-[#292f36] outline-none transition-all"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1 ml-1">
+                          <Zap size={10} className="text-yellow-500" />
+                          <label className="text-[8px] font-black uppercase tracking-widest text-gray-400">Carb</label>
+                        </div>
+                        <input 
+                          value={formData.carbs}
+                          onChange={e => setFormData({...formData, carbs: e.target.value})}
+                          className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-lg p-2 text-[12px] font-bold text-[#292f36] outline-none transition-all"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1 ml-1">
+                          <Leaf size={10} className="text-green-500" />
+                          <label className="text-[8px] font-black uppercase tracking-widest text-gray-400">Fat</label>
+                        </div>
+                        <input 
+                          value={formData.fat}
+                          onChange={e => setFormData({...formData, fat: e.target.value})}
+                          className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-lg p-2 text-[12px] font-bold text-[#292f36] outline-none transition-all"
+                        />
+                      </div>
                     </div>
-                    <input 
-                      type="number"
-                      value={formData.calories}
-                      onChange={e => setFormData({...formData, calories: Number(e.target.value)})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-lg p-2 text-[12px] font-bold text-[#292f36] outline-none transition-all"
-                    />
                   </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 ml-1">
-                      <ShieldCheck size={10} className="text-blue-500" />
-                      <label className="text-[8px] font-black uppercase tracking-widest text-gray-400">Prot</label>
-                    </div>
-                    <input 
-                      value={formData.protein}
-                      onChange={e => setFormData({...formData, protein: e.target.value})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-lg p-2 text-[12px] font-bold text-[#292f36] outline-none transition-all"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 ml-1">
-                      <Zap size={10} className="text-yellow-500" />
-                      <label className="text-[8px] font-black uppercase tracking-widest text-gray-400">Carb</label>
-                    </div>
-                    <input 
-                      value={formData.carbs}
-                      onChange={e => setFormData({...formData, carbs: e.target.value})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-lg p-2 text-[12px] font-bold text-[#292f36] outline-none transition-all"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 ml-1">
-                      <Leaf size={10} className="text-green-500" />
-                      <label className="text-[8px] font-black uppercase tracking-widest text-gray-400">Fat</label>
-                    </div>
-                    <input 
-                      value={formData.fat}
-                      onChange={e => setFormData({...formData, fat: e.target.value})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-lg p-2 text-[12px] font-bold text-[#292f36] outline-none transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
 
-              {/* Ingredients */}
-              <div className="space-y-3">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#292f36] border-l-3 border-accent pl-2">
-                  Ingredients
-                </h4>
-                <div className="flex gap-2">
-                  <input 
-                    value={newIngredient}
-                    onChange={e => setNewIngredient(e.target.value)}
-                    onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), handleAddIngredient())}
-                    placeholder="Add..."
-                    className="flex-1 bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-2.5 text-[12px] font-bold text-[#292f36] outline-none transition-all"
-                  />
-                  <button 
-                    type="button"
-                    onClick={handleAddIngredient}
-                    className="w-10 h-10 rounded-xl bg-[#292f36] text-white flex items-center justify-center hover:bg-black transition-all shadow-md"
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <AnimatePresence>
-                    {formData.ingredients?.map((ing, i) => (
-                      <motion.div
-                        key={ing}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        className="px-2 py-1 bg-gray-100 rounded-md flex items-center gap-1.5 group border border-gray-200"
-                      >
-                        <span className="text-[11px] font-bold text-[#292f36]">{ing}</span>
-                        <button 
-                          type="button"
-                          onClick={() => removeIngredient(ing)}
-                          className="text-gray-400 hover:text-red-500 transition-colors"
-                        >
-                          <X size={12} />
-                        </button>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                  {/* Ingredients section */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#292f36] border-l-3 border-accent pl-2">
+                      Ingredients List
+                    </h4>
+                    <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <input 
+                            value={newIngredient}
+                            onChange={e => setNewIngredient(e.target.value)}
+                            onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), handleAddIngredient())}
+                            placeholder="Add..."
+                            className="flex-1 bg-gray-50 border border-transparent focus:border-accent/20 focus:bg-white rounded-xl p-2.5 text-[12px] font-bold text-[#292f36] outline-none transition-all"
+                          />
+                          <button 
+                            type="button"
+                            onClick={handleAddIngredient}
+                            className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-[#3a4f6e] text-white flex items-center justify-center hover:scale-105 transition-all shadow-md"
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto scrollbar-hide py-1">
+                          <AnimatePresence>
+                            {formData.ingredients?.map((ing, i) => (
+                              <motion.div
+                                key={ing}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                className="px-2 py-1 bg-gray-100 rounded-md flex items-center gap-1.5 group border border-gray-200 shrink-0"
+                              >
+                                <span className="text-[10px] font-bold text-[#292f36]">{ing}</span>
+                                <button 
+                                  type="button"
+                                  onClick={() => removeIngredient(ing)}
+                                  className="text-gray-400 hover:text-red-500 transition-colors"
+                                >
+                                  <X size={12} />
+                                </button>
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
+                        </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </form>
@@ -321,7 +332,7 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
               </button>
               <button 
                 onClick={handleSubmit}
-                className="px-6 py-2.5 bg-[#292f36] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-black/10 hover:bg-black transition-all flex items-center gap-1.5"
+                className="px-6 py-2.5 bg-gradient-to-br from-accent to-[#3a4f6e] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:scale-105 transition-all flex items-center gap-1.5"
               >
                 <Check size={14} strokeWidth={3} />
                 {editingItem ? 'Save Changes' : 'Publish Dish'}

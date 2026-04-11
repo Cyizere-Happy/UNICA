@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import DashboardAnimation from "@/lib/gatepass/assets/Promo Code.json";
 import { apiService } from "@/lib/gatepass/api";
+import { operationalData } from "@/lib/gatepass/operationalData";
 import type { DashboardStats, Visit } from "@/lib/gatepass/types";
 
-const Card = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={`rounded-2xl shadow-sm p-5 ${className}`}>{children}</div>
+const Card = ({ children, className, onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) => (
+  <div className={`rounded-2xl shadow-sm p-5 ${className}`} onClick={onClick}>{children}</div>
 );
 
 export default function Dashboard() {
@@ -98,14 +99,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 grid grid-cols-1 lg:grid-cols-4 gap-6 font-sans">
+    <div className="max-w-7xl mx-auto space-y-6 font-jost pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
       <div className="lg:col-span-3 space-y-6">
 
         <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold text-[#292f36]">Hi, {user?.name || 'Admin'}</h2>
-            <p className="text-gray-500 font-medium">Let's manage your hospitality operations today!</p>
+          <div className="space-y-0.5">
+            <h1 className="text-xl font-black text-[#292f36] tracking-tight">Hi, {user?.name || 'Admin'}</h1>
+            <p className="text-[11px] text-[#4d5053] font-medium">Let's manage your hospitality operations today!</p>
           </div>
           {/* <button className="p-2 rounded-full bg-indigo-100 text-[#153d5d] hover:bg-indigo-200 transition">Bell</button> */}
         </div>
@@ -134,9 +136,14 @@ export default function Dashboard() {
             <p className="text-[10px] font-black uppercase tracking-widest text-[#4d668f] mb-1">Guests In-House</p>
             <h3 className="text-2xl font-black text-[#4d668f]">{stats?.activeVisitors ?? 12}</h3>
           </Card>
-          <Card className="bg-white border border-gray-100">
+          <Card 
+            className="bg-white border border-gray-100 cursor-pointer hover:border-accent/30 transition-all"
+            onClick={() => window.location.href = '/management/admin/kitchen-orders'}
+          >
             <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1">Pending Orders</p>
-            <h3 className="text-2xl font-black text-amber-500">{stats?.pendingSecurityCount ?? 4}</h3>
+            <h3 className="text-2xl font-black text-amber-500">
+              {operationalData.getOrders().filter(o => o.status === 'PENDING').length}
+            </h3>
           </Card>
           <Card className="bg-white border border-gray-100 border-l-4 border-l-[#292f36]">
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Available Rooms</p>
@@ -229,5 +236,6 @@ export default function Dashboard() {
         </Card>
       </div>
     </div>
+  </div>
   );
 }

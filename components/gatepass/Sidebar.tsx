@@ -21,7 +21,9 @@ import {
   Rocket,
   Utensils,
   Package,
-  MessageSquare
+  MessageSquare,
+  ChefHat,
+  Bed
 } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 import { cn } from '@/lib/utils';
@@ -45,7 +47,9 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
       title: 'Main Menu',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'kitchen-orders', label: 'Kitchen Command', icon: ChefHat },
         { id: 'room-bookings', label: 'Booking Requests', icon: Package },
+        { id: 'room-management', label: 'Rooms & Pricing', icon: Bed },
         { id: 'order-history', label: 'Order History', icon: ShoppingCart },
         { id: 'menu-management', label: 'Menu Mgmt', icon: Utensils },
         { id: 'registered-parents', label: 'Guests', icon: Users },

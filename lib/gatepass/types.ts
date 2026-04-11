@@ -153,6 +153,9 @@ export interface FoodOrder {
   status: 'PENDING' | 'PREPARING' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED';
   orderTime: string;
   notes?: string;
+  isConfirmedByGuest?: boolean;
+  rating?: number;
+  testimonial?: string;
 }
 
 export interface Room {

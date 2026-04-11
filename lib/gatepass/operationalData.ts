@@ -1,7 +1,14 @@
 import { Room, FoodItem, FoodOrder } from './types';
 
-// Mock data that the Admin Panel can now "Live Update"
-export let MOCK_ROOMS: Room[] = [
+// Storage keys
+const STORAGE_KEYS = {
+    ORDERS: 'unica-orders',
+    ROOMS: 'unica-rooms',
+    MENU: 'unica-menu'
+};
+
+// Initial Defaults (Fallback)
+const DEFAULT_ROOMS: Room[] = [
   {
     id: 'room-1',
     name: 'Deluxe Suite',
@@ -43,7 +50,7 @@ export let MOCK_ROOMS: Room[] = [
   }
 ];
 
-export let MOCK_MENU: FoodItem[] = [
+const DEFAULT_MENU: FoodItem[] = [
   { 
     id: 'b1', 
     name: 'Sunrise Omelette', 
@@ -130,7 +137,7 @@ export let MOCK_MENU: FoodItem[] = [
   }
 ];
 
-export let MOCK_ORDERS: FoodOrder[] = [
+const DEFAULT_ORDERS: FoodOrder[] = [
   {
     id: 'ORD-1001',
     guestId: 'G-101',
@@ -139,7 +146,7 @@ export let MOCK_ORDERS: FoodOrder[] = [
     items: [{ itemId: 'l2', name: 'Beef Burger', quantity: 1, price: 14 }],
     totalAmount: 14,
     status: 'DELIVERED',
-    orderTime: 'June 1, 2026, 08:22 AM',
+    orderTime: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ', 08:22 AM',
     notes: 'No onions please'
   },
   {
@@ -150,53 +157,108 @@ export let MOCK_ORDERS: FoodOrder[] = [
     items: [{ itemId: 'd2', name: 'Japanese Ramen', quantity: 1, price: 18 }],
     totalAmount: 18,
     status: 'PREPARING',
-    orderTime: 'June 1, 2026, 09:15 AM'
-  },
-  {
-    id: 'ORD-1003',
-    guestId: 'G-110',
-    guestName: 'Michael Brown',
-    roomNumber: 'Apt 4B',
-    items: [{ itemId: 'b1', name: 'Sunrise Omelette', quantity: 2, price: 8 }],
-    totalAmount: 16,
-    status: 'DELIVERED',
-    orderTime: 'June 1, 2026, 07:45 AM'
-  },
-  {
-    id: 'ORD-1004',
-    guestId: 'G-202',
-    guestName: 'Elena Rodriguez',
-    roomNumber: 'Room 202',
-    items: [{ itemId: 'l1', name: 'Grilled Chicken Wrap', quantity: 1, price: 12 }],
-    totalAmount: 12,
-    status: 'CANCELLED',
-    orderTime: 'May 31, 2026, 08:22 PM'
+    orderTime: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ', 09:15 AM'
   }
 ];
 
-// Helper methods to simulate CMS updates
-export const operationalData = {
-  getRooms: () => MOCK_ROOMS,
-  addRoom: (room: Room) => { MOCK_ROOMS = [...MOCK_ROOMS, room] },
-  updateRoom: (room: Room) => { MOCK_ROOMS = MOCK_ROOMS.map(r => r.id === room.id ? room : r) },
-  
-  getMenu: () => MOCK_MENU,
-  addMenuItem: (item: FoodItem) => { MOCK_MENU = [...MOCK_MENU, item] },
-  updateMenuItem: (item: FoodItem) => { MOCK_MENU = MOCK_MENU.map(m => m.id === item.id ? item : m) },
+// Memory variables that reflect current storage state
+let MEMORY_ROOMS: Room[] = DEFAULT_ROOMS;
+let MEMORY_MENU: FoodItem[] = DEFAULT_MENU;
+let MEMORY_ORDERS: FoodOrder[] = DEFAULT_ORDERS;
 
-  getOrders: () => MOCK_ORDERS,
+// Browser-safe storage helpers
+const isBrowser = typeof window !== 'undefined';
+
+const loadFromStorage = () => {
+  if (!isBrowser) return;
+  
+  try {
+    const savedOrders = localStorage.getItem(STORAGE_KEYS.ORDERS);
+    const savedRooms = localStorage.getItem(STORAGE_KEYS.ROOMS);
+    const savedMenu = localStorage.getItem(STORAGE_KEYS.MENU);
+
+    if (savedOrders) {
+        const parsed = JSON.parse(savedOrders);
+        if (Array.isArray(parsed)) MEMORY_ORDERS = parsed;
+    }
+    if (savedRooms) {
+        const parsed = JSON.parse(savedRooms);
+        if (Array.isArray(parsed)) MEMORY_ROOMS = parsed;
+    }
+    if (savedMenu) {
+        const parsed = JSON.parse(savedMenu);
+        if (Array.isArray(parsed)) MEMORY_MENU = parsed;
+    }
+  } catch (e) {
+    console.warn('⚠️ Storage load fail:', e);
+  }
+};
+
+const saveToStorage = () => {
+  if (!isBrowser) return;
+  
+  try {
+    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(MEMORY_ORDERS));
+    localStorage.setItem(STORAGE_KEYS.ROOMS, JSON.stringify(MEMORY_ROOMS));
+    localStorage.setItem(STORAGE_KEYS.MENU, JSON.stringify(MEMORY_MENU));
+    
+    console.log('💾 Data persisted to LocalStorage');
+    
+    // Dispatch events
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('fica-data-update'));
+  } catch (e) {
+    console.error('❌ Storage save fail:', e);
+  }
+};
+
+// Initial load
+loadFromStorage();
+
+// Helper methods
+export const operationalData = {
+  getRooms: () => { loadFromStorage(); return [...MEMORY_ROOMS]; },
+  addRoom: (room: Room) => { 
+    MEMORY_ROOMS = [...MEMORY_ROOMS, room];
+    saveToStorage();
+  },
+  updateRoom: (room: Room) => { 
+    MEMORY_ROOMS = MEMORY_ROOMS.map(r => r.id === room.id ? room : r);
+    saveToStorage();
+  },
+  
+  getMenu: () => { loadFromStorage(); return [...MEMORY_MENU]; },
+  addMenuItem: (item: FoodItem) => { 
+    MEMORY_MENU = [...MEMORY_MENU, item];
+    saveToStorage();
+  },
+  updateMenuItem: (item: FoodItem) => { 
+    MEMORY_MENU = MEMORY_MENU.map(m => m.id === item.id ? item : m);
+    saveToStorage();
+  },
+
+  getOrders: () => { loadFromStorage(); return [...MEMORY_ORDERS]; },
+  addOrder: (order: FoodOrder) => {
+    MEMORY_ORDERS = [order, ...MEMORY_ORDERS];
+    saveToStorage();
+  },
   updateOrderStatus: (orderId: string, status: FoodOrder['status']) => {
-    MOCK_ORDERS = MOCK_ORDERS.map(o => o.id === orderId ? { ...o, status } : o);
+    MEMORY_ORDERS = MEMORY_ORDERS.map(o => o.id === orderId ? { ...o, status } : o);
+    saveToStorage();
+  },
+  confirmOrderReceipt: (orderId: string) => {
+    MEMORY_ORDERS = MEMORY_ORDERS.map(o => o.id === orderId ? { ...o, isConfirmedByGuest: true } : o);
+    saveToStorage();
+  },
+  submitOrderFeedback: (orderId: string, rating: number, testimonial?: string) => {
+    MEMORY_ORDERS = MEMORY_ORDERS.map(o => o.id === orderId ? { ...o, rating, testimonial } : o);
+    saveToStorage();
   },
 
   getAnalytics: () => ({
     revenueData: [
-      { day: '1', revenue: 25 },
-      { day: '5', revenue: 20 },
-      { day: '10', revenue: 35 },
-      { day: '15', revenue: 55 },
-      { day: '20', revenue: 40 },
-      { day: '25', revenue: 65 },
+      { day: '1', revenue: 25 }, { day: '5', revenue: 20 }, { day: '10', revenue: 35 },
+      { day: '15', revenue: 55 }, { day: '20', revenue: 40 }, { day: '25', revenue: 65 },
       { day: '30', revenue: 95 },
     ],
     operationsSplit: [

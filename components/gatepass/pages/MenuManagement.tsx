@@ -21,6 +21,17 @@ export default function MenuManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
 
+  // Real-time synchronization for simulation
+  React.useEffect(() => {
+    const handleSync = () => setMenu(operationalData.getMenu());
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('fica-data-update', handleSync);
+    return () => {
+        window.removeEventListener('storage', handleSync);
+        window.removeEventListener('fica-data-update', handleSync);
+    };
+  }, []);
+
   const filteredMenu = useMemo(() => {
     return menu.filter((item) => {
       const matchesTab = activeTab === 'All' || item.meal === activeTab;
@@ -31,10 +42,10 @@ export default function MenuManagement() {
   }, [menu, activeTab, searchQuery]);
 
   const mealTabs = [
-    { type: 'All', icon: LayoutGrid, color: 'bg-indigo-50 text-indigo-600' },
-    { type: 'Breakfast', icon: Coffee, color: 'bg-orange-50 text-orange-600' },
-    { type: 'Lunch', icon: Sun, color: 'bg-yellow-50 text-yellow-600' },
-    { type: 'Dinner', icon: Moon, color: 'bg-blue-50 text-blue-600' },
+    { type: 'All', icon: LayoutGrid, color: 'bg-accent/10 text-accent' },
+    { type: 'Breakfast', icon: Coffee, color: 'bg-accent/10 text-accent' },
+    { type: 'Lunch', icon: Sun, color: 'bg-accent/10 text-accent' },
+    { type: 'Dinner', icon: Moon, color: 'bg-accent/10 text-accent' },
   ];
 
   const handleSaveItem = (item: FoodItem) => {
@@ -56,20 +67,10 @@ export default function MenuManagement() {
     }
   };
 
-  const getStats = () => {
-    const total = menu.length;
-    const avgPrice = menu.reduce((acc, item) => acc + item.price, 0) / (total || 1);
-    const inStock = menu.filter(m => m.available).length;
-    return { total, avgPrice, inStock };
-  };
-
-  const stats = getStats();
 
   return (
-    <div className="flex gap-8">
-      {/* Main Content Area */}
-      <div className="flex-1 space-y-6 min-w-0">
-        {/* Header Section */}
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-0.5">
             <h1 className="text-xl font-black text-[#292f36] tracking-tight flex items-center gap-2">
@@ -96,7 +97,7 @@ export default function MenuManagement() {
                 setEditingItem(null);
                 setIsModalOpen(true);
               }}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#292f36] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-lg group"
+              className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-accent to-[#3a4f6e] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg group"
             >
               <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" strokeWidth={3} />
               Add Dish
@@ -116,7 +117,7 @@ export default function MenuManagement() {
                 className={cn(
                   'flex items-center gap-2 px-4 py-1.5 rounded-xl text-[11px] font-black tracking-tight transition-all shrink-0',
                   isActive 
-                    ? 'bg-[#0e0e0e] text-white shadow-lg scale-105' 
+                    ? 'bg-gradient-to-br from-accent to-[#3a4f6e] text-white shadow-lg scale-105' 
                     : 'bg-white text-gray-500 hover:text-[#292f36] border border-gray-100'
                 )}
               >
@@ -221,72 +222,6 @@ export default function MenuManagement() {
             <p className="text-[#4d5053] font-medium mt-2 max-w-sm mx-auto italic">We couldn't find any matches for your current filters or search query.</p>
           </div>
         )}
-      </div>
-
-      {/* Management Sidebar (Right) */}
-      <div className="hidden xl:flex flex-col w-64 space-y-4 shrink-0">
-        <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-sm space-y-4 sticky top-6">
-            <div className="flex items-center justify-between">
-                <h2 className="text-[14px] font-black text-[#292f36]">Inventory Stats</h2>
-                <Settings2 size={14} className="text-gray-400 cursor-pointer hover:text-[#292f36] transition-colors" />
-            </div>
-
-            <div className="space-y-3">
-                <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/30">
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="p-1.5 bg-indigo-500 rounded-lg text-white">
-                            <Package size={12} />
-                        </div>
-                        <span className="text-[11px] font-black text-[#292f36]">Total Items</span>
-                    </div>
-                    <div className="flex items-end justify-between">
-                        <h4 className="text-lg font-black text-[#292f36]">{stats.total}</h4>
-                        <span className="text-[8px] font-black text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded-md uppercase tracking-wider">Live</span>
-                    </div>
-                </div>
-
-                <div className="p-3 bg-orange-50/50 rounded-xl border border-orange-100/30">
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="p-1.5 bg-orange-500 rounded-lg text-white">
-                            <Star size={12} />
-                        </div>
-                        <span className="text-[11px] font-black text-[#292f36]">In Stock</span>
-                    </div>
-                    <div className="flex items-end justify-between">
-                        <h4 className="text-lg font-black text-[#292f36]">{stats.inStock}</h4>
-                        <span className="text-[8px] font-black text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-md uppercase tracking-wider">OK</span>
-                    </div>
-                </div>
-
-                <div className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100/30">
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="p-1.5 bg-emerald-500 rounded-lg text-white">
-                            <TrendingUp size={12} />
-                        </div>
-                        <span className="text-[11px] font-black text-[#292f36]">Avg Price</span>
-                    </div>
-                    <div className="flex items-end justify-between">
-                        <h4 className="text-lg font-black text-[#292f36]">{formatPrice(Math.round(stats.avgPrice))}</h4>
-                        <span className="text-[8px] font-black text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md uppercase tracking-wider">RWF</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="pt-2">
-                <div className="p-4 bg-gradient-to-br from-[#292f36] to-[#1a1f24] rounded-2xl shadow-xl relative overflow-hidden group">
-                    <div className="relative z-10">
-                        <h4 className="text-white text-[12px] font-black mb-0.5">Menu Report</h4>
-                        <p className="text-gray-400 text-[10px] leading-relaxed mb-3">Export your inventory for kitchen staff.</p>
-                        <button className="w-full py-2 bg-white text-[#292f36] rounded-xl font-black text-[9px] uppercase tracking-widest hover:scale-105 transition-all">
-                            Download PDF
-                        </button>
-                    </div>
-                    {/* Animated background element */}
-                    <div className="absolute top-0 right-0 -mr-6 -mt-6 w-16 h-16 bg-accent/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-                </div>
-            </div>
-        </div>
-      </div>
 
       <AddFoodModal 
         isOpen={isModalOpen} 
