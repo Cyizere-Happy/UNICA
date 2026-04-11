@@ -113,73 +113,73 @@ export default function OrderManagement() {
           const status = getStatusIcon(order.status);
           const Icon = status.icon;
           return (
-            <div key={order.id} className="bg-white rounded-[32px] border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col lg:flex-row">
-              {/* Sidebar Info */}
-              <div className={cn('lg:w-64 flex-shrink-0 p-8 border-b lg:border-b-0 lg:border-r border-gray-100 flex flex-col justify-between', status.bg)}>
+            <div key={order.id} className="bg-white rounded-3xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col lg:flex-row">
+              {/* Compact Sidebar Info */}
+              <div className={cn('lg:w-52 flex-shrink-0 p-5 px-6 border-b lg:border-b-0 lg:border-r border-gray-100 flex flex-col justify-between', status.bg)}>
                 <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{order.id}</span>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{order.orderTime.split(',')[1].trim()}</p>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[9px] font-black text-gray-400/60 uppercase tracking-widest">{order.id}</span>
+                    <p className="text-[9px] text-gray-400/60 font-bold uppercase tracking-widest">{order.orderTime.split(',')[1].trim()}</p>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div className="p-4 bg-white/60 rounded-2xl border border-white/20">
-                       <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1 text-center">Destination</p>
-                       <h3 className="font-black text-[#292f36] text-xl text-center leading-tight">{order.roomNumber}</h3>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-white/60 rounded-xl border border-white/20 shadow-sm">
+                       <p className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5 text-center">Destination</p>
+                       <h3 className="font-black text-[#292f36] text-lg text-center leading-tight">{order.roomNumber}</h3>
                     </div>
 
-                    <div className="p-3 bg-accent/5 rounded-2xl border border-accent/10">
-                       <p className="text-[8px] font-black text-accent uppercase tracking-[0.2em] mb-0.5 text-center truncate">Total Load</p>
-                       <p className="font-black text-accent text-base text-center leading-none">
+                    <div className="p-2.5 bg-accent/5 rounded-xl border border-accent/10">
+                       <p className="text-[8px] font-black text-accent uppercase tracking-[0.2em] mb-0 text-center truncate">Load</p>
+                       <p className="font-black text-accent text-sm text-center leading-none">
                          {order.items.reduce((acc, i) => acc + i.quantity, 0)}
-                         <span className="text-[9px] ml-1 uppercase opacity-70">Dishes</span>
+                         <span className="text-[8px] ml-1 uppercase opacity-70">Dishes</span>
                        </p>
                     </div>
                     
-                    <div>
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Guest</p>
-                        <div className="flex items-center gap-2">
-                           <User className="w-3.5 h-3.5 text-accent" />
-                           <h4 className="font-bold text-[#292f36] text-sm">{order.guestName}</h4>
+                    <div className="pt-1">
+                        <p className="text-[8px] font-black text-gray-400/60 uppercase tracking-[0.2em] mb-1">Guest</p>
+                        <div className="flex items-center gap-1.5">
+                           <User className="w-3 h-3 text-accent" />
+                           <h4 className="font-bold text-[#292f36] text-[12px] truncate">{order.guestName}</h4>
                         </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-8">
-                  <div className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border", status.color, "bg-white shadow-sm")}>
-                    <Icon size={14} />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">{status.label}</span>
+                <div className="mt-6">
+                  <div className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border", status.color, "bg-white shadow-sm")}>
+                    <Icon size={12} />
+                    <span className="text-[9px] font-black uppercase tracking-[0.1em]">{status.label}</span>
                   </div>
                 </div>
               </div>
 
               {/* Order Content */}
-              <div className="flex-1 p-8 flex flex-col">
+              <div className="flex-1 p-6 flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-6 border-b border-gray-50 pb-4">
-                    <h2 className="text-sm font-black text-[#292f36] uppercase tracking-widest flex items-center gap-2">
-                       <Utensils className="w-4 h-4 text-accent" />
+                  <div className="flex items-center justify-between mb-5 border-b border-gray-50 pb-3">
+                    <h2 className="text-[11px] font-black text-[#292f36] uppercase tracking-widest flex items-center gap-2">
+                       <Utensils className="w-3.5 h-3.5 text-accent" />
                        Preparation List
                     </h2>
-                    <p className="text-xs font-bold text-[#4d5053]">{order.items.length} Unique Items</p>
+                    <p className="text-[10px] font-bold text-[#4d5053]">{order.items.length} Items</p>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {order.items.map((item, idx) => {
                       const details = getItemDetails(item.itemId);
                       return (
-                        <div key={idx} className="flex flex-col md:flex-row md:items-start justify-between gap-4 p-5 bg-gray-50/50 rounded-2xl border border-gray-100 hover:border-accent/20 transition-all group">
-                          <div className="flex items-start gap-4 flex-1">
-                            <span className="w-10 h-10 flex items-center justify-center bg-accent text-white text-sm font-black rounded-xl shadow-md shadow-accent/20 shrink-0 group-hover:scale-110 transition-transform">
+                        <div key={idx} className="flex flex-col md:flex-row md:items-start justify-between gap-3 p-3.5 bg-gray-50/40 rounded-xl border border-gray-100 hover:border-accent/20 transition-all group">
+                          <div className="flex items-start gap-3.5 flex-1">
+                            <span className="w-8 h-8 flex items-center justify-center bg-accent text-white text-xs font-black rounded-lg shadow-sm shrink-0 group-hover:scale-105 transition-transform">
                               {item.quantity}x
                             </span>
                             <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <p className="text-lg font-black text-[#292f36]">{item.name}</p>
+                              <div className="flex items-center gap-2 mb-0.5">
+                                <p className="text-[15px] font-black text-[#292f36]">{item.name}</p>
                                 {details && (
                                   <span className={cn(
-                                    "px-1.5 py-0.5 text-[8px] font-black uppercase rounded-md border",
+                                    "px-1.5 py-0.5 text-[7px] font-black uppercase rounded-md border",
                                     details.meal === 'Breakfast' ? "bg-amber-50 text-amber-600 border-amber-100" :
                                     details.meal === 'Lunch' ? "bg-blue-50 text-blue-600 border-blue-100" :
                                     "bg-indigo-50 text-indigo-600 border-indigo-100"
@@ -190,12 +190,15 @@ export default function OrderManagement() {
                               </div>
                               {details && (
                                 <div className="space-y-1">
-                                  <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-lg">{details.description}</p>
+                                  <p className="text-[11px] text-gray-400 font-medium leading-relaxed max-w-lg line-clamp-1">{details.description}</p>
                                   {details.ingredients && (
-                                    <div className="flex flex-wrap gap-1 mt-2">
-                                      {details.ingredients.map((ing, i) => (
-                                        <span key={i} className="text-[9px] px-1.5 py-0.5 bg-white border border-gray-100 text-gray-400 font-bold uppercase rounded-md">{ing}</span>
+                                    <div className="flex flex-wrap gap-1 mt-1.5">
+                                      {details.ingredients.slice(0, 5).map((ing, i) => (
+                                        <span key={i} className="text-[8px] px-1 py-0.5 bg-white border border-gray-100 text-gray-400 font-bold uppercase rounded-md">{ing}</span>
                                       ))}
+                                      {details.ingredients.length > 5 && (
+                                        <span className="text-[8px] text-gray-300 font-bold uppercase">+{details.ingredients.length - 5}</span>
+                                      )}
                                     </div>
                                   )}
                                 </div>
