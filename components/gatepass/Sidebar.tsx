@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -25,6 +25,7 @@ import {
   ChefHat,
   Bed
 } from 'lucide-react';
+import { operationalData } from '@/lib/gatepass/operationalData';
 import { useSidebar } from '@/context/SidebarContext';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,6 +43,21 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<{ label: string, badge?: number, top: number } | null>(null);
 
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+
+  useEffect(() => {
+    const handleSync = () => {
+      setUnreadMessagesCount(operationalData.getMessages().filter(m => m.status === 'UNREAD').length);
+    };
+    handleSync();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('fica-data-update', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('fica-data-update', handleSync);
+    };
+  }, []);
+
   const sections = [
     {
       title: 'Main Menu',
@@ -53,7 +69,7 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
         { id: 'order-history', label: 'Order History', icon: ShoppingCart },
         { id: 'menu-management', label: 'Menu Mgmt', icon: Utensils },
         { id: 'registered-parents', label: 'Guests', icon: Users },
-        { id: 'messages', label: 'Message', icon: MessageSquare, badge: 33 },
+        { id: 'messages', label: 'Message', icon: MessageSquare, badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
       ]
     },
     {

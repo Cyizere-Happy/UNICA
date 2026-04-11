@@ -5,14 +5,31 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Clock } from 'lucide-react';
-import { rooms } from '@/lib/data';
+import { operationalData } from '@/lib/gatepass/operationalData';
+import { rooms as staticRooms } from '@/lib/data';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { formatPrice } from '@/lib/utils';
+import { Room } from '@/lib/gatepass/types';
 
 export default function RoomsPage() {
-    const featuredRoom = rooms.find(r => r.id === 'room-3') || rooms[0];
-    const otherRooms = rooms.filter(r => r.id !== featuredRoom.id);
+    // Initialize with static data for SSR matching
+    const [allRooms, setAllRooms] = React.useState<Room[]>(staticRooms as Room[]);
+
+    // Real-time synchronization
+    React.useEffect(() => {
+        setAllRooms(operationalData.getRooms());
+        const handleSync = () => setAllRooms(operationalData.getRooms());
+        window.addEventListener('storage', handleSync);
+        window.addEventListener('fica-data-update', handleSync);
+        return () => {
+            window.removeEventListener('storage', handleSync);
+            window.removeEventListener('fica-data-update', handleSync);
+        };
+    }, []);
+
+    const featuredRoom = allRooms.find(r => r.id === 'room-3') || (allRooms.length > 0 ? allRooms[0] : null);
+    const otherRooms = allRooms.filter(r => !featuredRoom || r.id !== featuredRoom.id);
 
     return (
         <main className="min-h-screen bg-background">

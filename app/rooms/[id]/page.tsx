@@ -10,19 +10,54 @@ import {
     ArrowLeft, Check, Users, Maximize, Calendar,
     Wifi, Tv, Coffee, Thermometer, ShieldCheck, Star
 } from 'lucide-react';
-import { rooms } from '@/lib/data';
+import { operationalData } from '@/lib/gatepass/operationalData';
+import { Room } from '@/lib/gatepass/types';
+import { rooms as staticRooms } from '@/lib/data';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { formatPrice } from '@/lib/utils';
 import { BookingModal } from '@/components/BookingModal';
 
-
 export default function RoomDetails() {
     const { id } = useParams();
     const router = useRouter();
-    const room = rooms.find(r => r.id === id);
+    
+    // Initialize with static data for SSR Hydration matching
+    const [room, setRoom] = useState<Room | null>(() => {
+        return staticRooms.find(r => r.id === id) as Room || null;
+    });
     const [activeImage, setActiveImage] = useState(room?.mainImage || '');
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+    React.useEffect(() => {
+        // Hydrate immediately with dynamic client data on mount
+        const initialClientRoom = operationalData.getRooms().find(r => r.id === id) || null;
+        if (initialClientRoom) {
+             setRoom(initialClientRoom);
+             const currentImages = [initialClientRoom.mainImage, ...initialClientRoom.gallery];
+             if (!activeImage || !currentImages.includes(activeImage)) {
+                 setActiveImage(initialClientRoom.mainImage);
+             }
+        }
+
+        const handleSync = () => {
+            const currentRoom = operationalData.getRooms().find(r => r.id === id) || null;
+            setRoom(currentRoom);
+            // Reset active image if the previous one was removed or we don't have one
+            if (currentRoom) {
+               const validImages = [currentRoom.mainImage, ...currentRoom.gallery];
+               if (!activeImage || !validImages.includes(activeImage)) {
+                   setActiveImage(currentRoom.mainImage);
+               }
+            }
+        };
+        window.addEventListener('storage', handleSync);
+        window.addEventListener('fica-data-update', handleSync);
+        return () => {
+            window.removeEventListener('storage', handleSync);
+            window.removeEventListener('fica-data-update', handleSync);
+        };
+    }, [id, activeImage]);
 
 
     if (!room) {

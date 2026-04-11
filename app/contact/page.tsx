@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Mail, MapPin, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { operationalData } from '@/lib/gatepass/operationalData';
+import { ContactMessage } from '@/lib/gatepass/types';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 
@@ -17,8 +19,20 @@ export default function ContactPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate email sending
+        
+        const newMessage: ContactMessage = {
+            id: `MSG-${Date.now()}`,
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            status: 'UNREAD',
+            createdAt: new Date().toISOString()
+        };
+        
+        operationalData.saveMessage(newMessage);
         setIsSubmitted(true);
+        setFormData({ name: '', email: '', subject: '', message: '' }); // Clear form
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

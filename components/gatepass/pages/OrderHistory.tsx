@@ -145,7 +145,7 @@ export default function OrderHistory() {
               
               return (
                 <tr key={order.id} className="group hover:bg-[#fcfcfc]/80 transition-all duration-200">
-                  <td className="px-4 py-3">
+                  <td className="px-2 lg:px-4 py-3">
                     <input 
                       type="checkbox" 
                       checked={selectedOrders.includes(order.id)}
@@ -153,18 +153,26 @@ export default function OrderHistory() {
                       className="rounded border-gray-300 text-[#4d668f] focus:ring-[#4d668f]" 
                     />
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-4">
-                      <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0 shadow-sm border border-gray-50">
-                        <Image 
-                          src={getMenuImage(mainItem.name)} 
-                          alt={mainItem.name} 
-                          fill 
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="space-y-0.5">
-                        <p className="font-bold text-[#292f36] text-sm leading-tight flex items-center flex-wrap gap-2">
+                  <td className="px-2 lg:px-4 py-3 min-w-[200px]">
+                    <div className="flex items-center gap-3">
+                      {order.items.length > 1 ? (
+                        <div className="relative w-12 h-12 rounded-xl bg-accent/5 shrink-0 shadow-sm border border-accent/10 flex items-center justify-center text-2xl">
+                          🥘
+                        </div>
+                      ) : (
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0 shadow-sm border border-gray-50 flex items-center justify-center">
+                          <img 
+                            src={getMenuImage(mainItem.name)} 
+                            alt={mainItem.name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/food/placeholder.png';
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        <p className="font-bold text-[#292f36] text-sm leading-tight flex flex-wrap items-center gap-2">
                           {order.items.slice(0, 2).map(i => i.name).join(', ')}
                           {order.items.length > 2 && (
                             <span className="px-1.5 py-0.5 bg-accent/5 text-accent text-[9px] font-black uppercase rounded-md border border-accent/10 whitespace-nowrap">
@@ -172,63 +180,58 @@ export default function OrderHistory() {
                             </span>
                           )}
                         </p>
-                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.1em]">
-                          {order.items.reduce((acc, i) => acc + i.quantity, 0)} Total Dishes
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-400 font-black uppercase tracking-[0.1em]">
+                          <span>{order.items.reduce((acc, i) => acc + i.quantity, 0)} Total Dishes</span>
+                          <span>•</span>
+                          {(() => {
+                            const mealTypes = Array.from(new Set(order.items.map(i => getItemDetails(i.itemId)?.meal).filter(Boolean)));
+                            const isMixed = mealTypes.length > 1;
+                            return isMixed ? (
+                                <span className="px-1.5 py-0.5 bg-gray-50 text-gray-500 text-[9px] rounded-md border border-gray-100">Mixed</span>
+                            ) : (
+                                <span className={cn(
+                                "px-1.5 py-0.5 text-[9px] rounded-md border",
+                                mealTypes[0] === 'Breakfast' ? "bg-amber-50 text-amber-600 border-amber-100" :
+                                mealTypes[0] === 'Lunch' ? "bg-blue-50 text-blue-600 border-blue-100" :
+                                "bg-indigo-50 text-indigo-600 border-indigo-100"
+                                )}>
+                                {mealTypes[0] || 'Unknown'}
+                                </span>
+                            );
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    {(() => {
-                      const mealTypes = Array.from(new Set(order.items.map(i => getItemDetails(i.itemId)?.meal).filter(Boolean)));
-                      const isMixed = mealTypes.length > 1;
-                      return (
-                        <div className="flex flex-col gap-1">
-                          {isMixed ? (
-                            <span className="px-1.5 py-0.5 bg-gray-50 text-gray-500 text-[9px] font-black uppercase rounded-md border border-gray-100">Mixed</span>
-                          ) : (
-                            <span className={cn(
-                              "px-1.5 py-0.5 text-[9px] font-black uppercase rounded-md border",
-                              mealTypes[0] === 'Breakfast' ? "bg-amber-50 text-amber-600 border-amber-100" :
-                              mealTypes[0] === 'Lunch' ? "bg-blue-50 text-blue-600 border-blue-100" :
-                              "bg-indigo-50 text-indigo-600 border-indigo-100"
-                            )}>
-                              {mealTypes[0] || 'Unknown'}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })()}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-[#4d5053] font-medium whitespace-nowrap">
+                  <td className="px-2 lg:px-4 py-3 text-sm text-[#4d5053] font-medium min-w-[120px]">
                     {order.orderTime}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-[#4d668f] shrink-0" />
+                  <td className="px-2 lg:px-4 py-3 min-w-[150px]">
+                    <div className="flex gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-[#4d668f] shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-sm font-bold text-[#292f36] whitespace-nowrap">{order.roomNumber}, Unica House</p>
+                        <p className="text-sm font-bold text-[#292f36]">{order.roomNumber}, Unica House</p>
                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Kigali, Rwanda</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm font-black text-accent">
+                  <td className="px-2 lg:px-4 py-3 text-sm font-black text-accent whitespace-nowrap">
                     {formatPrice(order.totalAmount)}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
+                  <td className="px-2 lg:px-4 py-3">
+                    <div className="flex flex-col xl:flex-row xl:items-center gap-2">
                        <span className={cn(
-                        "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border",
+                        "w-fit px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border",
                         status.bg, status.text, status.border
                        )}>
                         {status.label}
                       </span>
-                      <button className="px-3 py-1 bg-white border border-accent/20 rounded-lg text-[10px] font-black text-accent uppercase tracking-wider hover:bg-accent hover:text-white transition-all shadow-sm">
+                      <button className="w-fit px-2 py-1 bg-white border border-accent/20 rounded-lg text-[9px] font-black text-accent uppercase tracking-wider hover:bg-accent hover:text-white transition-all shadow-sm">
                         Order Again
                       </button>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-2 py-3 text-right">
                     <button className="p-2 text-gray-400 hover:text-[#292f36] transition-colors">
                       <MoreHorizontal className="w-5 h-5" />
                     </button>

@@ -1,10 +1,11 @@
-import { Room, FoodItem, FoodOrder } from './types';
+import { Room, FoodItem, FoodOrder, ContactMessage } from './types';
 
 // Storage keys
 const STORAGE_KEYS = {
     ORDERS: 'unica-orders',
     ROOMS: 'unica-rooms',
-    MENU: 'unica-menu'
+    MENU: 'unica-menu',
+    MESSAGES: 'unica-messages'
 };
 
 // Initial Defaults (Fallback)
@@ -12,40 +13,87 @@ const DEFAULT_ROOMS: Room[] = [
   {
     id: 'room-1',
     name: 'Deluxe Suite',
-    type: 'suite',
-    description: 'A premium stay with elegant furnishings and a relaxing atmosphere.',
+    type: 'room',
+    description: 'A premium one-night stay bedroom with elegant furnish and a relaxing atmosphere.',
     price: 35,
     capacity: 2,
     size: '25m²',
     features: ['King Size Bed', 'En-suite Bathroom', 'High-speed WiFi', '4K TV'],
     mainImage: '/Images/UNICA_Bedroom_view.jpg',
-    gallery: ['/Images/UNICA_Bedroom_view2.jpg'],
+    gallery: [
+        '/Images/UNICA_Bedroom_view2.jpg',
+        '/Images/UNICA_Bedroom_view3.jpg',
+        '/Images/UNICA_Bedroom_Bed_view.jpg',
+        '/Images/UNICA_Bedroom_Bathroom.jpg'
+    ],
     status: 'AVAILABLE'
   },
   {
     id: 'room-2',
     name: 'Executive Room',
     type: 'room',
-    description: 'Modern and spacious room designed for supreme comfort.',
-    price: 45,
+    description: 'Modern and spacious room designed for comfort and convenience.',
+    price: 35,
     capacity: 2,
     size: '30m²',
-    features: ['Queen Size Bed', 'Work Desk', 'En-suite Bathroom'],
+    features: ['Queen Size Bed', 'Work Desk', 'En-suite Bathroom', 'WiFi'],
     mainImage: '/Images/UNICA_Bedroom2_view.jpg',
-    gallery: [],
+    gallery: ['/Images/UNICA_Bedroom2_Bathroom_view.jpg'],
     status: 'OCCUPIED'
   },
   {
+    id: 'room-3',
+    name: 'Superior Bedroom',
+    type: 'room',
+    description: 'Bright and airy bedroom with premium amenities and stunning views.',
+    price: 35,
+    capacity: 2,
+    size: '35m²',
+    features: ['King Size Bed', 'Balcony Access', 'Luxury Bathroom', 'WiFi', 'Mini Bar'],
+    mainImage: '/Images/UNICA_Bedroom3_view.jpg',
+    gallery: ['/Images/UNICA_Bedroom3_Bathroom_view.jpg'],
+    status: 'AVAILABLE'
+  },
+  {
+    id: 'room-4',
+    name: 'Standard Cozy',
+    type: 'room',
+    description: 'A cozy and well-appointed room perfect for a restful night.',
+    price: 35,
+    capacity: 2,
+    size: '22m²',
+    features: ['Queen Size Bed', 'Smart TV', 'WiFi'],
+    mainImage: '/Images/UNICA_Bedroom4_view.jpg',
+    gallery: [],
+    status: 'AVAILABLE'
+  },
+  {
+    id: 'room-5',
+    name: 'Premium Terrace View',
+    type: 'room',
+    description: 'Elegant room with direct access to a shared terrace and beautiful garden views.',
+    price: 35,
+    capacity: 2,
+    size: '38m²',
+    features: ['King Size Bed', 'Terrace', 'Premium Sound System', 'WiFi', 'Luxury Bath'],
+    mainImage: '/Images/UNICA_House_Bedroom5_view.jpg',
+    gallery: [],
+    status: 'AVAILABLE'
+  },
+  {
     id: 'apt-1',
-    name: 'Luxury 2-Bedroom',
+    name: 'Luxury 2-Bedroom Apartment',
     type: 'apartment',
-    description: 'Fully furnished with a modern kitchen and two private bedrooms.',
+    description: 'Fully furnished apartment with a modern kitchen, spacious saloon, and two private bedrooms.',
     price: 100,
     capacity: 4,
     size: '85m²',
-    features: ['Full Kitchen', 'Large Saloon', '2 Bedrooms', 'Dining Area'],
+    features: ['Full Kitchen', 'Large Saloon', '2 Bedrooms', 'Dining Area', 'Full Laundry'],
     mainImage: '/Images/UNICA_House_Apartment_kitchen.jpg',
-    gallery: [],
+    gallery: [
+        '/Images/Apartment_Kitchen_Counter_view.jpg',
+        '/Images/Apartment_Kitchen_Cupboard_view.jpg'
+    ],
     status: 'AVAILABLE'
   }
 ];
@@ -161,10 +209,23 @@ const DEFAULT_ORDERS: FoodOrder[] = [
   }
 ];
 
+const DEFAULT_MESSAGES: ContactMessage[] = [
+  {
+    id: `MSG-${Date.now()}`,
+    name: 'Jane Doe',
+    email: 'jane@example.com',
+    subject: 'Dietary Restrictions Question',
+    message: 'Hello, I am planning to visit and want to know if you offer vegan options on your menu?',
+    status: 'UNREAD',
+    createdAt: new Date().toISOString()
+  }
+];
+
 // Memory variables that reflect current storage state
 let MEMORY_ROOMS: Room[] = DEFAULT_ROOMS;
 let MEMORY_MENU: FoodItem[] = DEFAULT_MENU;
 let MEMORY_ORDERS: FoodOrder[] = DEFAULT_ORDERS;
+let MEMORY_MESSAGES: ContactMessage[] = DEFAULT_MESSAGES;
 
 // Browser-safe storage helpers
 const isBrowser = typeof window !== 'undefined';
@@ -177,17 +238,49 @@ const loadFromStorage = () => {
     const savedRooms = localStorage.getItem(STORAGE_KEYS.ROOMS);
     const savedMenu = localStorage.getItem(STORAGE_KEYS.MENU);
 
-    if (savedOrders) {
+    // Initial Seeding: If storage is empty, write defaults immediately
+    if (!savedOrders) {
+        localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(DEFAULT_ORDERS));
+        MEMORY_ORDERS = DEFAULT_ORDERS;
+    } else {
         const parsed = JSON.parse(savedOrders);
         if (Array.isArray(parsed)) MEMORY_ORDERS = parsed;
     }
-    if (savedRooms) {
+
+    if (!savedRooms) {
+        localStorage.setItem(STORAGE_KEYS.ROOMS, JSON.stringify(DEFAULT_ROOMS));
+        MEMORY_ROOMS = DEFAULT_ROOMS;
+    } else {
         const parsed = JSON.parse(savedRooms);
-        if (Array.isArray(parsed)) MEMORY_ROOMS = parsed;
+        if (Array.isArray(parsed)) {
+            // Merge in any missing default rooms to restore missing ones like 'Superior Bedroom'
+            const existingIds = new Set(parsed.map(r => r.id));
+            const missingRooms = DEFAULT_ROOMS.filter(r => !existingIds.has(r.id));
+            
+            if (missingRooms.length > 0) {
+                MEMORY_ROOMS = [...parsed, ...missingRooms];
+                localStorage.setItem(STORAGE_KEYS.ROOMS, JSON.stringify(MEMORY_ROOMS));
+            } else {
+                MEMORY_ROOMS = parsed;
+            }
+        }
     }
-    if (savedMenu) {
+
+    if (!savedMenu) {
+        localStorage.setItem(STORAGE_KEYS.MENU, JSON.stringify(DEFAULT_MENU));
+        MEMORY_MENU = DEFAULT_MENU;
+    } else {
         const parsed = JSON.parse(savedMenu);
         if (Array.isArray(parsed)) MEMORY_MENU = parsed;
+    }
+
+    const savedMessages = localStorage.getItem(STORAGE_KEYS.MESSAGES);
+    if (!savedMessages) {
+        localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(DEFAULT_MESSAGES));
+        MEMORY_MESSAGES = DEFAULT_MESSAGES;
+    } else {
+        const parsed = JSON.parse(savedMessages);
+        if (Array.isArray(parsed)) MEMORY_MESSAGES = parsed;
     }
   } catch (e) {
     console.warn('⚠️ Storage load fail:', e);
@@ -201,6 +294,7 @@ const saveToStorage = () => {
     localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(MEMORY_ORDERS));
     localStorage.setItem(STORAGE_KEYS.ROOMS, JSON.stringify(MEMORY_ROOMS));
     localStorage.setItem(STORAGE_KEYS.MENU, JSON.stringify(MEMORY_MENU));
+    localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(MEMORY_MESSAGES));
     
     console.log('💾 Data persisted to LocalStorage');
     
@@ -256,6 +350,16 @@ export const operationalData = {
   },
   submitOrderFeedback: (orderId: string, rating: number, testimonial?: string) => {
     MEMORY_ORDERS = MEMORY_ORDERS.map(o => o.id === orderId ? { ...o, rating, testimonial } : o);
+    saveToStorage();
+  },
+
+  getMessages: () => { loadFromStorage(); return [...MEMORY_MESSAGES]; },
+  saveMessage: (msg: ContactMessage) => {
+    MEMORY_MESSAGES = [msg, ...MEMORY_MESSAGES];
+    saveToStorage();
+  },
+  markMessageRead: (msgId: string) => {
+    MEMORY_MESSAGES = MEMORY_MESSAGES.map(m => m.id === msgId ? { ...m, status: 'READ' } : m);
     saveToStorage();
   },
 

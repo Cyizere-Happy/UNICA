@@ -5,10 +5,27 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { rooms } from '@/lib/data';
+import { operationalData } from '@/lib/gatepass/operationalData';
+import { rooms as staticRooms } from '@/lib/data';
 import { formatPrice } from '@/lib/utils';
+import { Room } from '@/lib/gatepass/types';
 
 export const RoomsGrid = () => {
+    // Initialize with static data for SSR matching
+    const [roomsList, setRoomsList] = React.useState<Room[]>(staticRooms as Room[]);
+
+    // Real-time synchronization
+    React.useEffect(() => {
+        setRoomsList(operationalData.getRooms());
+        const handleSync = () => setRoomsList(operationalData.getRooms());
+        window.addEventListener('storage', handleSync);
+        window.addEventListener('fica-data-update', handleSync);
+        return () => {
+            window.removeEventListener('storage', handleSync);
+            window.removeEventListener('fica-data-update', handleSync);
+        };
+    }, []);
+
     return (
         <section className="section-padding bg-white" id="rooms">
             <div className="container mx-auto">
@@ -18,7 +35,7 @@ export const RoomsGrid = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    {rooms.slice(0, 3).map((room, index) => (
+                    {roomsList.slice(0, 3).map((room, index) => (
                         <motion.div
                             key={room.id}
                             initial={{ opacity: 0, y: 20 }}

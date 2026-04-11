@@ -190,3 +190,13 @@ export interface BookingRequest {
   specialRequests?: string;
   createdAt: string;
 }
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: 'UNREAD' | 'READ';
+  createdAt: string;
+}
