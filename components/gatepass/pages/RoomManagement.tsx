@@ -113,24 +113,24 @@ export default function RoomManagement() {
         </button>
       </div>
 
-      {/* Grid of Rooms */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Grid of Rooms - Reverting to Unified Design */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <AnimatePresence mode="popLayout">
           {rooms.map((room) => (
             <motion.div 
               layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               key={room.id} 
-              className="bg-white rounded-[32px] border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all group border-b-4 border-b-gray-100/50"
+              className="group bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all p-3"
             >
-              <div className="relative h-56 overflow-hidden">
+              {/* Responsive Image Container */}
+              <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-gray-50">
                 <img src={room.mainImage} alt={room.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-3 right-3">
                   <span className={cn(
-                    "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl backdrop-blur-md",
+                    "px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg backdrop-blur-md",
                     room.status === 'AVAILABLE' ? "bg-green-500/90 text-white" : 
                     room.status === 'OCCUPIED' ? "bg-amber-500/90 text-white" : 
                     "bg-rose-500/90 text-white"
@@ -140,42 +140,35 @@ export default function RoomManagement() {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-4">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="font-black text-[#292f36] text-xl leading-tight">{room.name}</h3>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{room.type}</p>
+                    <h3 className="font-black text-[#292f36] text-[17px] leading-tight">{room.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                       <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{room.type}</p>
+                       <span className="w-1 h-1 bg-gray-200 rounded-full" />
+                       <span className="text-[10px] text-accent font-black">{room.size}</span>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <span className="font-black text-accent text-xl">{formatPrice(room.price)}</span>
+                    <span className="font-black text-accent text-lg">{formatPrice(room.price)}</span>
                     <p className="text-[9px] text-gray-400 font-bold uppercase">/ night</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-6 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-                  <div className="flex items-center gap-2 text-[11px] text-[#4d5053] font-bold uppercase tracking-tight">
-                    <Maximize className="w-4 h-4 text-accent" />
-                    {room.size}
-                  </div>
-                  <div className="flex items-center gap-2 text-[11px] text-[#4d5053] font-bold uppercase tracking-tight">
-                    <Users className="w-4 h-4 text-accent" />
-                    {room.capacity} Pax
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-5 border-t border-gray-50 gap-3">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100 gap-2">
+                  <div className="flex items-center gap-1">
                     <button 
                       onClick={() => openModal(room)}
-                      className="p-2.5 text-gray-400 hover:text-accent hover:bg-accent/5 rounded-xl transition-all" title="Edit Room Details"
+                      className="p-2 text-gray-400 hover:text-accent hover:bg-accent/5 rounded-xl transition-all" title="Edit Details"
                     >
-                      <Edit2 className="w-4.5 h-4.5" />
+                      <Edit2 className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleDelete(room.id)}
-                      className="p-2.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all" title="Purge from Inventory"
+                      className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all" title="Remove Room"
                     >
-                      <Trash2 className="w-4.5 h-4.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                   <button 
@@ -184,7 +177,7 @@ export default function RoomManagement() {
                         setActiveTab('GALLERY');
                         setIsModalOpen(true);
                     }}
-                    className="flex-1 px-4 py-2 text-[10px] font-black text-white bg-accent rounded-xl hover:bg-[#292f36] transition-all uppercase tracking-widest shadow-lg shadow-accent/10"
+                    className="px-4 py-2 text-[10px] font-black text-[#4d668f] bg-gray-50 rounded-xl hover:bg-[#4d668f] hover:text-white transition-all uppercase tracking-widest"
                   >
                     Manage Gallery
                   </button>
