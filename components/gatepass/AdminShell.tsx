@@ -9,7 +9,7 @@ import '@/components/gatepass/gatepass-admin.css';
 
 const ADMIN_ONLY_SEGMENTS = new Set<string>([]);
 
-type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'SECURITY' | null;
+type UserRole = 'ADMIN' | 'KITCHEN' | 'RECEPTION' | 'SUPER_ADMIN' | 'SECURITY' | null;
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

@@ -110,7 +110,7 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                 nextStep();
                             } else {
                                 setIsSubmitted(true);
-                                setTimeout(() => onSuccess?.(), 3000);
+                                // Removed automatic onSuccess timeout to allow user to dismiss manually
                             }
                         }} className="p-6 md:p-8 pt-0">
                             <AnimatePresence mode="wait">
@@ -328,14 +328,21 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                 Thank you for choosing Unica House. We've sent a confirmation email to <span className="text-accent font-bold">{formData.email}</span>.
                             </p>
                         </div>
-                        <div className="pt-6">
+                        <div className="pt-6 space-y-4">
                             <div className="bg-zinc-50 rounded-2xl p-4 border border-black/5 text-left">
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Order ID:</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Reservation ID:</span>
                                     <span className="text-xs font-black text-[#292f36]">#UH-{Math.floor(Math.random() * 10000)}</span>
                                 </div>
-                                <p className="text-[10px] text-zinc-400 font-medium">Please show this ID during check-in.</p>
+                                <p className="text-[10px] text-zinc-400 font-medium">Please present this ID during check-in for verification.</p>
                             </div>
+
+                            <button 
+                                onClick={() => onSuccess?.()}
+                                className="w-full py-4 bg-[#0e0e0e] text-white rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-black/10 active:scale-95"
+                            >
+                                Mark as Read & Dismiss
+                            </button>
                         </div>
                     </motion.div>
                 )}

@@ -8,8 +8,10 @@ import {
 } from 'lucide-react';
 import { operationalData } from '@/lib/gatepass/operationalData';
 import { GuestProfile, StayRecord } from '@/lib/gatepass/types';
-import { cn, formatPrice } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import { Save, X, Wand2, Info, Mail as MailIcon, Phone as PhoneIcon, User as UserIcon, ShieldCheck as ShieldIcon } from 'lucide-react';
+import { cn, formatPrice } from '@/lib/utils';
 
 type ActiveTab = 'IN_HOUSE' | 'GUEST_DB' | 'HISTORY';
 
@@ -19,6 +21,14 @@ export default function GuestManagement() {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<ActiveTab>('IN_HOUSE');
   const [loading, setLoading] = useState(true);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newGuest, setNewGuest] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    status: 'REGULAR' as GuestProfile['status']
+  });
+  const [generatedStayCode, setGeneratedStayCode] = useState<string | null>(null);
 
   useEffect(() => {
     const handleSync = () => {
@@ -53,6 +63,35 @@ export default function GuestManagement() {
     s.guestName.toLowerCase().includes(search.toLowerCase()) ||
     s.roomName.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleAddGuest = () => {
+    if (!newGuest.name || !newGuest.email || !newGuest.phone) {
+        toast.error("Please fill in all required fields");
+        return;
+    }
+
+    // Generate Stay Code: UNICA-XXX (3 alphanum)
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567889';
+    let randomChars = '';
+    for(let i=0; i<3; i++) randomChars += chars.charAt(Math.floor(Math.random() * chars.length));
+    const stayCode = `UNICA-${randomChars}`;
+    setGeneratedStayCode(stayCode);
+
+    // Save Guest
+    const guest: GuestProfile = {
+      id: `GST-${Date.now()}`,
+      name: newGuest.name,
+      email: newGuest.email,
+      phone: newGuest.phone,
+      totalBookings: 0,
+      totalSpent: 0,
+      lastVisit: new Date().toISOString(),
+      status: newGuest.status,
+      registeredAt: new Date().toISOString(),
+      stayCode: stayCode
+    };
+    operationalData.addGuest(guest);
+  };
 
   const getStatusStyle = (status: GuestProfile['status']) => {
     switch (status) {
@@ -101,7 +140,14 @@ export default function GuestManagement() {
             <button className="flex items-center gap-2 px-5 py-3 bg-white border border-gray-200 text-[#292f36] rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all shadow-sm active:scale-95">
                 <Download size={14} /> Export Report
             </button>
-            <button className="flex items-center gap-2 px-5 py-3 bg-[#292f36] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-black/10 active:scale-95">
+            <button 
+              onClick={() => {
+                setGeneratedStayCode(null);
+                setNewGuest({ name: '', email: '', phone: '', status: 'REGULAR' });
+                setIsAddModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-5 py-3 bg-[#292f36] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-black/10 active:scale-95"
+            >
                 <UserPlus size={14} strokeWidth={3} /> Add New Guest
             </button>
         </div>
@@ -145,6 +191,7 @@ export default function GuestManagement() {
                 <tr className="border-b border-gray-100">
                   <th className="p-4 pl-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Current Occupant</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Accomodation</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Stay Code</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Check-in Time</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Duration</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Live Status</th>
@@ -155,6 +202,7 @@ export default function GuestManagement() {
                 <tr className="border-b border-gray-100">
                   <th className="p-4 pl-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Guest Profile</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Contact Details</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Stay Code</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Total Bookings</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Lifetime Spent</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Tier Status</th>
@@ -165,6 +213,7 @@ export default function GuestManagement() {
                 <tr className="border-b border-gray-100">
                   <th className="p-4 pl-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Past Guest</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Room Details</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Stay Code</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Dates</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Final Bill</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Operational Note</th>
@@ -197,6 +246,11 @@ export default function GuestManagement() {
                           <p className="text-xs font-black text-[#292f36]">{stay.roomName}</p>
                           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{stay.roomType}</p>
                         </div>
+                      </td>
+                      <td className="p-4">
+                         <span className="px-3 py-1 bg-[#292f36] text-white rounded-lg text-xs font-black font-mono tracking-widest">
+                           {stay.stayCode || 'N/A'}
+                         </span>
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2 text-xs font-bold text-[#292f36]">
@@ -240,10 +294,13 @@ export default function GuestManagement() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <div className="flex flex-col text-xs font-bold text-[#292f36]">
-                           <span className="truncate max-w-[150px]">{guest.email}</span>
-                           <span className="text-gray-400 text-[10px]">{guest.phone}</span>
-                        </div>
+                         {guest.stayCode ? (
+                           <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-xs font-black font-mono tracking-widest">
+                             {guest.stayCode}
+                           </span>
+                         ) : (
+                           <span className="text-[10px] font-bold text-gray-300 uppercase italic">No Active Code</span>
+                         )}
                       </td>
                       <td className="p-4 text-center">
                         <span className="text-xs font-black text-[#292f36] bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">{guest.totalBookings}</span>
@@ -291,6 +348,11 @@ export default function GuestManagement() {
                            <p>{stay.roomName}</p>
                            <p className="text-gray-400 text-[10px] uppercase font-black tracking-widest">{stay.roomType}</p>
                         </div>
+                      </td>
+                      <td className="p-4">
+                         <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-lg text-xs font-black font-mono tracking-widest">
+                           {stay.stayCode || 'N/A'}
+                         </span>
                       </td>
                       <td className="p-4 text-xs font-bold text-[#292f36]">
                         <div className="flex flex-col gap-0.5">
@@ -357,6 +419,168 @@ export default function GuestManagement() {
               </div>
           </div>
       </div>
+
+      {/* Add New Guest Modal */}
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAddModalOpen(false)}
+              className="absolute inset-0 bg-[#292f36]/80 backdrop-blur-sm"
+            />
+            
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="w-full max-w-2xl bg-white rounded-[40px] shadow-2xl overflow-hidden relative z-10 flex flex-col max-h-[90vh]"
+            >
+              {!generatedStayCode ? (
+                <>
+                  <div className="p-8 pb-4 flex items-center justify-between border-b border-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#292f36] rounded-2xl flex items-center justify-center text-white">
+                        <UserPlus size={20} />
+                      </div>
+                      <div>
+                        <h3 className="font-black text-[#292f36] text-lg leading-tight">Register New Guest</h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Guest Relationship Management</p>
+                      </div>
+                    </div>
+                    <button onClick={() => setIsAddModalOpen(false)} className="p-2 text-gray-300 hover:text-rose-500 transition-colors">
+                      <X size={24} />
+                    </button>
+                  </div>
+
+                  <div className="p-8 space-y-6 overflow-y-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                          <div className="relative">
+                            <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                            <input 
+                              type="text" 
+                              value={newGuest.name} 
+                              onChange={(e) => setNewGuest({ ...newGuest, name: e.target.value })}
+                              className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-transparent focus:border-[#292f36]/10 focus:bg-white rounded-2xl font-bold text-[#292f36] transition-all outline-none"
+                              placeholder="e.g. Robert Smith"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tier Status</label>
+                          <select 
+                            value={newGuest.status} 
+                            onChange={(e) => setNewGuest({ ...newGuest, status: e.target.value as any })}
+                            className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-[#292f36]/10 focus:bg-white rounded-2xl font-bold text-[#292f36] transition-all outline-none appearance-none"
+                          >
+                             <option value="REGULAR">Regular Guest</option>
+                             <option value="VIP">VIP Access</option>
+                          </select>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                          <div className="relative">
+                            <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                            <input 
+                              type="email" 
+                              value={newGuest.email} 
+                              onChange={(e) => setNewGuest({ ...newGuest, email: e.target.value })}
+                              className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-transparent focus:border-[#292f36]/10 focus:bg-white rounded-2xl font-bold text-[#292f36] transition-all outline-none"
+                              placeholder="guest@example.com"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
+                          <div className="relative">
+                            <PhoneIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                            <input 
+                              type="text" 
+                              value={newGuest.phone} 
+                              onChange={(e) => setNewGuest({ ...newGuest, phone: e.target.value })}
+                              className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-transparent focus:border-[#292f36]/10 focus:bg-white rounded-2xl font-bold text-[#292f36] transition-all outline-none"
+                              placeholder="+250 ..."
+                            />
+                          </div>
+                        </div>
+                    </div>
+
+                    <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100 flex items-start gap-4">
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-amber-500 shrink-0 shadow-sm">
+                            <Wand2 size={20} />
+                        </div>
+                        <div>
+                            <h4 className="text-[12px] font-black text-amber-700 uppercase tracking-tight">Stay Code Generation</h4>
+                            <p className="text-[11px] text-amber-600/80 font-medium leading-relaxed mt-1">A secure stay code will be automatically generated upon registration. This code must be used by the guest to access room functions and orders.</p>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div className="p-8 border-t border-gray-100 flex items-center justify-between">
+                    <button 
+                      onClick={() => setIsAddModalOpen(false)}
+                      className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-[#292f36] transition-all"
+                    >
+                      Cancel Registration
+                    </button>
+                    <button 
+                      onClick={handleAddGuest}
+                      className="flex items-center gap-2 px-8 py-4 bg-[#292f36] text-white rounded-2xl font-black text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-black/10"
+                    >
+                      <ShieldIcon size={16} /> Finalize Registration
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="p-12 text-center">
+                    <motion.div 
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-500/20"
+                    >
+                        <CheckCircle2 size={40} className="text-white" />
+                    </motion.div>
+                    
+                    <h3 className="text-3xl font-black text-[#292f36] mb-2 tracking-tight">Guest Registered!</h3>
+                    <p className="text-sm text-gray-400 font-medium mb-10">Credentials have been synced with the local operational database.</p>
+                    
+                    <div className="bg-gray-50 rounded-[32px] p-8 border border-gray-100 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <ShieldIcon size={80} />
+                        </div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">Unique Stay Code</p>
+                        <div className="text-5xl font-black text-[#292f36] tracking-[0.1em] font-mono">
+                            {generatedStayCode}
+                        </div>
+                        <div className="mt-6 flex items-center justify-center gap-2 text-emerald-600">
+                            <CheckCircle2 size={14} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Active & Ready</span>
+                        </div>
+                    </div>
+
+                    <p className="mt-8 text-[11px] text-gray-400 font-bold max-w-xs mx-auto leading-relaxed italic">
+                        "Please provide this code to the guest. It serves as their digital key for the duration of the stay."
+                    </p>
+
+                    <button 
+                      onClick={() => setIsAddModalOpen(false)}
+                      className="mt-10 w-full py-4 bg-[#292f36] text-white rounded-2xl font-black text-[12px] uppercase tracking-widest hover:bg-black transition-all"
+                    >
+                        Dismiss & return
+                    </button>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

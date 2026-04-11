@@ -32,11 +32,25 @@ export const apiService = {
 
   async login(credentials: { email: string; password: string }) {
     if (MOCK_MODE) {
+      // Simulation of different staff roles based on email
+      let role = 'ADMIN';
+      let name = 'UNICA Admin';
+      
+      const email = credentials.email.toLowerCase();
+      if (email.includes('chef')) {
+        role = 'KITCHEN';
+        name = 'Head Chef';
+      } else if (email.includes('reception') || email.includes('frontdesk')) {
+        role = 'RECEPTION';
+        name = 'Reception Manager';
+      }
+
       const mockUser = {
-        name: 'UNICA Admin',
+        name: name,
         email: credentials.email,
-        role: 'ADMIN'
+        role: role
       };
+      
       localStorage.setItem('token', 'mock-token-123');
       localStorage.setItem('user', JSON.stringify(mockUser));
       return { accessToken: 'mock-token-123', user: mockUser };

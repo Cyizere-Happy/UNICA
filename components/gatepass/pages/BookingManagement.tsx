@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import BookingStats from '../BookingStats';
 import BookingDetailModal from '../BookingDetailModal';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 export default function BookingManagement() {
   const [bookings, setBookings] = useState<BookingRequest[]>(MOCK_BOOKING_REQUESTS);
@@ -51,9 +52,21 @@ export default function BookingManagement() {
     );
   };
 
-  const updateStatus = (id: string, newStatus: BookingRequest['status']) => {
-    setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
-    setIsModalOpen(false);
+  const updateStatus = (id: string, newStatus: BookingRequest['status'], stayCode?: string) => {
+    setBookings(prev => prev.map(b => {
+      if (b.id === id) {
+        if (newStatus === 'REJECTED') {
+          toast.error("Booking Rejected", {
+            description: `The request for ${b.guestName} has been declined.`,
+          });
+          setIsModalOpen(false);
+        } else if (newStatus === 'APPROVED' || newStatus === 'CHECKED_IN') {
+           // Success feedback is now handled via the Modal's internal state
+        }
+        return { ...b, status: newStatus, stayCode: stayCode || b.stayCode };
+      }
+      return b;
+    }));
   };
 
   const getStatusStyle = (status: BookingRequest['status']) => {
@@ -274,7 +287,7 @@ export default function BookingManagement() {
         booking={selectedBooking}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onApprove={(id) => updateStatus(id, 'APPROVED')}
+        onApprove={(id, code) => updateStatus(id, 'APPROVED', code)}
         onReject={(id) => updateStatus(id, 'REJECTED')}
       />
     </div>

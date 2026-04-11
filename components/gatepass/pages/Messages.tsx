@@ -18,6 +18,7 @@ export default function Messages() {
   // Reply flow state
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [userRole, setUserRole] = useState<string>('ADMIN');
   
   // State
   const [messages, setMessages] = useState<ContactMessage[]>(operationalData.getMessages());
@@ -25,6 +26,17 @@ export default function Messages() {
 
   // Sync logic
   useEffect(() => {
+    const userRaw = localStorage.getItem('user');
+    if (userRaw) {
+      try {
+        const u = JSON.parse(userRaw);
+        setUserRole(u.role || 'ADMIN');
+        if (u.role === 'KITCHEN') {
+          setActiveTab('feedback');
+        }
+      } catch (e) { /* ignore */ }
+    }
+
     const handleSync = () => {
       setMessages(operationalData.getMessages());
       setOrdersWithFeedback(
@@ -108,23 +120,25 @@ export default function Messages() {
 
       {/* Navigation Tabs */}
       <div className="flex bg-white rounded-2xl p-1.5 border border-gray-100 shadow-sm w-fit">
-        <button
-          onClick={() => setActiveTab('inquiries')}
-          className={cn(
-            "flex items-center gap-2 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all",
-            activeTab === 'inquiries' 
-              ? "bg-[#292f36] text-white shadow-md shadow-[#292f36]/20" 
-              : "text-gray-500 hover:bg-gray-50"
-          )}
-        >
-          <Mail size={14} />
-          Direct Inquiries
-          {unreadCount > 0 && (
-            <span className="bg-rose-500 text-white px-1.5 py-0.5 rounded-md text-[9px] font-black leading-none ml-1">
-              {unreadCount}
-            </span>
-          )}
-        </button>
+        {userRole !== 'KITCHEN' && (
+          <button
+            onClick={() => setActiveTab('inquiries')}
+            className={cn(
+              "flex items-center gap-2 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all",
+              activeTab === 'inquiries' 
+                ? "bg-[#292f36] text-white shadow-md shadow-[#292f36]/20" 
+                : "text-gray-500 hover:bg-gray-50"
+            )}
+          >
+            <Mail size={14} />
+            Direct Inquiries
+            {unreadCount > 0 && (
+              <span className="bg-rose-500 text-white px-1.5 py-0.5 rounded-md text-[9px] font-black leading-none ml-1">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+        )}
         <button
           onClick={() => setActiveTab('feedback')}
           className={cn(

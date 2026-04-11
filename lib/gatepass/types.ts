@@ -188,6 +188,7 @@ export interface BookingRequest {
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CHECKED_IN' | 'CHECKED_OUT';
   rating?: number;
   specialRequests?: string;
+  stayCode?: string;
   createdAt: string;
 }
 
@@ -213,6 +214,7 @@ export interface GuestProfile {
   status: 'VIP' | 'REGULAR' | 'BLACKLISTED';
   registeredAt: string;
   currentStayId?: string; // Links to an active StayRecord if checked in
+  stayCode?: string; // Active stay code if applicable
 }
 
 export interface StayRecord {
@@ -225,5 +227,6 @@ export interface StayRecord {
   checkOut?: string;
   status: 'CHECKED_IN' | 'CHECKED_OUT';
   totalAmount: number;
+  stayCode?: string;
   notes?: string;
 }

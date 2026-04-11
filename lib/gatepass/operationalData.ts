@@ -233,7 +233,8 @@ const DEFAULT_GUESTS: GuestProfile[] = [
     totalSpent: 4250.00,
     lastVisit: new Date().toISOString(),
     status: 'VIP',
-    registeredAt: '2025-01-15T08:00:00Z'
+    registeredAt: '2025-01-15T08:00:00Z',
+    stayCode: 'UNICA-A9W'
   },
   {
     id: 'GST-1002',
@@ -255,7 +256,8 @@ const DEFAULT_GUESTS: GuestProfile[] = [
     totalSpent: 3200.00,
     lastVisit: '2025-11-10T10:00:00Z',
     status: 'VIP',
-    registeredAt: '2024-06-05T09:15:00Z'
+    registeredAt: '2024-06-05T09:15:00Z',
+    stayCode: 'UNICA-X7K'
   }
 ];
 
@@ -268,7 +270,8 @@ const DEFAULT_STAYS: StayRecord[] = [
     roomType: 'room',
     checkIn: '2026-04-10T09:00:00Z',
     status: 'CHECKED_IN',
-    totalAmount: 35.00
+    totalAmount: 35.00,
+    stayCode: 'UNICA-A9W'
   },
   {
     id: 'STAY-801',
@@ -279,7 +282,8 @@ const DEFAULT_STAYS: StayRecord[] = [
     checkIn: '2026-03-01T14:00:00Z',
     checkOut: '2026-03-05T10:00:00Z',
     status: 'CHECKED_OUT',
-    totalAmount: 400.00
+    totalAmount: 400.00,
+    stayCode: 'UNICA-Z2Q'
   }
 ];
 
@@ -367,6 +371,35 @@ const loadFromStorage = () => {
   } catch (e) {
     console.warn('⚠️ Storage load fail:', e);
   }
+
+  // Migration: Ensure all guests and stays have a stayCode if missing
+  const generateCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567889';
+    let randomChars = '';
+    for(let i=0; i<3; i++) randomChars += chars.charAt(Math.floor(Math.random() * chars.length));
+    return `UNICA-${randomChars}`;
+  };
+
+  let migrated = false;
+  MEMORY_GUESTS = MEMORY_GUESTS.map(g => {
+    if (!g.stayCode) {
+      migrated = true;
+      return { ...g, stayCode: generateCode() };
+    }
+    return g;
+  });
+
+  MEMORY_STAYS = MEMORY_STAYS.map(s => {
+    if (!s.stayCode) {
+      migrated = true;
+      return { ...s, stayCode: generateCode() };
+    }
+    return s;
+  });
+
+  if (migrated && isBrowser) {
+    saveToStorage();
+  }
 };
 
 const saveToStorage = () => {
@@ -448,6 +481,10 @@ export const operationalData = {
   },
 
   getGuests: () => { loadFromStorage(); return [...MEMORY_GUESTS]; },
+  addGuest: (guest: GuestProfile) => {
+    MEMORY_GUESTS = [...MEMORY_GUESTS, guest];
+    saveToStorage();
+  },
   
   getStays: () => { loadFromStorage(); return [...MEMORY_STAYS]; },
   addStay: (stay: StayRecord) => {

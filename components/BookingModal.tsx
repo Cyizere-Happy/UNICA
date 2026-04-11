@@ -43,10 +43,7 @@ export const BookingModal = ({ isOpen, onClose, room }: BookingModalProps) => {
                     <BookingForm
                         room={room}
                         onSuccess={() => {
-                            // Handle success (e.g., show success message or just close)
-                            setTimeout(() => {
-                                onClose();
-                            }, 2000);
+                            // User now dismisses the modal manually via the "Mark as Read" button
                         }}
                     />
                 </div>

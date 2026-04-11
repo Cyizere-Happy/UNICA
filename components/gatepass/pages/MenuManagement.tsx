@@ -20,9 +20,18 @@ export default function MenuManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
+  const [userRole, setUserRole] = useState<string>('ADMIN');
 
   // Real-time synchronization for simulation
   React.useEffect(() => {
+    const userRaw = localStorage.getItem('user');
+    if (userRaw) {
+      try {
+        const u = JSON.parse(userRaw);
+        setUserRole(u.role || 'ADMIN');
+      } catch (e) { /* ignore */ }
+    }
+
     const handleSync = () => setMenu(operationalData.getMenu());
     window.addEventListener('storage', handleSync);
     window.addEventListener('fica-data-update', handleSync);
@@ -92,16 +101,18 @@ export default function MenuManagement() {
               />
             </div>
             
-            <button
-              onClick={() => {
-                setEditingItem(null);
-                setIsModalOpen(true);
-              }}
-              className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-accent to-[#3a4f6e] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg group"
-            >
-              <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" strokeWidth={3} />
-              Add Dish
-            </button>
+            {userRole === 'ADMIN' && (
+              <button
+                onClick={() => {
+                  setEditingItem(null);
+                  setIsModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-accent to-[#3a4f6e] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg group"
+              >
+                <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" strokeWidth={3} />
+                Add Dish
+              </button>
+            )}
           </div>
         </div>
 
@@ -179,23 +190,25 @@ export default function MenuManagement() {
                       <span className="text-base font-black text-[#292f36]">{formatPrice(item.price)}</span>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <button 
-                         onClick={() => {
-                           setEditingItem(item);
-                           setIsModalOpen(true);
-                         }}
-                         className="p-2 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-[#292f36] rounded-lg transition-all"
-                      >
-                        <Edit2 size={13} />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="p-2 bg-red-50 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all border border-red-50/50"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
+                    {userRole === 'ADMIN' && (
+                      <div className="flex items-center gap-1.5">
+                        <button 
+                           onClick={() => {
+                             setEditingItem(item);
+                             setIsModalOpen(true);
+                           }}
+                           className="p-2 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-[#292f36] rounded-lg transition-all"
+                        >
+                          <Edit2 size={13} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteItem(item.id)}
+                          className="p-2 bg-red-50 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all border border-red-50/50"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 

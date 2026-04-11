@@ -184,18 +184,29 @@ export default function RoomDetails() {
                                         <span className="text-zinc-400 font-medium whitespace-nowrap text-sm"> / night</span>
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-[10px] font-bold text-green-500 uppercase tracking-widest bg-green-500/10 px-3 py-1 rounded-full">Available</span>
+                                        {room.status === 'AVAILABLE' ? (
+                                            <span className="text-[10px] font-bold text-green-500 uppercase tracking-widest bg-green-500/10 px-3 py-1 rounded-full">Available</span>
+                                        ) : (
+                                            <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest bg-rose-500/10 px-3 py-1 rounded-full">{room.status.replace('_', ' ')}</span>
+                                        )}
                                     </div>
                                 </div>
 
                                 <button
                                     onClick={() => {
+                                        if (room.status !== 'AVAILABLE') return;
                                         console.log("Opening booking modal for room:", room.id);
                                         setIsBookingModalOpen(true);
                                     }}
-                                    className="w-full bg-[#0e0e0e] text-white py-4 rounded-xl text-base font-bold hover:bg-black transition-all shadow-lg shadow-black/5 hover:-translate-y-1 active:scale-95"
+                                    disabled={room.status !== 'AVAILABLE'}
+                                    className={cn(
+                                        "w-full py-4 rounded-xl text-base font-bold transition-all shadow-lg hover:-translate-y-1 active:scale-95",
+                                        room.status === 'AVAILABLE' 
+                                            ? "bg-[#0e0e0e] text-white hover:bg-black shadow-black/5" 
+                                            : "bg-zinc-100 text-zinc-400 cursor-not-allowed shadow-none hover:translate-y-0"
+                                    )}
                                 >
-                                    Book This Room
+                                    {room.status === 'AVAILABLE' ? 'Book This Room' : `Room ${room.status.replace('_', ' ')}`}
                                 </button>
 
 

@@ -245,20 +245,37 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
           "flex-1 scrollbar-custom overflow-x-hidden px-4 space-y-8 scrollbar-hide py-2",
           collapsed && "space-y-6"
         )}>
-          {sections.map((section) => (
-            <div key={section.title} className={cn(collapsed ? "space-y-4" : "space-y-1")}>
-              {!collapsed && (
-                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 mb-3">
-                  {section.title}
-                </h3>
-              )}
-              <div className={cn("flex flex-col", collapsed ? "gap-4" : "gap-1")}>
-                {section.items.map((item) => (
-                  <NavItem key={item.id} item={item} collapsed={collapsed} />
-                ))}
+          {sections.map((section) => {
+            // Filter items based on userRole
+            const filteredItems = section.items.filter(item => {
+              if (userRole === 'ADMIN') return true;
+              
+              const rolePermissions: Record<string, string[]> = {
+                KITCHEN: ['dashboard', 'kitchen-orders', 'order-history', 'menu-management', 'messages'],
+                RECEPTION: ['dashboard', 'room-bookings', 'registered-parents', 'messages'],
+              };
+              
+              const allowedIds = rolePermissions[userRole] || [];
+              return allowedIds.includes(item.id);
+            });
+
+            if (filteredItems.length === 0) return null;
+
+            return (
+              <div key={section.title} className={cn(collapsed ? "space-y-4" : "space-y-1")}>
+                {!collapsed && (
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 mb-3">
+                    {section.title}
+                  </h3>
+                )}
+                <div className={cn("flex flex-col", collapsed ? "gap-4" : "gap-1")}>
+                  {filteredItems.map((item) => (
+                    <NavItem key={item.id} item={item} collapsed={collapsed} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Bottom Menu */}
