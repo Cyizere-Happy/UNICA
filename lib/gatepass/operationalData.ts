@@ -226,6 +226,10 @@ export const operationalData = {
     MEMORY_ROOMS = MEMORY_ROOMS.map(r => r.id === room.id ? room : r);
     saveToStorage();
   },
+  removeRoom: (roomId: string) => {
+    MEMORY_ROOMS = MEMORY_ROOMS.filter(r => r.id !== roomId);
+    saveToStorage();
+  },
   
   getMenu: () => { loadFromStorage(); return [...MEMORY_MENU]; },
   addMenuItem: (item: FoodItem) => { 
