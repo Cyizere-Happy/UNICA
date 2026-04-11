@@ -365,21 +365,21 @@ export const operationalData = {
 
   getAnalytics: () => ({
     revenueData: [
-      { day: '1', revenue: 25 }, { day: '5', revenue: 20 }, { day: '10', revenue: 35 },
-      { day: '15', revenue: 55 }, { day: '20', revenue: 40 }, { day: '25', revenue: 65 },
-      { day: '30', revenue: 95 },
+      { day: '1', revenue: 3200 }, { day: '5', revenue: 4100 }, { day: '10', revenue: 3800 },
+      { day: '15', revenue: 5200 }, { day: '20', revenue: 4800 }, { day: '25', revenue: 6100 },
+      { day: '30', revenue: 7500 },
     ],
     operationsSplit: [
-      { name: 'Rooms Viewed', value: 45, color: '#4d668f' },
-      { name: 'Bookings Done', value: 25, color: '#292f36' },
-      { name: 'Menu Viewed', value: 20, color: '#d1d5db' },
-      { name: 'Other Sessions', value: 10, color: '#f3f4f6' },
+      { name: 'Room Bookings', value: 65, color: '#4d668f' },
+      { name: 'Food & Beverage', value: 25, color: '#292f36' },
+      { name: 'Spa & Wellness', value: 7, color: '#d1d5db' },
+      { name: 'Transport / Tours', value: 3, color: '#f3f4f6' },
     ],
     highlights: [
-      { title: 'Total Revenue', value: '$12,450', change: '+12%', icon: 'TrendingUp' },
-      { title: 'Active Stays', value: '42', change: '+5%', icon: 'Bed' },
-      { title: 'Customer Rating', value: '88%', change: '+2%', icon: 'Star' },
-      { title: 'Booking Streak', value: '07 Days', change: '+8%', icon: 'Zap' },
+      { title: 'RevPAR', value: '$124.50', change: '+4.2%', icon: 'TrendingUp' },
+      { title: 'ADR', value: '$155.00', change: '+8.1%', icon: 'Zap' },
+      { title: 'Occupancy Rate', value: '78%', change: '+12%', icon: 'Bed' },
+      { title: 'F&B Revenue', value: '$8,250', change: '+18%', icon: 'Star' },
     ]
   })
 };

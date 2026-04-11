@@ -79,8 +79,8 @@ export default function Analytics() {
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-6 transition-all">
             <div>
-              <h3 className="text-base font-black text-[#292f36]">Progress Overview</h3>
-              <p className="text-[10px] text-gray-400 font-medium">Your hospitality metrics and trends.</p>
+              <h3 className="text-base font-black text-[#292f36]">30-Day Revenue Trend</h3>
+              <p className="text-[10px] text-gray-400 font-medium">Combined Room & F&B Revenue ($).</p>
             </div>
             <div className="flex gap-2">
               <select className="bg-gray-50 border-none rounded-lg px-2 py-1 text-[9px] font-bold outline-none">
@@ -130,7 +130,7 @@ export default function Analytics() {
         {/* Weekly Activity Split */}
         <Card>
           <div className="flex items-center justify-between mb-4 transition-all">
-            <h3 className="text-base font-black text-[#292f36]">Operations Split</h3>
+            <h3 className="text-base font-black text-[#292f36]">Revenue Distribution</h3>
             <div className="flex gap-1">
                <button className="p-1 hover:bg-gray-50 rounded text-gray-400"><Search className="w-3.5 h-3.5" /></button>
                <button className="p-1 hover:bg-gray-50 rounded text-gray-400"><ChevronRight className="w-3.5 h-3.5" /></button>
@@ -197,21 +197,30 @@ export default function Analytics() {
             <tbody className="divide-y divide-gray-50">
               <tr>
                 <td className="px-6 py-4 flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
-                   <p className="text-xs font-bold text-[#292f36]">Sarah Johnson (Room 105)</p>
+                   <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                   <p className="text-xs font-bold text-[#292f36]">Sarah Johnson (Deluxe Suite - 105)</p>
                 </td>
-                <td className="px-6 py-4 text-[11px] font-bold text-gray-400 italic">2026-06-02</td>
-                <td className="px-6 py-4"><span className="text-[10px] font-black bg-amber-50 text-amber-600 px-2 py-1 rounded-md">Pending</span></td>
-                <td className="px-6 py-4 text-[10px] font-black text-gray-400">High</td>
+                <td className="px-6 py-4 text-[11px] font-bold text-gray-400">11:00 AM</td>
+                <td className="px-6 py-4"><span className="text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Late Check-out</span></td>
+                <td className="px-6 py-4 text-[10px] font-black text-rose-500">Critical</td>
               </tr>
               <tr>
                 <td className="px-6 py-4 flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                   <p className="text-xs font-bold text-[#292f36]">Michael Brown (Suite 204)</p>
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                   <p className="text-xs font-bold text-[#292f36]">Michael Brown (Executive - 204)</p>
                 </td>
-                <td className="px-6 py-4 text-[11px] font-bold text-gray-400 italic">2026-06-02</td>
-                <td className="px-6 py-4"><span className="text-[10px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded-md">Confirmed</span></td>
-                <td className="px-6 py-4 text-[10px] font-black text-gray-400">Medium</td>
+                <td className="px-6 py-4 text-[11px] font-bold text-gray-400">09:30 AM</td>
+                <td className="px-6 py-4"><span className="text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Checked Out</span></td>
+                <td className="px-6 py-4 text-[10px] font-black text-emerald-500">Resolved</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                   <p className="text-xs font-bold text-[#292f36]">Emily Davis (Standard Cozy - 302)</p>
+                </td>
+                <td className="px-6 py-4 text-[11px] font-bold text-gray-400">10:00 AM</td>
+                <td className="px-6 py-4"><span className="text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Pending Room Check</span></td>
+                <td className="px-6 py-4 text-[10px] font-black text-amber-500">Standard</td>
               </tr>
             </tbody>
           </table>
