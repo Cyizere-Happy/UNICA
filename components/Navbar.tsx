@@ -4,18 +4,28 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home, ShoppingBag } from 'lucide-react';
+import { Menu, X, Home, ShoppingBag, User, LogOut, FileText, LayoutDashboard, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
 
 import { useGuestAuth } from '@/context/GuestAuthContext';
+import { Sparkles } from 'lucide-react';
 
 export const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
     const { toggleCart, cartItems } = useCart();
-    const { isAuthenticated, isRegistered, guestUser, setEntryModalOpen, setCheckoutModalOpen } = useGuestAuth();
+    const { 
+        isAuthenticated, 
+        isRegistered, 
+        guestUser, 
+        setEntryModalOpen, 
+        setCheckoutModalOpen,
+        serviceModalOpen,
+        setServiceModalOpen,
+        logout
+    } = useGuestAuth();
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.cartQuantity, 0);
 
@@ -57,7 +67,7 @@ export const Navbar = () => {
                         <Home className="w-5 h-5" />
                     </div>
                     <span className="text-lg font-black tracking-tight text-[#292f36]">
-                        unica<span className="text-accent font-medium">house</span>
+                        unica<span className="text-accent font-medium">villa</span>
                     </span>
                 </Link>
 
@@ -85,24 +95,81 @@ export const Navbar = () => {
 
                 {/* Right Action Button */}
                 <div className="flex items-center gap-2 md:gap-4">
-                    <button 
-                        onClick={toggleCart}
-                        className="p-2.5 rounded-xl text-[#292f36] hover:bg-black/5 transition-all relative group"
-                    >
-                        <ShoppingBag className="w-5 h-5" />
-                        {cartCount > 0 && (
-                            <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-accent text-white text-[9px] font-black flex items-center justify-center rounded-full border-2 border-white shadow-sm group-hover:scale-110 transition-transform">
-                                {cartCount}
-                            </span>
-                        )}
-                    </button>
+                    {isAuthenticated && guestUser?.stayType !== 'APARTMENT' && (
+                        <button 
+                            onClick={toggleCart}
+                            className="p-2.5 rounded-xl text-[#292f36] hover:bg-black/5 transition-all relative group"
+                        >
+                            <ShoppingBag className="w-5 h-5" />
+                            {cartCount > 0 && (
+                                <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-accent text-white text-[9px] font-black flex items-center justify-center rounded-full border-2 border-white shadow-sm group-hover:scale-110 transition-transform">
+                                    {cartCount}
+                                </span>
+                            )}
+                        </button>
+                    )}
+ 
+                    {!isAuthenticated ? (
+                        <button 
+                            onClick={() => setEntryModalOpen(true)}
+                            className="px-5 py-2.5 rounded-xl font-semibold text-xs tracking-wide transition-all active:scale-95 bg-[#0e0e0e] text-white hover:bg-black"
+                        >
+                            Enter
+                        </button>
+                    ) : (
+                        <div className="relative group/menu">
+                            <button 
+                                className="flex items-center gap-3 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all border border-gray-100 group"
+                            >
+                                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
+                                    <User size={18} />
+                                </div>
+                                <div className="hidden md:flex flex-col items-start leading-none gap-1">
+                                    <span className="text-[10px] font-black text-[#292f36] uppercase tracking-wider">{guestUser?.name?.split(' ')[0]}</span>
+                                    <span className="text-[8px] font-bold text-gray-400">{guestUser?.roomNumber || 'Guest'}</span>
+                                </div>
+                                <ChevronDown size={14} className="text-gray-400 group-hover:rotate-180 transition-transform duration-300" />
+                            </button>
 
-                    <button 
-                        onClick={handleAuthAction}
-                        className="px-5 py-2.5 rounded-xl font-semibold text-xs tracking-wide transition-all active:scale-95 bg-[#0e0e0e] text-white hover:bg-black overflow-hidden max-w-[120px] truncate"
-                    >
-                        {isAuthenticated && isRegistered ? (guestUser?.name || 'Member') : 'Enter'}
-                    </button>
+                            {/* Dropdown Menu */}
+                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-300 translate-y-2 group-hover/menu:translate-y-0 z-[60]">
+                                <div className="px-4 py-3 border-b border-gray-50 mb-1">
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Portal Access</p>
+                                </div>
+                                <button 
+                                    onClick={() => setServiceModalOpen(true)}
+                                    className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 text-[#292f36] transition-colors group/item"
+                                >
+                                    <div className="w-8 h-8 rounded-lg bg-accent/5 text-accent flex items-center justify-center group-hover/item:bg-accent group-hover/item:text-white transition-all">
+                                        <Sparkles size={16} />
+                                    </div>
+                                    <span className="text-xs font-bold font-jost">Cleaning Service</span>
+                                </button>
+                                <button 
+                                    onClick={() => setCheckoutModalOpen(true)}
+                                    className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 text-[#292f36] transition-colors group/item"
+                                >
+                                    <div className="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 flex items-center justify-center group-hover/item:bg-rose-50 group-hover/item:text-rose-500 transition-all">
+                                        <LogOut size={16} />
+                                    </div>
+                                    <span className="text-xs font-bold font-jost">Initiate Checkout</span>
+                                </button>
+                                <div className="mt-2 pt-2 border-t border-gray-50">
+                                    <button 
+                                        onClick={() => {
+                                            logout();
+                                        }}
+                                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-rose-50/50 text-rose-500 transition-colors"
+                                    >
+                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                                            <LogOut size={16} />
+                                        </div>
+                                        <span className="text-xs font-black uppercase tracking-widest">Sign Out</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Mobile Toggle */}
                     <button

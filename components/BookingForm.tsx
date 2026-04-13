@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Users, Mail, Phone, User, ArrowRight, ArrowLeft, CheckCircle2, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Room } from '@/lib/data';
+import { Room } from '@/lib/gatepass/types';
+import { apiService } from '@/lib/gatepass/apiService';
+import { toast } from 'sonner';
 
 interface BookingFormProps {
     room: Room;
@@ -14,6 +16,7 @@ interface BookingFormProps {
 export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
     const [step, setStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -104,13 +107,33 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                             </div>
                         </div>
 
-                        <form onSubmit={(e) => {
+                        <form onSubmit={async (e) => {
                             e.preventDefault();
                             if (step < 3) {
                                 nextStep();
                             } else {
-                                setIsSubmitted(true);
-                                // Removed automatic onSuccess timeout to allow user to dismiss manually
+                                setIsLoading(true);
+                                try {
+                                    await apiService.createBooking({
+                                        guestName: formData.fullName,
+                                        guestEmail: formData.email,
+                                        guestPhone: formData.phone,
+                                        roomName: room.name,
+                                        roomType: room.type,
+                                        roomPrice: room.price,
+                                        checkIn: formData.checkIn,
+                                        checkOut: formData.checkOut,
+                                        guests: Number(formData.guests),
+                                        totalAmount: Number(room.price), // Simplified for now
+                                        specialRequests: formData.specialRequests
+                                    });
+                                    setIsSubmitted(true);
+                                } catch (err) {
+                                    console.error('Booking failed:', err);
+                                    toast.error("Booking failed. Please try again.");
+                                } finally {
+                                    setIsLoading(false);
+                                }
                             }
                         }} className="p-6 md:p-8 pt-0">
                             <AnimatePresence mode="wait">
@@ -295,14 +318,20 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                 )}
                                 <button
                                     type="submit"
-                                    disabled={!isStepValid()}
+                                    disabled={!isStepValid() || isLoading}
                                     className={cn(
                                         "w-full md:grow bg-[#0e0e0e] text-white py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed order-1 md:order-2",
                                         step === 1 && "w-full"
                                     )}
                                 >
-                                    {step === 3 ? 'Confirm Booking' : 'Save & Continue'}
-                                    {step < 3 && <ArrowRight className="w-4 h-4" />}
+                                    {isLoading ? (
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        <>
+                                            {step === 3 ? 'Confirm Booking' : 'Save & Continue'}
+                                            {step < 3 && <ArrowRight className="w-4 h-4" />}
+                                        </>
+                                    )}
                                 </button>
                             </div>
                             {step === 1 && (
@@ -323,9 +352,9 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                             <CheckCircle2 className="w-10 h-10 text-white" />
                         </div>
                         <div className="space-y-2">
-                            <h2 className="text-3xl font-black text-[#292f36]">Booking Confirmed!</h2>
+                            <h3 className="text-xl font-bold text-gray-900">Your Unicavilla Stay</h3>
                             <p className="text-zinc-500 font-medium max-w-xs mx-auto">
-                                Thank you for choosing Unica House. We've sent a confirmation email to <span className="text-accent font-bold">{formData.email}</span>.
+                                Thank you for choosing Unicavilla. We've sent a confirmation email to <span className="text-accent font-bold">{formData.email}</span>.
                             </p>
                         </div>
                         <div className="pt-6 space-y-4">

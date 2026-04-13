@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Calendar, Plus, Users, MapPin, Edit, XCircle, Filter, Download, Settings, Trash2 } from 'lucide-react';
 import Lottie from "lottie-react";
 import animationData from "@/lib/gatepass/assets/Logo.json";
-import { apiService } from '@/lib/gatepass/api';
+import { apiService } from '@/lib/gatepass/apiService';
 import type { VisitingDay } from '@/lib/gatepass/types';
 import { toast } from 'sonner';
 import ConfirmModal from '@/components/gatepass/ConfirmModal';
@@ -35,12 +35,12 @@ export default function VisitingDays() {
   });
   const [visitType, setVisitType] = useState<'PARENTS' | 'OUTSIDE_VISITORS'>('PARENTS');
   const [newVisit, setNewVisit] = useState({
-    parentName: '',
-    studentName: '',
-    studentClass: '',
+    guestName: '',
+    roomName: '',
+    roomType: '',
     visitorOrganization: '',
     visitDepartment: '',
-    contactNumber: '',
+    guestPhone: '',
     purpose: '',
     visitDate: '',
     visitTime: '',
@@ -118,7 +118,7 @@ export default function VisitingDays() {
         title: newVisitingDay.title,
         date: newVisitingDay.date,
         pricePerPerson: 2000, // Default price or add to UI
-        audience: newVisitingDay.audience.toUpperCase(), // Map to Backend Enum
+        audience: newVisitingDay.audience.toUpperCase() as 'PARENTS' | 'OUTSIDE_VISITORS', // Map to Backend Enum
         status: 'OPEN',
         location: newVisitingDay.location,
         startTime: newVisitingDay.startTime,
@@ -213,12 +213,12 @@ export default function VisitingDays() {
     setSelectedDay(day);
     setVisitType(day.audience || 'PARENTS');
     setNewVisit({
-      parentName: '',
-      studentName: '',
-      studentClass: '',
+      guestName: '',
+      roomName: '',
+      roomType: '',
       visitorOrganization: '',
       visitDepartment: '',
-      contactNumber: '',
+      guestPhone: '',
       purpose: '',
       visitDate: day.date,
       visitTime: '',
@@ -236,13 +236,13 @@ export default function VisitingDays() {
 
     try {
       const payload = {
-        parentName: newVisit.parentName,
-        phoneNumber: newVisit.contactNumber,
+        guestName: newVisit.guestName,
+        phoneNumber: newVisit.guestPhone,
         visitDate: newVisit.visitDate,
         visitTime: newVisit.visitTime,
         purpose: newVisit.purpose,
         visitorType: visitType,
-        studentNames: visitType === 'PARENTS' ? [newVisit.studentName] : undefined,
+        roomNames: visitType === 'PARENTS' ? [newVisit.roomName] : undefined,
         institution: newVisit.institution || newVisit.visitorOrganization,
         email: newVisit.email,
         visitCode: selectedDay?.visitCode || '123456'
@@ -528,7 +528,7 @@ export default function VisitingDays() {
                     : 'text-gray-500'
                     }`}
                 >
-                  Parent Visit
+                  Guest Visit
                 </button>
                 <button
                   type="button"
@@ -548,12 +548,12 @@ export default function VisitingDays() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-semibold mb-1">Parent / Guardian Name</label>
+                      <label className="block font-semibold mb-1">Guest Name</label>
                       <input
                         type="text"
-                        value={newVisit.parentName}
+                        value={newVisit.guestName}
                         onChange={e =>
-                          setNewVisit(prev => ({ ...prev, parentName: e.target.value }))
+                          setNewVisit(prev => ({ ...prev, guestName: e.target.value }))
                         }
                         className="w-full px-3 py-1.5 border rounded"
                       />
@@ -562,9 +562,9 @@ export default function VisitingDays() {
                       <label className="block font-semibold mb-1">Host / Room</label>
                       <input
                         type="text"
-                        value={newVisit.studentName}
+                        value={newVisit.roomName}
                         onChange={e =>
-                          setNewVisit(prev => ({ ...prev, studentName: e.target.value }))
+                          setNewVisit(prev => ({ ...prev, roomName: e.target.value }))
                         }
                         className="w-full px-3 py-1.5 border rounded"
                       />
@@ -572,14 +572,14 @@ export default function VisitingDays() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-semibold mb-1">Class</label>
+                      <label className="block font-semibold mb-1">Room Type</label>
                       <input
                         type="text"
-                        value={newVisit.studentClass}
+                        value={newVisit.roomType}
                         onChange={e =>
-                          setNewVisit(prev => ({ ...prev, studentClass: e.target.value }))
+                          setNewVisit(prev => ({ ...prev, roomType: e.target.value }))
                         }
-                        placeholder="e.g. Grade 5 A"
+                        placeholder="e.g. Deluxe Suite"
                         className="w-full px-3 py-1.5 border rounded"
                       />
                     </div>
@@ -603,9 +603,9 @@ export default function VisitingDays() {
                       <label className="block font-semibold mb-1">Visitor Name</label>
                       <input
                         type="text"
-                        value={newVisit.parentName}
+                        value={newVisit.guestName}
                         onChange={e =>
-                          setNewVisit(prev => ({ ...prev, parentName: e.target.value }))
+                          setNewVisit(prev => ({ ...prev, guestName: e.target.value }))
                         }
                         className="w-full px-3 py-1.5 border rounded"
                       />
@@ -648,11 +648,11 @@ export default function VisitingDays() {
                       <label className="block font-semibold mb-1">Contact Number</label>
                       <input
                         type="tel"
-                        value={newVisit.contactNumber}
+                        value={newVisit.guestPhone}
                         onChange={e =>
                           setNewVisit(prev => ({
                             ...prev,
-                            contactNumber: e.target.value
+                            guestPhone: e.target.value
                           }))
                         }
                         className="w-full px-3 py-1.5 border rounded"
@@ -861,8 +861,8 @@ export default function VisitingDays() {
             <div className="p-5 space-y-4">
               <div className="flex items-center justify-between p-3 border rounded-lg hover:border-[#153d5d] transition-colors cursor-pointer">
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900">Auto-Approve Parents</h4>
-                  <p className="text-xs text-gray-500">Skip manual approval for registered parents</p>
+                  <h4 className="text-sm font-semibold text-gray-900">Auto-Approve Guests</h4>
+                  <p className="text-xs text-gray-500">Skip manual approval for registered guests</p>
                 </div>
                 <div className="w-10 h-6 bg-blue-600 rounded-full relative">
                   <div className="w-4 h-4 bg-white rounded-full absolute right-1 top-1"></div>

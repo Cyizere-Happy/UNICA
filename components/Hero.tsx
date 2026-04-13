@@ -7,11 +7,11 @@ import { BedDouble, Building2, Compass, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 const heroImages = [
-    { src: "/Images/UNICA_Morning_Front_view.jpg", alt: "Unica House Morning View" },
-    { src: "/Images/UNICA_House_Evening_side_view.jpg", alt: "Unica House Evening Side View" },
-    { src: "/Images/UNICA_House_Evening_Front_view.jpg", alt: "Unica House Evening Front View" },
-    { src: "/Images/UNICA_House_Night_Front_View.jpg", alt: "Unica House Night View" },
-    { src: "/Images/UNICA_Morning_Side_View.jpg", alt: "Unica House Morning Side View" },
+    { src: "/Images/UNICA_Morning_Front_view.jpg", alt: "Unicavilla Morning View" },
+    { src: "/Images/UNICA_House_Evening_side_view.jpg", alt: "Unicavilla Evening Side View" },
+    { src: "/Images/UNICA_House_Evening_Front_view.jpg", alt: "Unicavilla Evening Front View" },
+    { src: "/Images/UNICA_House_Night_Front_View.jpg", alt: "Unicavilla Night View" },
+    { src: "/Images/UNICA_Morning_Side_View.jpg", alt: "Unicavilla Morning Side View" },
 ];
 
 export const Hero = () => {
@@ -83,7 +83,7 @@ export const Hero = () => {
                         >
                             Experience the zenith of Rwandan hospitality.
                             <br className="hidden sm:block" />
-                            A house designed for the unique traveler.
+                            A villa designed for the unique traveler.
                         </motion.p>
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}

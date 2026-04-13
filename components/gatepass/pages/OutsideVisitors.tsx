@@ -16,7 +16,7 @@ import {
   XCircle,
   Hash
 } from 'lucide-react';
-import { apiService } from '@/lib/gatepass/api';
+import { apiService } from '@/lib/gatepass/apiService';
 import type { Visit } from '@/lib/gatepass/types';
 import NoData from '@/components/gatepass/NoData';
 import { toast } from 'sonner';
@@ -43,7 +43,7 @@ export default function OutsideVisitors() {
       setLoading(true);
       const { visits } = await apiService.getVisits({
         limit: 200,
-        visitCode: code.trim()
+        stayCode: code.trim()
       });
       setVisits(visits);
       setActiveCode(code.trim());
@@ -66,8 +66,8 @@ export default function OutsideVisitors() {
       if (!query) return true;
 
       const fields = [
-        visit.parentName,
-        visit.parentPhone,
+        visit.guestName,
+        visit.guestPhone,
         visit.purpose,
         visit.institution,
         ...(visit.visitorMembers?.map(m => m.name + ' ' + m.role) || []),
@@ -283,7 +283,7 @@ export default function OutsideVisitors() {
                         <div className="space-y-3 text-sm text-gray-600">
                           <div className="flex items-center gap-3">
                             <Building2 className="w-4 h-4 text-gray-400" />
-                            <span className="font-medium text-gray-900">{visit.parentName}</span>
+                            <span className="font-medium text-gray-900">{visit.guestName}</span>
                           </div>
                           <div className="flex items-center gap-3">
                             <Clock className="w-4 h-4 text-gray-400" />
@@ -324,7 +324,7 @@ export default function OutsideVisitors() {
                   Organization
                 </p>
                 <h2 className="mt-1 text-2xl font-bold text-gray-900">
-                  {selectedVisit.institution || selectedVisit.parentName}
+                  {selectedVisit.institution || selectedVisit.guestName}
                 </h2>
                 <p className="text-gray-600 mt-1">{selectedVisit.purpose}</p>
               </div>
@@ -344,7 +344,7 @@ export default function OutsideVisitors() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
                     { icon: Clock, label: 'Date & Time', value: `${selectedVisit.visitDate} · ${selectedVisit.visitTime}` },
-                    { icon: Building2, label: 'Host', value: selectedVisit.parentName, sub: selectedVisit.parentPhone },
+                    { icon: Building2, label: 'Host', value: selectedVisit.guestName, sub: selectedVisit.guestPhone },
                     {
                       icon: null, label: 'Status', value: (
                         <span

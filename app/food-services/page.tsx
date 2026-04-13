@@ -1,165 +1,35 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Minus, Plus, ShoppingBag, X, Zap, Leaf, Flame, ShieldCheck } from 'lucide-react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { cn } from '@/lib/utils';
+import { cn, resolveImageUrl } from '@/lib/utils';
 import { AnimatePresence } from 'framer-motion';
-
-type MealType = 'Breakfast' | 'Lunch' | 'Dinner';
-
-type FoodItem = {
-    id: string;
-    name: string;
-    meal: MealType;
-    price: number;
-    image: string;
-    description: string;
-    calories?: number;
-    protein?: string;
-    fat?: string;
-    carbs?: string;
-    ingredients?: string[];
-};
-
-const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner'];
-
-const foodItems: FoodItem[] = [
-    { 
-        id: 'b1', 
-        name: 'Sunrise Omelette', 
-        meal: 'Breakfast', 
-        price: 5000, 
-        image: '/food/sunrise_omelette.png', 
-        description: 'Farm eggs, herbs, toast, and seasonal fruit.',
-        calories: 340,
-        protein: '18g',
-        fat: '22g',
-        carbs: '12g',
-        ingredients: ['Farm Fresh Eggs', 'Himalayan Salt', 'Fresh Chives', 'Whole Wheat Toast', 'Mixed Berries']
-    },
-    { 
-        id: 'b2', 
-        name: 'Granola Bowl', 
-        meal: 'Breakfast', 
-        price: 4500, 
-        image: '/food/granola_bowl.png', 
-        description: 'Yogurt, house granola, banana, and honey drizzle.',
-        calories: 420,
-        protein: '12g',
-        fat: '15g',
-        carbs: '58g',
-        ingredients: ['Greek Yogurt', 'Whole Grain Oats', 'Wildflower Honey', 'Sliced Banana', 'Almonds']
-    },
-    { 
-        id: 'b3', 
-        name: 'Pancake Stack', 
-        meal: 'Breakfast', 
-        price: 6000, 
-        image: '/food/pancake_stack.png', 
-        description: 'Fluffy pancakes served with syrup and berries.',
-        calories: 510,
-        protein: '10g',
-        fat: '18g',
-        carbs: '72g',
-        ingredients: ['Organic Flour', 'Maple Syrup', 'Cultured Butter', 'Assorted Fresh Berries', 'Vanilla Bean']
-    },
-    { 
-        id: 'l1', 
-        name: 'Grilled Chicken Wrap', 
-        meal: 'Lunch', 
-        price: 8500, 
-        image: '/food/chicken_wrap.png', 
-        description: 'Crisp greens, grilled chicken, and garlic aioli.',
-        calories: 480,
-        protein: '32g',
-        fat: '14g',
-        carbs: '42g',
-        ingredients: ['Chargrilled Chicken Breast', 'Artisanal Tortilla', 'Romaine Lettuce', 'Garlic Reduction', 'Cherry Tomatoes']
-    },
-    { 
-        id: 'l2', 
-        name: 'Garden Bowl', 
-        meal: 'Lunch', 
-        price: 7000, 
-        image: '/food/garden_bowl.png', 
-        description: 'Fresh greens, avocado, roasted seeds, and dressing.',
-        calories: 310,
-        protein: '9g',
-        fat: '24g',
-        carbs: '18g',
-        ingredients: ['Baby Spinach', 'Hass Avocado', 'Pumpkin Seeds', 'Balsamic Vinaigrette', 'Cucumber']
-    },
-    { 
-        id: 'l3', 
-        name: 'Beef Burger', 
-        meal: 'Lunch', 
-        price: 9500, 
-        image: '/food/beef_burger.png', 
-        description: 'Toasted bun, premium beef patty, and fries.',
-        calories: 780,
-        protein: '45g',
-        fat: '38g',
-        carbs: '65g',
-        ingredients: ['Wagyu Beef Patty', 'Brioche Bun', 'Aged Cheddar', 'Caramelized Onions', 'Secret Sauce']
-    },
-    { 
-        id: 'd1', 
-        name: 'Steak Plate', 
-        meal: 'Dinner', 
-        price: 15000, 
-        image: '/food/steak_plate.png', 
-        description: 'Pan-seared steak, mashed potatoes, and vegetables.',
-        calories: 840,
-        protein: '58g',
-        fat: '42g',
-        carbs: '35g',
-        ingredients: ['Prime Sirloin', 'Yukon Gold Potatoes', 'Garlic Butter', 'Seasonal Asparagus', 'Vinegar Reduction']
-    },
-    { 
-        id: 'd2', 
-        name: 'Herb Salmon', 
-        meal: 'Dinner', 
-        price: 14000, 
-        image: '/food/herb_salmon.png', 
-        description: 'Oven baked salmon with lemon butter and greens.',
-        calories: 520,
-        protein: '42g',
-        fat: '28g',
-        carbs: '8g',
-        ingredients: ['Wild-Caught Salmon', 'Fresh Dill', 'Lemon Zest', 'Extra Virgin Olive Oil', 'Steamed Spinach']
-    },
-    { 
-        id: 'd3', 
-        name: 'Pasta Alfredo', 
-        meal: 'Dinner', 
-        price: 11000, 
-        image: '/food/pasta_alfredo.png', 
-        description: 'Creamy sauce, parmesan, and fresh parsley.',
-        calories: 670,
-        protein: '15g',
-        fat: '34g',
-        carbs: '68g',
-        ingredients: ['Handmade Fettuccine', 'Aged Parmesan', 'Heavy Cream', 'Fresh Parsley', 'Black Peppercorns']
-    },
-];
+import { apiService } from '@/lib/gatepass/apiService';
 
 import { useCart } from '@/context/CartContext';
-
 import { useGuestAuth } from '@/context/GuestAuthContext';
+
+type MealType = 'Breakfast' | 'Lunch' | 'Dinner';
+const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner'];
 
 export default function FoodServicesPage() {
     const [activeMeal, setActiveMeal] = useState<MealType>('Breakfast');
-    const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
-    const { cartItems, updateCart, toggleCart } = useCart();
-    const { isAuthenticated, isRegistered, setEntryModalOpen } = useGuestAuth();
+    const [selectedItem, setSelectedItem] = useState<any | null>(null);
+    const [menuItems, setMenuItems] = useState<any[]>([]);
+    const { cartItems, updateCart } = useCart();
+    const { isAuthenticated, isRegistered, guestUser, setEntryModalOpen } = useGuestAuth();
+
+    useEffect(() => {
+        apiService.getMenu().then(setMenuItems).catch(console.error);
+    }, []);
 
     const filteredItems = useMemo(
-        () => foodItems.filter((item) => item.meal === activeMeal),
-        [activeMeal]
+        () => menuItems.filter((item) => item.meal === activeMeal),
+        [activeMeal, menuItems]
     );
 
     const getItemQty = (id: string) => {
@@ -167,8 +37,9 @@ export default function FoodServicesPage() {
     };
 
     const totalItems = cartItems.reduce((acc, item) => acc + item.cartQuantity, 0);
-    
     const isFullGuest = isAuthenticated && isRegistered;
+    const canOrderInterface = isAuthenticated; // Allow authenticated but unregistered guests to add to cart
+    const isApartmentGuest = guestUser?.stayType === 'APARTMENT';
 
     return (
         <main className="min-h-screen bg-[#f6f7f9]">
@@ -225,7 +96,7 @@ export default function FoodServicesPage() {
                             >
                                 <div className="relative h-44 overflow-hidden">
                                     <Image 
-                                        src={item.image} 
+                                        src={resolveImageUrl(item.image)} 
                                         alt={item.name} 
                                         fill 
                                         className="object-cover transition-transform duration-700 group-hover:scale-110" 
@@ -243,24 +114,30 @@ export default function FoodServicesPage() {
                                     <div className="flex items-center justify-between">
                                         <span className="text-xl font-black text-[#292f36]">{item.price} RWF</span>
 
-                                        {isFullGuest ? (
-                                            <div className="flex items-center gap-2 bg-[#f5f6f8] rounded-xl p-1" onClick={(e) => e.stopPropagation()}>
-                                                <button
-                                                    onClick={() => updateCart(item, -1)}
-                                                    className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center transition-colors"
-                                                >
-                                                    <Minus className="w-4 h-4" />
-                                                </button>
-                                                <span className="w-7 text-center text-sm font-bold text-[#292f36]">
-                                                    {getItemQty(item.id)}
-                                                </span>
-                                                <button
-                                                    onClick={() => updateCart(item, 1)}
-                                                    className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center transition-colors"
-                                                >
-                                                    <Plus className="w-4 h-4" />
-                                                </button>
-                                            </div>
+                                        {canOrderInterface ? (
+                                            isApartmentGuest ? (
+                                                <div className="px-4 py-2 bg-gray-100 text-[#292f36]/40 text-[9px] font-black uppercase tracking-widest rounded-xl border border-black/5">
+                                                    Menu Only
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2 bg-[#f5f6f8] rounded-xl p-1" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        onClick={() => updateCart(item, -1)}
+                                                        className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center transition-colors"
+                                                    >
+                                                        <Minus className="w-4 h-4" />
+                                                    </button>
+                                                    <span className="w-7 text-center text-sm font-bold text-[#292f36]">
+                                                        {getItemQty(item.id)}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => updateCart(item, 1)}
+                                                        className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center transition-colors"
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            )
                                         ) : (
                                             <button 
                                                 onClick={(e) => {
@@ -300,7 +177,7 @@ export default function FoodServicesPage() {
                             <div className="flex flex-col md:flex-row h-full max-h-[90vh] md:max-h-[80vh]">
                                 {/* Left Side - Image */}
                                 <div className="md:w-[45%] h-36 md:h-auto relative shrink-0">
-                                    <Image src={selectedItem.image} alt={selectedItem.name} fill className="object-cover" />
+                                    <Image src={resolveImageUrl(selectedItem.image)} alt={selectedItem.name} fill className="object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
                                 </div>
 
@@ -338,7 +215,7 @@ export default function FoodServicesPage() {
                                     <div className="mb-4">
                                         <h4 className="text-[10px] font-black text-[#292f36] uppercase tracking-[0.12em] mb-2">Ingredients</h4>
                                         <div className="flex flex-wrap gap-1">
-                                            {selectedItem.ingredients?.map((ing, i) => (
+                                            {selectedItem.ingredients?.map((ing: string, i: number) => (
                                                 <span key={i} className="px-2 py-1 bg-[#f5f6f8] text-[#4d5053] text-[9px] font-semibold rounded-md border border-black/5">
                                                     {ing}
                                                 </span>
@@ -355,26 +232,32 @@ export default function FoodServicesPage() {
                                             </span>
                                         </div>
 
-                                        {isFullGuest ? (
-                                            <div className="flex items-center gap-4">
-                                                <div className="flex items-center gap-2.5 bg-[#f5f6f8] rounded-xl p-1.5">
-                                                    <button
-                                                        onClick={() => updateCart(selectedItem, -1)}
-                                                        className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center shadow-sm transition-all active:scale-90"
-                                                    >
-                                                        <Minus className="w-4 h-4" />
-                                                    </button>
-                                                    <span className="w-6 text-center text-base font-black text-[#292f36]">
-                                                        {getItemQty(selectedItem.id)}
-                                                    </span>
-                                                    <button
-                                                        onClick={() => updateCart(selectedItem, 1)}
-                                                        className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center shadow-md transition-all active:scale-90"
-                                                    >
-                                                        <Plus className="w-4 h-4" />
-                                                    </button>
+                                        {canOrderInterface ? (
+                                            isApartmentGuest ? (
+                                                <div className="px-6 py-3 bg-gray-100 text-[#292f36]/40 rounded-xl font-black text-[10px] uppercase tracking-widest border border-black/5">
+                                                    Dining Preview Mode
                                                 </div>
-                                            </div>
+                                            ) : (
+                                                <div className="flex items-center gap-4">
+                                                    <div className="flex items-center gap-2.5 bg-[#f5f6f8] rounded-xl p-1.5">
+                                                        <button
+                                                            onClick={() => updateCart(selectedItem, -1)}
+                                                            className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center shadow-sm transition-all active:scale-90"
+                                                        >
+                                                            <Minus className="w-4 h-4" />
+                                                        </button>
+                                                        <span className="w-6 text-center text-base font-black text-[#292f36]">
+                                                            {getItemQty(selectedItem.id)}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => updateCart(selectedItem, 1)}
+                                                            className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center shadow-md transition-all active:scale-90"
+                                                        >
+                                                            <Plus className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )
                                         ) : (
                                             <button 
                                                 onClick={() => setEntryModalOpen(true)}
@@ -395,4 +278,3 @@ export default function FoodServicesPage() {
         </main>
     );
 }
-

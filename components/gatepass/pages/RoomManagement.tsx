@@ -6,27 +6,21 @@ import {
   CheckCircle2, AlertCircle, X, Camera, Image as ImageIcon, 
   Layout, Save, Trash, Wand2, Info
 } from 'lucide-react';
-import { operationalData } from '@/lib/gatepass/operationalData';
+import { apiService } from '@/lib/gatepass/apiService';
 import { Room } from '@/lib/gatepass/types';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, resolveImageUrl } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function RoomManagement() {
-  const [rooms, setRooms] = useState<Room[]>(operationalData.getRooms());
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'DETAILS' | 'GALLERY'>('DETAILS');
   const [editingRoom, setEditingRoom] = useState<Partial<Room> | null>(null);
 
-  // Real-time synchronization for simulation
   useEffect(() => {
-    const handleSync = () => setRooms(operationalData.getRooms());
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('fica-data-update', handleSync);
-    return () => {
-        window.removeEventListener('storage', handleSync);
-        window.removeEventListener('fica-data-update', handleSync);
-    };
+    apiService.getRooms().then(setRooms).catch(console.error);
   }, []);
 
   const openModal = (room?: Room) => {
@@ -52,27 +46,35 @@ export default function RoomManagement() {
     setIsModalOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editingRoom || !editingRoom.name) return;
-    
     const roomToSave = editingRoom as Room;
-    const exists = rooms.find(r => r.id === roomToSave.id);
-    
-    if (exists) {
-      operationalData.updateRoom(roomToSave);
-    } else {
-      operationalData.addRoom(roomToSave);
+    try {
+      if (rooms.find(r => r.id === roomToSave.id)) {
+        const updated = await apiService.updateRoom(roomToSave.id, roomToSave);
+        setRooms(prev => prev.map(r => r.id === updated.id ? updated : r));
+        toast.success('Room updated successfully.');
+      } else {
+        const created = await apiService.createRoom(roomToSave);
+        setRooms(prev => [...prev, created]);
+        toast.success('Room created successfully.');
+      }
+      setIsModalOpen(false);
+      setEditingRoom(null);
+    } catch (err) {
+      toast.error('Failed to save room.');
+      console.error(err);
     }
-    
-    setRooms(operationalData.getRooms());
-    setIsModalOpen(false);
-    setEditingRoom(null);
   };
 
-  const handleDelete = (roomId: string) => {
-    if (confirm('Are you sure you want to remove this room from inventory?')) {
-      operationalData.removeRoom(roomId);
-      setRooms(operationalData.getRooms());
+  const handleDelete = async (roomId: string) => {
+    if (!confirm('Are you sure you want to remove this room from inventory?')) return;
+    try {
+      await apiService.deleteRoom(roomId);
+      setRooms(prev => prev.filter(r => r.id !== roomId));
+      toast.success('Room removed.');
+    } catch (err) {
+      toast.error('Failed to delete room.');
     }
   };
 
@@ -127,7 +129,7 @@ export default function RoomManagement() {
             >
               {/* Responsive Image Container */}
               <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-gray-50">
-                <img src={room.mainImage} alt={room.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <img src={resolveImageUrl(room.mainImage)} alt={room.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute top-3 right-3">
                   <span className={cn(
                     "px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg backdrop-blur-md",
@@ -321,19 +323,27 @@ export default function RoomManagement() {
                           />
                         </div>
                       </div>
-
-                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Main Cover Image URL</label>
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Main Cover Image Upload</label>
                           <div className="flex gap-2">
                              <input 
-                               type="text" 
-                               value={editingRoom?.mainImage || ''} 
-                               onChange={(e) => updateField('mainImage', e.target.value)}
-                               className="flex-1 px-5 py-3 bg-gray-50 border-2 border-transparent focus:border-accent/10 focus:bg-white rounded-2xl font-bold text-[#292f36] text-[11px] transition-all outline-none"
+                               type="file" 
+                               accept="image/*"
+                               onChange={async (e) => {
+                                 const file = e.target.files?.[0];
+                                 if (file) {
+                                   try {
+                                     const { url } = await apiService.uploadImage(file, 'rooms');
+                                     updateField('mainImage', url);
+                                   } catch (err) {
+                                     console.error('Upload failed:', err);
+                                   }
+                                 }
+                               }}
+                               className="flex-1 px-5 py-2.5 bg-gray-50 border-2 border-transparent focus:border-accent/10 focus:bg-white rounded-2xl font-bold text-[#292f36] text-[11px] transition-all outline-none"
                              />
                              <div className="w-12 h-12 rounded-xl border-2 border-gray-100 overflow-hidden shrink-0">
-                                <img src={editingRoom?.mainImage} className="w-full h-full object-cover" />
+                                <img src={resolveImageUrl(editingRoom?.mainImage)} className="w-full h-full object-cover" />
                              </div>
                           </div>
                         </div>
@@ -350,8 +360,7 @@ export default function RoomManagement() {
                           </select>
                         </div>
                       </div>
-                    </div>
-                  ) : (
+                    ) : (
                     <div className="space-y-8">
                        <div className="p-6 bg-accent/5 rounded-[32px] border border-accent/10">
                           <h5 className="text-[11px] font-black text-accent uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -359,27 +368,23 @@ export default function RoomManagement() {
                           </h5>
                           <div className="flex gap-3">
                              <input 
-                               id="new-gallery-url"
-                               type="text" 
-                               placeholder="Paste image URL here..."
-                               className="flex-1 px-5 py-3.5 bg-white border-2 border-transparent focus:border-accent/10 rounded-2xl font-bold text-[#292f36] text-[12px] transition-all outline-none shadow-sm"
-                               onKeyDown={(e) => {
-                                 if (e.key === 'Enter') {
-                                   addToGallery((e.target as HTMLInputElement).value);
-                                   (e.target as HTMLInputElement).value = '';
+                               id="new-gallery-file"
+                               type="file" 
+                               accept="image/*"
+                               className="flex-1 px-5 py-2 bg-white border-2 border-transparent focus:border-accent/10 rounded-2xl font-bold text-[#292f36] text-[12px] transition-all outline-none shadow-sm"
+                               onChange={async (e) => {
+                                 const file = e.target.files?.[0];
+                                 if (file) {
+                                   try {
+                                     const { url } = await apiService.uploadImage(file, 'rooms');
+                                     addToGallery(url);
+                                     e.target.value = '';
+                                   } catch (err) {
+                                     console.error('Upload failed:', err);
+                                   }
                                  }
                                }}
                              />
-                             <button 
-                               onClick={() => {
-                                 const el = document.getElementById('new-gallery-url') as HTMLInputElement;
-                                 addToGallery(el.value);
-                                 el.value = '';
-                               }}
-                               className="px-6 py-3.5 bg-accent text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg"
-                             >
-                               Inject
-                             </button>
                           </div>
                        </div>
 
@@ -394,7 +399,7 @@ export default function RoomManagement() {
                                 key={idx} 
                                 className="relative aspect-square rounded-2xl overflow-hidden group shadow-md"
                               >
-                                 <img src={url} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                                 <img src={resolveImageUrl(url)} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <button 
                                       onClick={() => removeFromGallery(idx)}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Search, CheckCircle, UserCheck, Clock, AlertCircle, User, GraduationCap, Phone, Hash, Users, QrCode, XCircle } from 'lucide-react';
-import { apiService } from '@/lib/gatepass/api';
+import { apiService } from '@/lib/gatepass/apiService';
 import type { Visit } from '@/lib/gatepass/types';
 import Lottie from "lottie-react";
 import animationData from "@/lib/gatepass/assets/Digital Payment.json";
@@ -145,8 +145,8 @@ export default function Verification() {
     setSuccessMessage('');
 
     try {
-      const response = await apiService.checkIn(searchQuery.trim());
-      setVisit(response.visitor);
+      const response = await apiService.checkIn({ stayCode: searchQuery.trim() });
+      setVisit(response);
       setSuccessMessage(response.message || 'Visitor checked in successfully!');
       setTimeout(() => {
         setSearchQuery('');
@@ -273,10 +273,10 @@ export default function Verification() {
                     className="p-4 hover:bg-blue-50 cursor-pointer transition-colors flex items-center justify-between"
                   >
                     <div>
-                      <h4 className="font-bold text-gray-900">{res.parentName}</h4>
+                      <h4 className="font-bold text-gray-900">{res.guestName}</h4>
                       <div className="text-sm text-gray-600 mt-1 flex flex-wrap gap-x-4 gap-y-1">
-                        <span className="flex items-center gap-1"><GraduationCap className="w-3.5 h-3.5" /> {res.studentName} {res.studentId ? `(${res.studentId})` : ''}</span>
-                        <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5" /> {res.parentPhone}</span>
+                        <span className="flex items-center gap-1"><GraduationCap className="w-3.5 h-3.5" /> {res.roomName} {res.roomId ? `(${res.roomId})` : ''}</span>
+                        <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5" /> {res.guestPhone}</span>
                         <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> {res.relationship || 'Visitor'}</span>
                         <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {res.visitorCount} {res.visitorCount === 1 ? 'Person' : 'People'}</span>
                         <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {res.visitDate}</span>
@@ -324,14 +324,14 @@ export default function Verification() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">
-                    {canCheckIn ? `Ready to Check In: ${visit.studentName || 'Visitor'}` :
-                      visit.status === 'CHECKED_IN' ? `Checked In: ${visit.studentName || 'Visitor'}` :
+                    {canCheckIn ? `Ready to Check In: ${visit.roomName || 'Visitor'}` :
+                      visit.status === 'CHECKED_IN' ? `Checked In: ${visit.roomName || 'Visitor'}` :
                         visit.status === 'PENDING' ? 'Pending Approval' :
                           'Visit Status: ' + visit.status}
                   </h2>
                   <p className="text-gray-600">
-                    {canCheckIn ? `Approving entry for visitor to see ${visit.studentName}` :
-                      visit.status === 'CHECKED_IN' ? `${visit.parentName} successfully checked in to visit ${visit.studentName}` :
+                    {canCheckIn ? `Approving entry for visitor to see ${visit.roomName}` :
+                      visit.status === 'CHECKED_IN' ? `${visit.guestName} successfully checked in to visit ${visit.roomName}` :
                         'This visit requires approval before check-in'}
                   </p>
                 </div>
@@ -365,7 +365,7 @@ export default function Verification() {
                     </div>
                     <div className="flex-1">
                       <label className="text-sm text-gray-600">Lead Guest Name</label>
-                      <p className="text-lg font-semibold text-gray-900">{visit.parentName}</p>
+                      <p className="text-lg font-semibold text-gray-900">{visit.guestName}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -374,7 +374,7 @@ export default function Verification() {
                     </div>
                     <div className="flex-1">
                       <label className="text-sm text-gray-600">Phone Number</label>
-                      <p className="text-gray-900 font-mono">{visit.parentPhone}</p>
+                      <p className="text-gray-900 font-mono">{visit.guestPhone}</p>
                     </div>
                   </div>
                   {visit.nationalId && (
@@ -415,7 +415,7 @@ export default function Verification() {
                     </div>
                     <div className="flex-1">
                       <label className="text-sm text-gray-600">Host / Room</label>
-                      <p className="text-lg font-semibold text-gray-900">{visit.studentName}</p>
+                      <p className="text-lg font-semibold text-gray-900">{visit.roomName}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -423,8 +423,8 @@ export default function Verification() {
                       <Hash className="w-4 h-4 text-indigo-600" />
                     </div>
                     <div className="flex-1">
-                      <label className="text-sm text-gray-600">Student ID</label>
-                      <p className="text-gray-900 font-mono text-lg">{visit.studentId}</p>
+                      <label className="text-sm text-gray-600">Room ID</label>
+                      <p className="text-gray-900 font-mono text-lg">{visit.roomId}</p>
                     </div>
                   </div>
                   {visit.relationship && (

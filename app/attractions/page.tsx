@@ -86,7 +86,7 @@ export default function AttractionsPage() {
                         >
                             <span className="text-accent font-black text-xs uppercase tracking-[0.4em] border-b-2 border-accent pb-2">Exclusive Discovery</span>
                         </motion.div>
-                        <h1 className="text-4xl md:text-7xl font-black text-[#292f36] tracking-tighter mb-3 leading-none">
+                        <h1 className="text-xl font-black text-[#292f36] tracking-tighter uppercase italic">Unicavilla
                             Discovery
                         </h1>
                     </div>

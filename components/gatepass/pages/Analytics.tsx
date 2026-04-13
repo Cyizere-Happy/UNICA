@@ -1,5 +1,5 @@
 'use client';
-
+import { useEffect, useState } from 'react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -8,7 +8,8 @@ import {
   TrendingUp, Bed, Star, Zap, Search, RefreshCw, 
   ChevronRight, Filter, SortAsc, Play, Rocket 
 } from 'lucide-react';
-import { operationalData } from '@/lib/gatepass/operationalData';
+import { apiService } from '@/lib/gatepass/apiService';
+import api from '@/lib/gatepass/api';
 import { useSidebar } from '@/context/SidebarContext';
 
 const Card = ({ children, className }: { children: React.ReactNode; className?: string }) => (
@@ -17,15 +18,71 @@ const Card = ({ children, className }: { children: React.ReactNode; className?: 
   </div>
 );
 
+const DISTRIBUTION = [
+  { name: 'Room Bookings', value: 65, color: '#4d668f' },
+  { name: 'Food & Beverage', value: 25, color: '#292f36' },
+  { name: 'Spa & Wellness', value: 7, color: '#d1d5db' },
+  { name: 'Transport / Tours', value: 3, color: '#f3f4f6' },
+];
+
 export default function Analytics() {
-  const data = operationalData.getAnalytics();
   const { collapsed } = useSidebar();
+  const [revenueData, setRevenueData] = useState<{ day: string; revenue: number }[]>([]);
+  const [highlights, setHighlights] = useState<{ title: string; value: string; change: string; icon: string }[]>([]);
+  const [upcomingCheckouts, setUpcomingCheckouts] = useState<any[]>([]);
+  const [distribution, setDistribution] = useState<{ name: string; value: number; color: string }[]>([
+    { name: 'Room Bookings', value: 0, color: '#4d668f' },
+    { name: 'Food & Beverage', value: 0, color: '#292f36' },
+    { name: 'Spa & Wellness', value: 0, color: '#d1d5db' },
+    { name: 'Transport / Tours', value: 0, color: '#f3f4f6' },
+  ]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+
+  const loadData = async () => {
+    try {
+      const [trendsData, highlightsData, staysData] = await Promise.all([
+        api.get('/analytics/trends').then(r => r.data),
+        api.get('/analytics/highlights').then(r => r.data),
+        api.get('/stays/active').then(r => r.data),
+      ]);
+
+      // Map trends to chart format
+      const chartData = (trendsData || []).map((t: any, i: number) => ({
+        day: String(i + 1),
+        revenue: t.revenue,
+      }));
+      setRevenueData(chartData);
+
+      // Map highlights to KPI cards
+      setHighlights([
+        { title: 'Occupancy Rate', value: `${highlightsData.occupancyRate}%`, change: 'Live', icon: 'Bed' },
+        { title: 'ADR', value: `$${highlightsData.adr}`, change: 'Live', icon: 'TrendingUp' },
+        { title: 'RevPAR', value: `$${highlightsData.revPar}`, change: 'Live', icon: 'Zap' },
+        { title: 'F&B Revenue', value: `$${highlightsData.fbRevenue}`, change: 'Live', icon: 'Star' },
+      ]);
+
+      // Map stays to upcoming checkouts
+      setUpcomingCheckouts((staysData || []).slice(0, 3));
+
+      // Map distribution and total revenue
+      if (highlightsData.distribution) {
+        setDistribution(highlightsData.distribution);
+      }
+      if (highlightsData.totalRevenue) {
+        setTotalRevenue(highlightsData.totalRevenue);
+      }
+    } catch (err) {
+      console.error('Failed to load analytics data', err);
+    }
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   return (
     <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 w-full font-sans bg-transparent min-h-screen transition-all duration-300">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-[#292f36] tracking-tight transition-all">Highlights</h1>
-        <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-gray-200 text-[10px] font-bold text-gray-500 hover:bg-white hover:shadow-sm transition-all">
+        <button onClick={loadData} className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-gray-200 text-[10px] font-bold text-gray-500 hover:bg-white hover:shadow-sm transition-all">
           <RefreshCw className="w-3 h-3" />
           Refresh Data
         </button>
@@ -35,7 +92,7 @@ export default function Analytics() {
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 transition-all duration-500
         ${!collapsed ? 'gap-3' : 'gap-4'}
       `}>
-        {data.highlights.map((item, idx) => {
+        {highlights.map((item, idx) => {
           const Icon = { TrendingUp, Bed, Star, Zap }[item.icon] || TrendingUp;
           return (
             <Card key={idx} className={`relative overflow-hidden group transition-all duration-500
@@ -94,7 +151,7 @@ export default function Analytics() {
           
           <div className="h-[220px] w-full transition-all">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.revenueData}>
+              <AreaChart data={revenueData}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#4d668f" stopOpacity={0.3}/>
@@ -141,13 +198,13 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={data.operationsSplit}
+                  data={distribution}
                   innerRadius={50}
                   outerRadius={65}
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {data.operationsSplit.map((entry, index) => (
+                  {distribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -155,12 +212,12 @@ export default function Analytics() {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Total</p>
-              <p className="text-xl font-black text-[#292f36]">42</p>
+              <p className="text-xl font-black text-[#292f36]">{totalRevenue}</p>
             </div>
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-y-2.5">
-            {data.operationsSplit.map((item, i) => (
+            {distribution.map((item, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color }} />
                 <p className="text-[9px] font-bold text-gray-500 whitespace-nowrap">{item.name}: <span className="text-[#292f36]">{item.value}%</span></p>
@@ -195,33 +252,21 @@ export default function Analytics() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              <tr>
-                <td className="px-6 py-4 flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                   <p className="text-xs font-bold text-[#292f36]">Sarah Johnson (Deluxe Suite - 105)</p>
-                </td>
-                <td className="px-6 py-4 text-[11px] font-bold text-gray-400">11:00 AM</td>
-                <td className="px-6 py-4"><span className="text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Late Check-out</span></td>
-                <td className="px-6 py-4 text-[10px] font-black text-rose-500">Critical</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                   <p className="text-xs font-bold text-[#292f36]">Michael Brown (Executive - 204)</p>
-                </td>
-                <td className="px-6 py-4 text-[11px] font-bold text-gray-400">09:30 AM</td>
-                <td className="px-6 py-4"><span className="text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Checked Out</span></td>
-                <td className="px-6 py-4 text-[10px] font-black text-emerald-500">Resolved</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                   <p className="text-xs font-bold text-[#292f36]">Emily Davis (Standard Cozy - 302)</p>
-                </td>
-                <td className="px-6 py-4 text-[11px] font-bold text-gray-400">10:00 AM</td>
-                <td className="px-6 py-4"><span className="text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Pending Room Check</span></td>
-                <td className="px-6 py-4 text-[10px] font-black text-amber-500">Standard</td>
-              </tr>
+              {upcomingCheckouts.length === 0 ? (
+                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-400 text-sm font-medium">No active stays to display.</td></tr>
+              ) : upcomingCheckouts.map((stay, i) => (
+                <tr key={stay.id || i}>
+                  <td className="px-6 py-4 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <p className="text-xs font-bold text-[#292f36]">{stay.guest?.name || 'Guest'} ({stay.room?.name || 'Room'})</p>
+                  </td>
+                  <td className="px-6 py-4 text-[11px] font-bold text-gray-400">
+                    {stay.expectedCheckOutAt ? new Date(stay.expectedCheckOutAt).toLocaleDateString() : 'TBD'}
+                  </td>
+                  <td className="px-6 py-4"><span className="text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Active</span></td>
+                  <td className="px-6 py-4 text-[10px] font-black text-emerald-500">Standard</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </Card>

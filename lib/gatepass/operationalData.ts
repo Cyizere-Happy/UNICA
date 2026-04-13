@@ -1,4 +1,4 @@
-import { Room, FoodItem, FoodOrder, ContactMessage, GuestProfile } from './types';
+import { Room, FoodItem, FoodOrder, ContactMessage, GuestProfile, StayRecord } from './types';
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -271,7 +271,8 @@ const DEFAULT_STAYS: StayRecord[] = [
     checkIn: '2026-04-10T09:00:00Z',
     status: 'CHECKED_IN',
     totalAmount: 35.00,
-    stayCode: 'UNICA-A9W'
+    stayCode: 'UNICA-A9W',
+    type: 'ROOM'
   },
   {
     id: 'STAY-801',
@@ -283,7 +284,8 @@ const DEFAULT_STAYS: StayRecord[] = [
     checkOut: '2026-03-05T10:00:00Z',
     status: 'CHECKED_OUT',
     totalAmount: 400.00,
-    stayCode: 'UNICA-Z2Q'
+    stayCode: 'UNICA-Z2Q',
+    type: 'APARTMENT'
   }
 ];
 
@@ -305,100 +307,18 @@ const loadFromStorage = () => {
     const savedOrders = localStorage.getItem(STORAGE_KEYS.ORDERS);
     const savedRooms = localStorage.getItem(STORAGE_KEYS.ROOMS);
     const savedMenu = localStorage.getItem(STORAGE_KEYS.MENU);
-
-    // Initial Seeding: If storage is empty, write defaults immediately
-    if (!savedOrders) {
-        localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(DEFAULT_ORDERS));
-        MEMORY_ORDERS = DEFAULT_ORDERS;
-    } else {
-        const parsed = JSON.parse(savedOrders);
-        if (Array.isArray(parsed)) MEMORY_ORDERS = parsed;
-    }
-
-    if (!savedRooms) {
-        localStorage.setItem(STORAGE_KEYS.ROOMS, JSON.stringify(DEFAULT_ROOMS));
-        MEMORY_ROOMS = DEFAULT_ROOMS;
-    } else {
-        const parsed = JSON.parse(savedRooms);
-        if (Array.isArray(parsed)) {
-            // Merge in any missing default rooms to restore missing ones like 'Superior Bedroom'
-            const existingIds = new Set(parsed.map(r => r.id));
-            const missingRooms = DEFAULT_ROOMS.filter(r => !existingIds.has(r.id));
-            
-            if (missingRooms.length > 0) {
-                MEMORY_ROOMS = [...parsed, ...missingRooms];
-                localStorage.setItem(STORAGE_KEYS.ROOMS, JSON.stringify(MEMORY_ROOMS));
-            } else {
-                MEMORY_ROOMS = parsed;
-            }
-        }
-    }
-
-    if (!savedMenu) {
-        localStorage.setItem(STORAGE_KEYS.MENU, JSON.stringify(DEFAULT_MENU));
-        MEMORY_MENU = DEFAULT_MENU;
-    } else {
-        const parsed = JSON.parse(savedMenu);
-        if (Array.isArray(parsed)) MEMORY_MENU = parsed;
-    }
-
     const savedMessages = localStorage.getItem(STORAGE_KEYS.MESSAGES);
-    if (!savedMessages) {
-        localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(DEFAULT_MESSAGES));
-        MEMORY_MESSAGES = DEFAULT_MESSAGES;
-    } else {
-        const parsed = JSON.parse(savedMessages);
-        if (Array.isArray(parsed)) MEMORY_MESSAGES = parsed;
-    }
-
     const savedGuests = localStorage.getItem(STORAGE_KEYS.GUESTS);
-    if (!savedGuests) {
-        localStorage.setItem(STORAGE_KEYS.GUESTS, JSON.stringify(DEFAULT_GUESTS));
-        MEMORY_GUESTS = DEFAULT_GUESTS;
-    } else {
-        const parsed = JSON.parse(savedGuests);
-        if (Array.isArray(parsed)) MEMORY_GUESTS = parsed;
-    }
-
     const savedStays = localStorage.getItem(STORAGE_KEYS.STAYS);
-    if (!savedStays) {
-        localStorage.setItem(STORAGE_KEYS.STAYS, JSON.stringify(DEFAULT_STAYS));
-        MEMORY_STAYS = DEFAULT_STAYS;
-    } else {
-        const parsed = JSON.parse(savedStays);
-        if (Array.isArray(parsed)) MEMORY_STAYS = parsed;
-    }
+
+    if (savedOrders) MEMORY_ORDERS = JSON.parse(savedOrders);
+    if (savedRooms) MEMORY_ROOMS = JSON.parse(savedRooms);
+    if (savedMenu) MEMORY_MENU = JSON.parse(savedMenu);
+    if (savedMessages) MEMORY_MESSAGES = JSON.parse(savedMessages);
+    if (savedGuests) MEMORY_GUESTS = JSON.parse(savedGuests);
+    if (savedStays) MEMORY_STAYS = JSON.parse(savedStays);
   } catch (e) {
     console.warn('⚠️ Storage load fail:', e);
-  }
-
-  // Migration: Ensure all guests and stays have a stayCode if missing
-  const generateCode = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567889';
-    let randomChars = '';
-    for(let i=0; i<3; i++) randomChars += chars.charAt(Math.floor(Math.random() * chars.length));
-    return `UNICA-${randomChars}`;
-  };
-
-  let migrated = false;
-  MEMORY_GUESTS = MEMORY_GUESTS.map(g => {
-    if (!g.stayCode) {
-      migrated = true;
-      return { ...g, stayCode: generateCode() };
-    }
-    return g;
-  });
-
-  MEMORY_STAYS = MEMORY_STAYS.map(s => {
-    if (!s.stayCode) {
-      migrated = true;
-      return { ...s, stayCode: generateCode() };
-    }
-    return s;
-  });
-
-  if (migrated && isBrowser) {
-    saveToStorage();
   }
 };
 

@@ -1,32 +1,50 @@
+export type MealType = 'Breakfast' | 'Lunch' | 'Dinner';
+
+export interface DashboardStats {
+  totalVisitsToday: number;
+  pendingApprovals: number;
+  activeVisitors: number;
+  visitsThisMonth: number;
+  totalGuests: number;
+  completedVisitsToday: number;
+  cancelledVisitsToday: number;
+  guestsStayedToday: number;
+  vacantRooms: number;
+  pendingSecurityCount: number;
+  pendingOrders?: number;
+  availableRooms?: number;
+  totalBookings?: number;
+  approvedBookings?: number;
+  revenueToday?: number;
+  topDish?: string;
+  summaryItems?: { title: string; count: string; color: string }[];
+}
+
 export interface Visit {
   id: string;
-  parentName: string;
-  parentPhone: string;
-  studentName: string;
-  studentId: string;
-  nationalId?: string;
+  guestName: string;
+  guestPhone?: string;
+  roomName: string;
+  roomId?: string;
+  guestId?: string;
+  institution?: string;
   relationship?: string;
+  purpose: string;
+  status: string;
+  visitorType?: 'parent' | 'outside_visitor';
+  paymentStatus?: 'PAID' | 'PENDING';
+  paymentAmount?: number;
+  transactionId?: string;
+  visitNotes?: string;
+  visitorMembers?: VisitorMember[];
   visitorCount?: number;
+  nationalId?: string;
+  createdAt: string;
   visitDate: string;
   visitTime: string;
-  purpose: string;
-  status: 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'CANCELLED';
-  paymentStatus: 'PENDING' | 'PAID' | 'FAILED';
-  paymentAmount: number;
-  transactionId: string;
-  createdAt: string;
-  updatedAt?: string;
-  visitorType?: 'PARENTS' | 'OUTSIDE_VISITORS';
-  institution?: string;
-  email?: string;
-  visitorMembers?: VisitorMember[];
-  visitNotes?: string;
-  documents?: VisitDocument[];
-  // Optional extra categorisation for outside visitors (e.g. which department/person they visited)
-  visitDepartment?: string;
   checkedInAt?: string;
-  visitCode?: string;
 }
+
 
 export interface VisitorMember {
   id: string;
@@ -37,89 +55,8 @@ export interface VisitorMember {
   notes?: string;
 }
 
-export interface VisitDocument {
-  id: string;
-  title: string;
-  url: string;
-  type: 'id' | 'ticket' | 'other';
-}
 
-export interface Student {
-  id: string;
-  name: string;
-  grade: string;
-  class: string;
-  guardianName: string;
-  guardianPhone: string;
-  guardianEmail: string;
-  address?: string;
-  enrollmentDate: string;
-  status?: 'active' | 'inactive';
-}
 
-export interface Transaction {
-  id: string;
-  visitId: string;
-  parentName: string;
-  amount: number;
-  paymentMethod: 'momo' | 'stripe' | 'flutterwave';
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
-  transactionDate: string;
-  reference: string;
-}
-
-export interface DashboardStats {
-  totalVisitsToday: number;
-  pendingApprovals: number;
-  activeVisitors: number;
-  totalStudents: number;
-  visitsThisMonth: number;
-  completedVisitsToday: number;
-  cancelledVisitsToday: number;
-  studentsVisitedToday: number;
-  studentsNotVisitedToday: number;
-  pendingSecurityCount: number;
-  summaryItems?: { title: string; count: string; color: string }[];
-}
-
-export interface SchoolVisit {
-  id: string;
-  visitTitle: string;
-  visitType: 'field_trip' | 'guest_speaker' | 'school_event' | 'inspection' | 'other';
-  scheduledDate: string;
-  scheduledTime: string;
-  duration: string; // e.g., "2 hours", "Full day"
-  location: string;
-  description: string;
-  organizer: string;
-  contactPerson: string;
-  contactPhone: string;
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  participants: number; // Number of students/staff participating
-  notes?: string;
-  createdAt: string;
-  completedAt?: string;
-}
-
-export interface VisitingDay {
-  id: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  maxVisitors: number;
-  currentVisitors: number;
-  status: 'OPEN' | 'CLOSED' | 'scheduled' | 'active' | 'completed' | 'cancelled';
-  notes?: string;
-  createdAt: string;
-  audience?: 'PARENTS' | 'OUTSIDE_VISITORS';
-  visitCode: string;
-  title: string;
-  pricePerPerson: number;
-  location: string;
-  isManual?: boolean;
-}
-
-export type MealType = 'Breakfast' | 'Lunch' | 'Dinner';
 
 export interface FoodItem {
   id: string;
@@ -202,31 +139,80 @@ export interface ContactMessage {
   createdAt: string;
 }
 
+export interface VisitingDay {
+  id: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  audience: 'PARENTS' | 'OUTSIDE_VISITORS';
+  pricePerPerson?: number;
+  maxVisitors: number;
+  currentVisitors: number;
+  status: 'OPEN' | 'CLOSED' | 'active' | 'completed';
+  visitCode: string;
+  isManual?: boolean;
+}
+
 export interface GuestProfile {
   id: string;
   name: string;
   email: string;
   phone: string;
-  avatar?: string;
-  totalBookings: number;
-  totalSpent: number;
-  lastVisit: string;
+  avatarUrl?: string;
   status: 'VIP' | 'REGULAR' | 'BLACKLISTED';
+  nationality?: string;
+  idType?: 'NATIONAL_ID' | 'PASSPORT' | 'RESIDENCE_PERMIT';
+  idNumber?: string;
+  residenceAddress?: string;
+  totalSpent: number;
   registeredAt: string;
-  currentStayId?: string; // Links to an active StayRecord if checked in
-  stayCode?: string; // Active stay code if applicable
+  totalBookings?: number;
+  lastVisit?: string;
+  currentStayId?: string;
+  stayCode?: string;
+}
+
+export interface StayCompanion {
+  id: string;
+  stayId: string;
+  name: string;
+  nationality: string;
+  idType: 'NATIONAL_ID' | 'PASSPORT' | 'RESIDENCE_PERMIT';
+  idNumber: string;
+  phone?: string;
+}
+
+export interface CleaningRequest {
+  id: string;
+  stayId: string;
+  type: 'MOPPING' | 'BEDSHEET_CHANGE';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  stay?: StayRecord;
 }
 
 export interface StayRecord {
   id: string;
   guestId: string;
   guestName: string;
+  roomId?: string;
   roomName: string;
   roomType: string;
+  stayCode: string;
   checkIn: string;
   checkOut?: string;
+  expectedCheckOutAt?: string;
+  type: 'ROOM' | 'APARTMENT';
+  purposeOfVisit?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
   status: 'CHECKED_IN' | 'CHECKED_OUT';
   totalAmount: number;
-  stayCode?: string;
   notes?: string;
+  companions?: StayCompanion[];
 }
+

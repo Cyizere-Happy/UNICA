@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import DashboardAnimation from "@/lib/gatepass/assets/Promo Code.json";
-import { apiService } from "@/lib/gatepass/api";
-import { operationalData } from "@/lib/gatepass/operationalData";
+import { apiService, UserProfile } from "@/lib/gatepass/apiService";
 import type { DashboardStats, Visit } from "@/lib/gatepass/types";
 
 const Card = ({ children, className, onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) => (
@@ -12,6 +11,7 @@ const Card = ({ children, className, onClick }: { children: React.ReactNode; cla
 );
 
 export default function Dashboard() {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentVisits, setRecentVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,14 +23,26 @@ export default function Dashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const [statsData, visitsData] = await Promise.all([
-          apiService.getDashboardStats(),
-          apiService.getVisits({ limit: 20 }) // get more for carousel
-        ]);
-        setStats(statsData);
-        setRecentVisits(visitsData.visits);
+        const profileData = await apiService.getProfile();
+        setUserProfile(profileData);
+
+        const promises: Promise<any>[] = [];
+        
+        // Define which roles need which data
+        const needsStats = ['ADMIN', 'RECEPTION', 'KITCHEN'].includes(profileData.role);
+        const needsVisits = ['ADMIN', 'RECEPTION'].includes(profileData.role);
+
+        if (needsStats) promises.push(apiService.getDashboardStats());
+        if (needsVisits) promises.push(apiService.getVisits({ limit: 20 }));
+
+        const results = await Promise.all(promises);
+        
+        let resultIndex = 0;
+        if (needsStats) setStats(results[resultIndex++]);
+        if (needsVisits) setRecentVisits(results[resultIndex++].visits);
+
       } catch (err) {
-        console.error(err);
+        console.error('Dashboard data fetch failed:', err);
       } finally {
         setLoading(false);
       }
@@ -74,7 +86,7 @@ export default function Dashboard() {
     return result;
   };
 
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const user = userProfile;
 
   // Filter recent visits: only show if within the last 2 days
   const filterRecentVisits = (visits: Visit[]) => {
@@ -106,7 +118,7 @@ export default function Dashboard() {
 
         <div className="flex justify-between items-center">
           <div className="space-y-0.5">
-            <h1 className="text-xl font-black text-[#292f36] tracking-tight">Hi, {user?.name || 'Admin'}</h1>
+            <h1 className="text-xl font-black text-[#292f36] tracking-tight">Hi, {user?.fullName || 'Manager'}</h1>
             <p className="text-[11px] text-[#4d5053] font-medium">Let's manage your hospitality operations today!</p>
           </div>
           {/* <button className="p-2 rounded-full bg-indigo-100 text-[#153d5d] hover:bg-indigo-200 transition">Bell</button> */}
@@ -128,29 +140,55 @@ export default function Dashboard() {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-white border border-gray-100">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Arrivals Today</p>
-            <h3 className="text-2xl font-black text-[#292f36]">{stats?.totalVisitsToday ?? 0}</h3>
-          </Card>
-          <Card className="bg-white border border-gray-100">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#4d668f] mb-1">Guests In-House</p>
-            <h3 className="text-2xl font-black text-[#4d668f]">{stats?.activeVisitors ?? 12}</h3>
-          </Card>
-          <Card 
-            className="bg-white border border-gray-100 cursor-pointer hover:border-accent/30 transition-all"
-            onClick={() => window.location.href = '/management/admin/kitchen-orders'}
-          >
-            <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1">Pending Orders</p>
-            <h3 className="text-2xl font-black text-amber-500">
-              {operationalData.getOrders().filter(o => o.status === 'PENDING').length}
-            </h3>
-          </Card>
-          <Card className="bg-white border border-gray-100 border-l-4 border-l-[#292f36]">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Available Rooms</p>
-            <h3 className="text-2xl font-black text-[#292f36]">
-              {stats?.studentsNotVisitedToday ?? 6}
-            </h3>
-          </Card>
+          {user?.role === 'KITCHEN' ? (
+            <>
+              <Card 
+                className="bg-white border border-gray-100 cursor-pointer hover:border-accent/30 transition-all border-l-4 border-l-amber-500"
+                onClick={() => window.location.href = '/management/admin/kitchen-orders'}
+              >
+                <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1">Pending Orders</p>
+                <h3 className="text-2xl font-black text-[#292f36]">{stats?.pendingOrders ?? 0}</h3>
+              </Card>
+              <Card className="bg-white border border-gray-100">
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1">Preferred Dish</p>
+                <h3 className="text-xl font-black text-[#292f36] truncate" title={stats?.topDish}>{stats?.topDish ?? '—'}</h3>
+              </Card>
+              <Card className="bg-white border border-gray-100">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">New Arrivals</p>
+                <h3 className="text-2xl font-black text-[#292f36]">{stats?.totalVisitsToday ?? 0}</h3>
+              </Card>
+              <Card className="bg-white border border-gray-100">
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#4d668f] mb-1">Guests In-House</p>
+                <h3 className="text-2xl font-black text-[#4d668f]">{stats?.activeVisitors ?? 0}</h3>
+              </Card>
+            </>
+          ) : (
+            <>
+              <Card className="bg-white border border-gray-100 border-l-4 border-l-accent">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Arrivals Today</p>
+                <h3 className="text-2xl font-black text-[#292f36]">{stats?.totalVisitsToday ?? 0}</h3>
+              </Card>
+              <Card className="bg-white border border-gray-100">
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#4d668f] mb-1">Guests In-House</p>
+                <h3 className="text-2xl font-black text-[#4d668f]">{stats?.activeVisitors ?? 0}</h3>
+              </Card>
+              <Card 
+                className="bg-white border border-gray-100 cursor-pointer hover:border-accent/30 transition-all"
+                onClick={() => window.location.href = '/management/admin/kitchen-orders'}
+              >
+                <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1">Pending Orders</p>
+                <h3 className="text-2xl font-black text-amber-500">
+                  {stats?.pendingOrders ?? 0}
+                </h3>
+              </Card>
+              <Card className="bg-white border border-gray-100 border-l-4 border-l-[#292f36]">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Available Rooms</p>
+                <h3 className="text-2xl font-black text-[#292f36]">
+                  {stats?.availableRooms ?? '—'}
+                </h3>
+              </Card>
+            </>
+          )}
         </div>
 
         <Card className="bg-white">
@@ -162,8 +200,8 @@ export default function Dashboard() {
               filteredRecentVisits.slice(0, 5).map((visit) => (
                 <div key={visit?.id || Math.random()} className="p-3 bg-gray-50 rounded-xl flex justify-between items-center shadow-sm hover:shadow-md transition">
                   <div>
-                    <p className="font-medium text-gray-900">{visit?.parentName || 'Unknown'}</p>
-                    <p className="text-sm text-gray-500">{visit?.studentName}</p>
+                    <p className="font-medium text-gray-900">{visit?.guestName || 'Unknown'}</p>
+                    <p className="text-sm text-gray-500">{visit?.roomName}</p>
                   </div>
                   <div className="flex gap-3 items-center">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium bg-[#4d668f11] text-[#4d668f]`}>
@@ -182,12 +220,12 @@ export default function Dashboard() {
       <div className="space-y-6">
         <Card className="flex flex-col items-center text-center bg-white">
           <img
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=292f36&color=fff&size=128`}
+            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullName || 'Admin')}&background=292f36&color=fff&size=128`}
             alt="Admin"
             className="w-16 h-16 rounded-full mb-2"
           />
-          <h3 className="font-semibold text-gray-900">{user?.name || 'Admin Name'}</h3>
-          <p className="text-gray-500 text-sm">House Admin</p>
+          <h3 className="font-semibold text-gray-900">{user?.fullName || 'Manager'}</h3>
+          <p className="text-gray-500 text-sm">{user?.role ? user.role.charAt(0) + user.role.slice(1).toLowerCase() : 'Staff'}</p>
         </Card>
 
         {/* UPCOMING VISITS - Only 4 at a time, rotates */}
@@ -207,7 +245,7 @@ export default function Dashboard() {
                       "bg-[#292f36]"
                   }`} />
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900 text-sm">{visit?.parentName || 'Unknown'}</p>
+                  <p className="font-medium text-gray-900 text-sm">{visit?.guestName || 'Unknown'}</p>
                   <p className="text-xs text-gray-500">{visit?.purpose || "Guest Access"}</p>
                 </div>
               </div>

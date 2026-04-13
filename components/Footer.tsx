@@ -12,11 +12,11 @@ export const Footer = () => {
                         <Link href="/" className="flex items-center gap-2">
                             <Home className="text-accent w-6 h-6" />
                             <span className="text-lg md:text-xl font-black tracking-tight text-white uppercase italic">
-                                UNICA<span className="text-accent font-normal">HOUSE</span>
+                                UNICAVILLA<span className="text-accent font-normal"></span>
                             </span>
                         </Link>
                         <p className="text-zinc-400 text-[12px] leading-relaxed max-w-xs font-medium opacity-80">
-                            Experience the perfect blend of modern luxury and welcoming comfort at Unica House. Your home away from home.
+                            Experience the perfect blend of modern luxury and welcoming comfort at Unicavilla. Your home away from home.
                         </p>
                         <div className="flex gap-5 pt-2">
                             <Link href="#" className="text-zinc-400 hover:text-accent transition-colors"><Facebook className="w-5 h-5" /></Link>
@@ -62,7 +62,7 @@ export const Footer = () => {
                             </li>
                             <li className="flex items-center gap-3 text-zinc-400 text-[12px] font-medium">
                                 <Mail className="w-4 h-4 text-accent shrink-0" />
-                                <span>stay@unicahouse.com</span>
+                                <span>stay@unicavilla.com</span>
                             </li>
                         </ul>
                     </div>
@@ -70,7 +70,7 @@ export const Footer = () => {
 
                 <div className="pt-8 md:pt-16 mt-8 md:mt-16 border-t border-white/5 text-center">
                     <p className="text-zinc-500 text-[10px] uppercase font-black tracking-widest text-center opacity-60">
-                        © {new Date().getFullYear()} Unica House Hotel. All rights reserved.
+                        © {new Date().getFullYear()} Unicavilla. All rights reserved.
                     </p>
                 </div>
             </div>

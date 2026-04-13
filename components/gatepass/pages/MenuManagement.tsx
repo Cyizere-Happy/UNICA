@@ -8,14 +8,15 @@ import {
 } from 'lucide-react';
 import { operationalData } from '@/lib/gatepass/operationalData';
 import { FoodItem, MealType } from '@/lib/gatepass/types';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, resolveImageUrl } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { apiService } from '@/lib/gatepass/apiService';
 import AddFoodModal from '../AddFoodModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 export default function MenuManagement() {
-  const [menu, setMenu] = useState<FoodItem[]>(operationalData.getMenu());
+  const [menu, setMenu] = useState<FoodItem[]>([]);
   const [activeTab, setActiveTab] = useState<MealType | 'All'>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,6 +24,7 @@ export default function MenuManagement() {
   const [userRole, setUserRole] = useState<string>('ADMIN');
 
   // Real-time synchronization for simulation
+  // Real-time synchronization
   React.useEffect(() => {
     const userRaw = localStorage.getItem('user');
     if (userRaw) {
@@ -32,13 +34,15 @@ export default function MenuManagement() {
       } catch (e) { /* ignore */ }
     }
 
-    const handleSync = () => setMenu(operationalData.getMenu());
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('fica-data-update', handleSync);
-    return () => {
-        window.removeEventListener('storage', handleSync);
-        window.removeEventListener('fica-data-update', handleSync);
+    const fetchData = async () => {
+      try {
+        const data = await apiService.getMenu();
+        setMenu(data);
+      } catch (err) {
+        console.error('Failed to fetch menu:', err);
+      }
     };
+    fetchData();
   }, []);
 
   const filteredMenu = useMemo(() => {
@@ -57,22 +61,30 @@ export default function MenuManagement() {
     { type: 'Dinner', icon: Moon, color: 'bg-accent/10 text-accent' },
   ];
 
-  const handleSaveItem = (item: FoodItem) => {
-    if (editingItem) {
-      operationalData.updateMenuItem(item);
-    } else {
-      operationalData.addMenuItem(item);
+  const handleSaveItem = async (item: FoodItem) => {
+    try {
+      if (editingItem) {
+        await apiService.updateMenuItem(item.id, item);
+      } else {
+        await apiService.createMenuItem(item);
+      }
+      const updated = await apiService.getMenu();
+      setMenu(updated);
+      setEditingItem(null);
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error(err);
     }
-    setMenu(operationalData.getMenu());
-    setEditingItem(null);
   };
 
-  const handleDeleteItem = (id: string) => {
+  const handleDeleteItem = async (id: string) => {
     if (confirm('Are you sure you want to remove this dish from the menu?')) {
-      // Small mock delete logic
-      const updatedMenu = menu.filter(m => m.id !== id);
-      setMenu(updatedMenu);
-      // In a real app we'd update operationalData too
+      try {
+        await apiService.deleteMenuItem(id);
+        setMenu(prev => prev.filter(m => m.id !== id));
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
@@ -157,7 +169,7 @@ export default function MenuManagement() {
                 {/* Image Container */}
                 <div className="relative h-36 w-full rounded-2xl overflow-hidden bg-gray-50">
                   <Image 
-                    src={item.image} 
+                    src={resolveImageUrl(item.image)} 
                     alt={item.name} 
                     fill 
                     className="object-cover transition-transform duration-700 group-hover:scale-110" 

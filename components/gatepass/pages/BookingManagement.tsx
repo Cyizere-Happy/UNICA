@@ -16,7 +16,6 @@ import {
   ArrowUpDown,
   UserPlus
 } from 'lucide-react';
-import { MOCK_BOOKING_REQUESTS } from '@/lib/gatepass/mockData';
 import { BookingRequest } from '@/lib/gatepass/types';
 import { cn, formatPrice } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,13 +24,27 @@ import BookingDetailModal from '../BookingDetailModal';
 import Image from 'next/image';
 import { toast } from 'sonner';
 
+import { apiService } from '@/lib/gatepass/apiService';
+
 export default function BookingManagement() {
-  const [bookings, setBookings] = useState<BookingRequest[]>(MOCK_BOOKING_REQUESTS);
+  const [bookings, setBookings] = useState<BookingRequest[]>([]);
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showStats, setShowStats] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<BookingRequest | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  React.useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const data = await apiService.getBookings();
+        setBookings(data);
+      } catch (err) {
+        console.error("Failed to fetch bookings", err);
+      }
+    };
+    fetchBookings();
+  }, []);
 
   const filteredBookings = bookings.filter(b =>
     b.guestName.toLowerCase().includes(search.toLowerCase()) ||
@@ -52,21 +65,26 @@ export default function BookingManagement() {
     );
   };
 
-  const updateStatus = (id: string, newStatus: BookingRequest['status'], stayCode?: string) => {
-    setBookings(prev => prev.map(b => {
-      if (b.id === id) {
-        if (newStatus === 'REJECTED') {
-          toast.error("Booking Rejected", {
-            description: `The request for ${b.guestName} has been declined.`,
-          });
-          setIsModalOpen(false);
-        } else if (newStatus === 'APPROVED' || newStatus === 'CHECKED_IN') {
-           // Success feedback is now handled via the Modal's internal state
+  const updateStatus = async (id: string, newStatus: BookingRequest['status'], stayCode?: string) => {
+    try {
+      await apiService.updateBookingStatus(id, newStatus, stayCode);
+      
+      setBookings(prev => prev.map(b => {
+        if (b.id === id) {
+          if (newStatus === 'REJECTED') {
+            toast.error("Booking Rejected", {
+              description: `The request for ${b.guestName} has been declined.`,
+            });
+            setIsModalOpen(false);
+          }
+          return { ...b, status: newStatus, stayCode: stayCode || b.stayCode };
         }
-        return { ...b, status: newStatus, stayCode: stayCode || b.stayCode };
-      }
-      return b;
-    }));
+        return b;
+      }));
+    } catch (error) {
+      toast.error('Failed to update booking status.');
+      console.error(error);
+    }
   };
 
   const getStatusStyle = (status: BookingRequest['status']) => {

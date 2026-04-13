@@ -1,14 +1,20 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { operationalData } from '@/lib/gatepass/operationalData';
+import { apiService } from '@/lib/gatepass/apiService';
+import { useInactivityTimer } from '@/lib/gatepass/useInactivityTimer';
 
 interface GuestUser {
+  id?: string; // stayId
+  guestId?: string; // Real guest UUID
+  roomId?: string; // Real room UUID
   name: string;
   email: string;
   stayCode: string;
   roomNumber?: string;
   checkOutDate?: string;
+  roomPrice?: number;
+  stayType?: 'ROOM' | 'APARTMENT';
 }
 
 interface GuestAuthContextType {
@@ -17,10 +23,12 @@ interface GuestAuthContextType {
   guestUser: GuestUser | null;
   entryModalOpen: boolean;
   verifyStayCode: (code: string) => Promise<boolean>;
-  registerGuest: (data: Omit<GuestUser, 'stayCode'>) => void;
+  registerGuest: (data: any) => Promise<boolean>;
   setEntryModalOpen: (open: boolean) => void;
   checkoutModalOpen: boolean;
   setCheckoutModalOpen: (open: boolean) => void;
+  serviceModalOpen: boolean;
+  setServiceModalOpen: (open: boolean) => void;
   logout: () => void;
 }
 
@@ -33,6 +41,15 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [entryModalOpen, setEntryModalOpen] = useState(false);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+  const [serviceModalOpen, setServiceModalOpen] = useState(false);
+
+  // 1-hour inactivity timeout for guests
+  useInactivityTimer(() => {
+    if (isAuthenticated) {
+      console.log('Guest session expired due to inactivity');
+      logout();
+    }
+  }, 3600000);
 
   // Load state from localStorage
   useEffect(() => {
@@ -59,47 +76,67 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
   }, [guestUser, isAuthenticated, isRegistered]);
 
   const verifyStayCode = async (code: string) => {
-    // Check operational data for active stay
-    const allStays = operationalData.getStays();
-    const activeStay = allStays.find(s => 
-      s.stayCode?.toUpperCase() === code.toUpperCase() && 
-      s.status === 'CHECKED_IN'
-    );
-
-    if (activeStay) {
-      setIsAuthenticated(true);
-      const guestObj = {
-        name: activeStay.guestName,
-        email: '', // Get from guest if needed
-        stayCode: code,
-        roomNumber: activeStay.roomName,
-        checkOutDate: activeStay.expectedCheckOutAt || '' // We may need to update types to include this in operationalData
-      };
-      setGuestUser(guestObj);
-      return true;
+    try {
+      // Trim and uppercase to be safe
+      const cleanCode = code.trim().toUpperCase();
+      const response = await apiService.verifyGuest(cleanCode);
+      
+      // Backend returns: { access_token, guest, room, stayId }
+      const { access_token, guest, room, stayId } = response;
+      
+      if (access_token && guest) {
+        // Store as 'token' — this is what api.ts reads
+        localStorage.setItem('token', access_token);
+        setIsAuthenticated(true);
+        
+        const guestObj: GuestUser = {
+          id: stayId,
+          guestId: guest.id,
+          roomId: room?.id,
+          name: guest.name,
+          email: guest.email,
+          stayCode: cleanCode,
+          roomNumber: room?.name,
+          checkOutDate: room?.expectedCheckOutAt,
+          roomPrice: room?.price ? Number(room.price) : 0,
+          stayType: room?.type === 'apartment' ? 'APARTMENT' : 'ROOM',
+        };
+        setGuestUser(guestObj);
+        return true;
+      }
+    } catch (error) {
+      console.error('Guest verification failed:', error);
     }
     return false;
   };
 
-  const registerGuest = (data: Omit<GuestUser, 'stayCode'>) => {
-    if (guestUser) {
-      // Simulate assigning a checkOut date 1 to 3 days in the future
-      const outDate = new Date();
-      outDate.setDate(outDate.getDate() + Math.floor(Math.random() * 3) + 1);
-
-      setGuestUser({ 
-          ...data, 
-          stayCode: guestUser.stayCode,
-          checkOutDate: outDate.toISOString()
-      });
-      setIsRegistered(true);
+  const registerGuest = async (data: any) => {
+    try {
+      if (!guestUser?.stayCode) return false;
+      
+      const response = await apiService.registerGuestProfile(data);
+      if (response.success) {
+        setGuestUser({ 
+            ...guestUser,
+            ...data,
+            name: data.name,
+            email: data.email
+        });
+        setIsRegistered(true);
+        return true;
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
     }
+    return false;
   };
 
   const logout = () => {
     setIsAuthenticated(false);
     setIsRegistered(false);
     setGuestUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('unica-guest-session');
   };
 
   return (
@@ -113,6 +150,8 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
       setEntryModalOpen,
       checkoutModalOpen,
       setCheckoutModalOpen,
+      serviceModalOpen,
+      setServiceModalOpen,
       logout
     }}>
       {children}

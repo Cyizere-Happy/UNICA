@@ -8,6 +8,8 @@ import { useSidebar } from '@/context/SidebarContext';
 import { cn, formatPrice } from '@/lib/utils';
 import Image from 'next/image';
 
+import { apiService } from '@/lib/gatepass/apiService';
+
 const statusColors = {
   DELIVERED: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100', label: 'Completed' },
   PREPARING: { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100', label: 'Preparing' },
@@ -17,19 +19,22 @@ const statusColors = {
 };
 
 export default function OrderHistory() {
-  const [orders, setOrders] = useState<FoodOrder[]>(operationalData.getOrders());
+  const [orders, setOrders] = useState<FoodOrder[]>([]);
+  const [menu, setMenu] = useState<any[]>([]);
 
-  // Real-time synchronization for simulation
   useEffect(() => {
-    const handleSync = () => setOrders(operationalData.getOrders());
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('fica-data-update', handleSync);
-    return () => {
-        window.removeEventListener('storage', handleSync);
-        window.removeEventListener('fica-data-update', handleSync);
+    const fetchData = async () => {
+      try {
+        const fetchedOrders = await apiService.getOrders();
+        setOrders(fetchedOrders);
+        const fetchedMenu = await apiService.getMenu();
+        setMenu(fetchedMenu);
+      } catch (err) {
+        console.error("Failed to load order history", err);
+      }
     };
+    fetchData();
   }, []);
-  const menu = operationalData.getMenu();
   const getItemDetails = (itemId: string) => menu.find(m => m.id === itemId);
   
   const [search, setSearch] = useState('');

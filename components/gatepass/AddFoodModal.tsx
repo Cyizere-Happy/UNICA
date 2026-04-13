@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2, Image as ImageIcon, Flame, ShieldCheck, Zap, Leaf, Check } from 'lucide-react';
 import { FoodItem, MealType } from '@/lib/gatepass/types';
-import { cn } from '@/lib/utils';
+import { apiService } from '@/lib/gatepass/apiService';
+import { cn, resolveImageUrl } from '@/lib/utils';
 
 interface AddFoodModalProps {
   isOpen: boolean;
@@ -69,14 +70,15 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
     });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      try {
+        const { url } = await apiService.uploadImage(file, 'food');
+        setFormData({ ...formData, image: url });
+      } catch (err) {
+        console.error('Upload failed:', err);
+      }
     }
   };
 
@@ -203,7 +205,7 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
                         )}>
                              {formData.image ? (
                                <div className="w-16 h-16 rounded-xl overflow-hidden border border-white/50 shadow-sm relative shrink-0">
-                                 <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                                 <img src={resolveImageUrl(formData.image)} alt="Preview" className="w-full h-full object-cover" />
                                </div>
                              ) : (
                                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-300">

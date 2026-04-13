@@ -24,7 +24,9 @@ import {
   Package,
   MessageSquare,
   ChefHat,
-  Bed
+  Bed,
+  Shield,
+  Sparkles
 } from 'lucide-react';
 import { operationalData } from '@/lib/gatepass/operationalData';
 import { useSidebar } from '@/context/SidebarContext';
@@ -69,8 +71,9 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
         { id: 'room-management', label: 'Rooms & Pricing', icon: Bed },
         { id: 'order-history', label: 'Order History', icon: ShoppingCart },
         { id: 'menu-management', label: 'Menu Mgmt', icon: Utensils },
-        { id: 'registered-parents', label: 'Guests', icon: Users },
+        { id: 'registered-guests', label: 'Guests', icon: Users },
         { id: 'messages', label: 'Message', icon: MessageSquare, badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
+        { id: 'service-requests', label: 'Service Requests', icon: Sparkles },
       ]
     },
     {
@@ -78,6 +81,7 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
       items: [
         { id: 'reports', label: 'Reports', icon: FileText },
         { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+        { id: 'staff-management', label: 'Staff Management', icon: Shield },
       ]
     },
     {
@@ -190,7 +194,7 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
               </div>
               {!collapsed && (
                 <div className="flex flex-col">
-                  <span className="text-[13px] font-black text-[#292f36] leading-none mb-1">Unica House Inc.</span>
+                  <span className="text-[13px] font-black text-[#292f36] leading-none mb-1">Unicavilla</span>
                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Premium Plan</span>
                 </div>
               )}
@@ -252,7 +256,7 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
               
               const rolePermissions: Record<string, string[]> = {
                 KITCHEN: ['dashboard', 'kitchen-orders', 'order-history', 'menu-management', 'messages'],
-                RECEPTION: ['dashboard', 'room-bookings', 'registered-parents', 'messages'],
+                RECEPTION: ['dashboard', 'room-bookings', 'registered-guests', 'messages', 'service-requests'],
               };
               
               const allowedIds = rolePermissions[userRole] || [];

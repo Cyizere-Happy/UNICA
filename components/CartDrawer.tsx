@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, ShoppingBag, Trash2, Tag, ChevronRight, CheckCircle2, History, Star, MessageSquare, Timer, Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
-import { operationalData } from '@/lib/gatepass/operationalData';
+import { cn, resolveImageUrl } from '@/lib/utils';
+import { apiService } from '@/lib/gatepass/apiService';
 import { FoodOrder } from '@/lib/gatepass/types';
 
 type ServiceType = 'Room Delivery' | 'Rooftop' | 'Kitchen';
@@ -25,73 +25,109 @@ export default function CartDrawer() {
   const [rating, setRating] = useState(0);
   const [testimonial, setTestimonial] = useState('');
   const [activeFeedbackOrderId, setActiveFeedbackOrderId] = useState<string | null>(null);
+  const [liveOrders, setLiveOrders] = useState<FoodOrder[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
   const isFullGuest = isAuthenticated && isRegistered;
 
-  // Real-time synchronization for simulation
-  const [, forceUpdate] = useState({});
+  // Live data synchronization
   React.useEffect(() => {
-    const handleSync = () => forceUpdate({});
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('fica-data-update', handleSync);
-    return () => {
-        window.removeEventListener('storage', handleSync);
-        window.removeEventListener('fica-data-update', handleSync);
+    const fetchOrders = async () => {
+      if (!isFullGuest) return;
+      try {
+        setIsLoadingOrders(true);
+        const data = await apiService.getMyOrders();
+        setLiveOrders(data);
+      } catch (err) {
+        console.error('Failed to fetch orders:', err);
+      } finally {
+        setIsLoadingOrders(false);
+      }
     };
-  }, []);
+
+    if (view === 'HISTORY') {
+      fetchOrders();
+    }
+    
+    const interval = setInterval(() => {
+        if (view === 'HISTORY' && isFullGuest) fetchOrders();
+    }, 15000); // Poll every 15s when history is open
+
+    return () => clearInterval(interval);
+  }, [view, isFullGuest]);
 
   const deliveryCharge = serviceType === 'Room Delivery' ? 500 : 0;
   const subtotal = getSubtotal();
   const total = subtotal + deliveryCharge;
 
-  // Filter orders for the current guest
-  const myOrders = operationalData.getOrders().filter(o => 
-    o.guestName === guestUser?.name || o.guestId === guestUser?.email
-  );
+  // Filter orders for the current guest (now using live state)
+  const myOrders = liveOrders;
 
-  const handleConfirmOrder = () => {
+  const handleConfirmOrder = async () => {
     if (!guestUser) return;
     
-    // Create new order record
-    const newOrder: FoodOrder = {
-        id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-        guestId: guestUser.email,
-        guestName: guestUser.name,
-        roomNumber: guestUser.roomNumber || 'TBD',
-        items: cartItems.map(i => ({ 
-            itemId: i.id, 
-            name: i.name, 
-            quantity: i.cartQuantity, 
-            price: i.price 
-        })),
-        totalAmount: total,
-        status: 'PENDING',
-        orderTime: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + `, ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-        notes: specialRequests
-    };
+    try {
+      // Prepare backend-compliant payload (CreateOrderDto)
+      const payload = {
+          guestId: guestUser.guestId,
+          stayId: guestUser.id,
+          roomId: guestUser.roomId,
+          items: cartItems.map(i => ({ 
+              menuItemId: i.id, // Must be the real database ID
+              quantity: i.cartQuantity
+          })),
+          notes: specialRequests
+      };
 
-    operationalData.addOrder(newOrder);
-    setIsOrdered(true);
-    setSpecialRequests('');
-    
-    setTimeout(() => {
-      clearCart();
-      setIsOrdered(false);
-      setView('HISTORY');
-    }, 4500);
+      await apiService.createOrder(payload as any);
+      setIsOrdered(true);
+      setSpecialRequests('');
+      
+      // Refresh local history immediately
+      const updatedOrders = await apiService.getMyOrders();
+      setLiveOrders(updatedOrders);
+
+      setTimeout(() => {
+        clearCart();
+        setIsOrdered(false);
+        setView('HISTORY');
+      }, 4500);
+    } catch (err: any) {
+      console.error('Order placement failed:', err);
+      if (err.response?.status === 401) {
+        alert('Your session has expired or is invalid. Please refresh and verify your stay code again.');
+      } else {
+        alert('Failed to place order. Please try again or contact reception.');
+      }
+    }
   };
 
-  const handleConfirmReceipt = (orderId: string) => {
-    operationalData.confirmOrderReceipt(orderId);
-    setActiveFeedbackOrderId(orderId);
+  const handleConfirmReceipt = async (orderId: string) => {
+    try {
+        await apiService.confirmOrderReceipt(orderId);
+        // Refresh orders to update UI state
+        const updated = await apiService.getMyOrders();
+        setLiveOrders(updated);
+        setActiveFeedbackOrderId(orderId);
+    } catch (err) {
+        console.error('Failed to confirm receipt:', err);
+    }
   };
 
-  const handleSubmitFeedback = () => {
+  const handleSubmitFeedback = async () => {
     if (activeFeedbackOrderId) {
-        operationalData.submitOrderFeedback(activeFeedbackOrderId, rating, testimonial);
-        setActiveFeedbackOrderId(null);
-        setRating(0);
-        setTestimonial('');
+        try {
+            await apiService.submitOrderFeedback(activeFeedbackOrderId, rating, testimonial);
+            setActiveFeedbackOrderId(null);
+            setRating(0);
+            setTestimonial('');
+            
+            // Refresh to show "Feedback Received" status
+            const updated = await apiService.getMyOrders();
+            setLiveOrders(updated);
+        } catch (err) {
+            console.error('Feedback submission failed:', err);
+        }
     }
   };
 
@@ -214,7 +250,7 @@ export default function CartDrawer() {
                     {cartItems.map((item) => (
                       <div key={item.id} className="flex gap-4 group p-3 md:p-4 bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-all">
                         <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden relative shrink-0 border border-gray-100">
-                          <Image src={item.image} alt={item.name} fill className="object-cover" />
+                          <Image src={resolveImageUrl(item.image)} alt={item.name} fill className="object-cover" />
                         </div>
                         <div className="flex-1 flex flex-col justify-between py-0.5">
                           <div className="flex justify-between items-start">
@@ -405,11 +441,24 @@ export default function CartDrawer() {
         {view === 'CART' && !isOrdered && cartItems.length > 0 && (
           <div className="p-4 md:p-6 border-t border-gray-100 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.02)]">
             <button
-              onClick={() => isFullGuest ? handleConfirmOrder() : setEntryModalOpen(true)}
-              className="w-full py-4 bg-[#292f36] text-white rounded-[20px] font-black text-xs uppercase tracking-widest shadow-xl shadow-black/10 hover:bg-black transition-all flex items-center justify-center gap-2 group"
+              onClick={() => {
+                if (!isFullGuest) {
+                    setEntryModalOpen(true);
+                } else if (guestUser?.stayType !== 'APARTMENT') {
+                    handleConfirmOrder();
+                }
+              }}
+              disabled={isFullGuest && guestUser?.stayType === 'APARTMENT'}
+              className={cn(
+                  "w-full py-4 rounded-[20px] font-black text-xs uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2 group",
+                  isFullGuest && guestUser?.stayType === 'APARTMENT' 
+                    ? "bg-gray-100 text-[#292f36]/30 cursor-not-allowed shadow-none" 
+                    : "bg-[#292f36] text-white shadow-black/10 hover:bg-black"
+              )}
             >
-              {isFullGuest ? 'Confirm Order' : 'Register to Place Order'}
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {!isFullGuest ? 'Register to Place Order' : 
+               guestUser?.stayType === 'APARTMENT' ? 'Dining Preview Mode' : 'Confirm Order'}
+              {(!isFullGuest || guestUser?.stayType !== 'APARTMENT') && <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
             </button>
           </div>
         )}

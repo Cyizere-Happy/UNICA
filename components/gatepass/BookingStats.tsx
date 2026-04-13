@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Users, Calendar, Clock, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { apiService } from '@/lib/gatepass/apiService';
 
 interface StatItemProps {
   title: string;
@@ -44,11 +45,17 @@ const StatItem = ({ title, value, delta, trend, icon: Icon, index }: StatItemPro
 };
 
 export default function BookingStats() {
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    apiService.getDashboardStats().then(setData).catch(console.error);
+  }, []);
+
   const stats = [
-    { title: "Total Requests", value: "250", delta: "+3 product", trend: 'up', icon: Calendar },
-    { title: "Revenue", value: "$15,490", delta: "+9%", trend: 'up', icon: DollarSign },
-    { title: "Bookings", value: "2,355", delta: "+7%", trend: 'up', icon: Clock },
-    { title: "Avg. Daily Sales", value: "890", delta: "+5%", trend: 'up', icon: Users },
+    { title: "Total Requests",   value: String(data?.totalBookings ?? '—'),    delta: "Live", trend: 'up',   icon: Calendar },
+    { title: "Approved",         value: String(data?.approvedBookings ?? '—'),  delta: "Live", trend: 'up',   icon: Clock },
+    { title: "Pending",          value: String(data?.pendingApprovals ?? '—'),  delta: "Live", trend: 'down', icon: Users },
+    { title: "Revenue (Today)",  value: `$${data?.revenueToday ?? 0}`,          delta: "Live", trend: 'up',   icon: DollarSign },
   ];
 
   return (

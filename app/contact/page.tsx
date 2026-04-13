@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Mail, MapPin, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { operationalData } from '@/lib/gatepass/operationalData';
+import { apiService } from '@/lib/gatepass/apiService';
 import { ContactMessage } from '@/lib/gatepass/types';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -17,22 +17,30 @@ export default function ContactPage() {
         message: ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsSubmitting(true);
+        setError(null);
         
-        const newMessage: ContactMessage = {
-            id: `MSG-${Date.now()}`,
-            name: formData.name,
-            email: formData.email,
-            subject: formData.subject,
-            message: formData.message,
-            status: 'UNREAD',
-            createdAt: new Date().toISOString()
-        };
-        
-        operationalData.saveMessage(newMessage);
-        setIsSubmitted(true);
-        setFormData({ name: '', email: '', subject: '', message: '' }); // Clear form
+        try {
+            await apiService.sendMessage({
+                name: formData.name,
+                email: formData.email,
+                subject: formData.subject,
+                message: formData.message,
+            });
+            
+            setIsSubmitted(true);
+            setFormData({ name: '', email: '', subject: '', message: '' }); 
+        } catch (err) {
+            console.error('Failed to send message:', err);
+            setError('Failed to send your message. Please try again later.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -86,7 +94,7 @@ export default function ContactPage() {
                                     </div>
                                     <div className="space-y-1">
                                         <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Email</h3>
-                                        <p className="text-sm md:text-base font-bold text-[#292f36]">stay@unicahouse.com</p>
+                                        <p className="text-sm md:text-base font-bold text-[#292f36]">stay@unicavilla.com</p>
                                     </div>
                                 </div>
 
@@ -127,6 +135,12 @@ export default function ContactPage() {
                                             <h2 className="text-lg md:text-xl font-black text-[#292f36] mb-1.5">Suggestion Box</h2>
                                             <p className="text-zinc-500 text-xs md:text-sm font-medium opacity-80">How can we improve?</p>
                                         </div>
+
+                                        {error && (
+                                            <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-xl">
+                                                <p className="text-rose-600 text-[11px] font-bold uppercase tracking-widest">{error}</p>
+                                            </div>
+                                        )}
 
                                         <form onSubmit={handleSubmit} className="space-y-3.5">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -184,10 +198,11 @@ export default function ContactPage() {
 
                                             <button
                                                 type="submit"
-                                                className="w-full bg-accent text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.18em] shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                disabled={isSubmitting}
+                                                className="w-full bg-accent text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.18em] shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                                             >
-                                                Send Suggestion
-                                                <Send className="w-3.5 h-3.5" />
+                                                {isSubmitting ? 'Sending...' : 'Send Suggestion'}
+                                                {!isSubmitting && <Send className="w-3.5 h-3.5" />}
                                             </button>
                                         </form>
 
@@ -203,9 +218,9 @@ export default function ContactPage() {
                                             <CheckCircle2 className="w-8 h-8 text-white" />
                                         </div>
                                         <div className="space-y-2.5">
-                                            <h2 className="text-2xl font-black text-[#292f36]">Thank You!</h2>
-                                            <p className="text-zinc-500 text-sm font-medium max-w-xs mx-auto leading-relaxed">
-                                                We've received your suggestion and will review it carefully. Your feedback helps us build a better Unica House.
+                                            <h2 className="text-3xl font-black text-[#292f36] tracking-tighter mb-4">Contact Unicavilla</h2>
+                                            <p className="text-[#64748b] font-medium leading-relaxed">
+                                                Questions about our premium stay or apartments? Reach out to our dedicated team. We've received your suggestion and will review it carefully. Your feedback helps us build a better Unicavilla.
                                             </p>
                                         </div>
                                         <button

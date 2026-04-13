@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
   MessageSquare, Star, Search, Filter, MailOpen, Mail, 
-  Trash2, ExternalLink, Calendar, CheckCircle2, User, ChevronRight, Send, Reply
+  Trash2, ExternalLink, Calendar, CheckCircle2, User, ChevronRight, Send, Reply, Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { operationalData } from '@/lib/gatepass/operationalData';
-import { ContactMessage, FoodOrder } from '@/lib/gatepass/types';
+import { apiService } from '@/lib/gatepass/apiService';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,60 +14,91 @@ export default function Messages() {
   const [activeTab, setActiveTab] = useState<'inquiries' | 'feedback'>('inquiries');
   const [search, setSearch] = useState('');
   
-  // Reply flow state
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [userRole, setUserRole] = useState<string>('ADMIN');
-  
-  // State
-  const [messages, setMessages] = useState<ContactMessage[]>(operationalData.getMessages());
-  const [ordersWithFeedback, setOrdersWithFeedback] = useState<FoodOrder[]>([]);
 
-  // Sync logic
+  const [messages, setMessages] = useState<any[]>([]);
+  const [ordersWithFeedback, setOrdersWithFeedback] = useState<any[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
   useEffect(() => {
     const userRaw = localStorage.getItem('user');
     if (userRaw) {
       try {
         const u = JSON.parse(userRaw);
         setUserRole(u.role || 'ADMIN');
-        if (u.role === 'KITCHEN') {
-          setActiveTab('feedback');
-        }
+        if (u.role === 'KITCHEN') setActiveTab('feedback');
       } catch (e) { /* ignore */ }
     }
 
-    const handleSync = () => {
-      setMessages(operationalData.getMessages());
-      setOrdersWithFeedback(
-        operationalData.getOrders().filter(o => o.testimonial || o.rating)
-      );
+    const fetchData = async () => {
+      try {
+        const [msgs, orders] = await Promise.all([
+          apiService.getMessages(),
+          apiService.getOrders(),
+        ]);
+        setMessages(msgs);
+        setOrdersWithFeedback(orders.filter((o: any) => o.testimonial || o.rating));
+      } catch (err) {
+        console.error('Failed to load messages', err);
+      } finally {
+        setLoadingMessages(false);
+      }
     };
-    handleSync(); // Initial load
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('fica-data-update', handleSync);
-    return () => {
-      window.removeEventListener('storage', handleSync);
-      window.removeEventListener('fica-data-update', handleSync);
-    };
+    fetchData();
   }, []);
 
-  // Handlers
-  const handleMarkAsRead = (id: string, currentStatus: string) => {
+  const handleMarkAsRead = async (id: string, currentStatus: string) => {
     if (currentStatus === 'UNREAD') {
-        operationalData.markMessageRead(id);
+      try {
+        await apiService.markMessageRead(id);
+        setMessages(prev => prev.map(m => m.id === id ? { ...m, status: 'READ' } : m));
+        toast.success('Message marked as read.');
+      } catch (err) {
+        toast.error('Failed to update message status.');
+      }
     }
   };
 
-  const handleSendReply = (id: string) => {
+  const handleSendReply = async (id: string) => {
     if (!replyText.trim()) {
-        toast.error('Please draft a response first.');
-        return;
+      toast.error('Please draft a response first.');
+      return;
     }
-    // Simulate backend sending email
-    toast.success('Email successfully routed and sent to recipient.');
-    operationalData.markMessageRead(id);
-    setReplyingTo(null);
-    setReplyText('');
+    
+    try {
+      setActionLoadingId(id);
+      await apiService.replyToMessage(id, replyText);
+      setMessages(prev => prev.map(m => m.id === id ? { ...m, status: 'READ' } : m));
+      toast.success('Reply sent successfully!');
+      setReplyingTo(null);
+      setReplyText('');
+    } catch (err) {
+      console.error('Reply error:', err);
+      toast.error('Failed to send email reply.');
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleDeleteMessage = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this message? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setActionLoadingId(id);
+      await apiService.deleteMessage(id);
+      setMessages(prev => prev.filter(m => m.id !== id));
+      toast.success('Message deleted.');
+    } catch (err) {
+      console.error('Delete error:', err);
+      toast.error('Failed to delete message.');
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
   // Filtering
@@ -224,9 +254,16 @@ export default function Messages() {
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-50">
                         <button 
-                            className="text-[10px] uppercase tracking-widest font-black text-gray-400 hover:text-rose-500 transition-colors flex items-center gap-1"
+                            onClick={() => handleDeleteMessage(msg.id)}
+                            disabled={actionLoadingId === msg.id}
+                            className="text-[10px] uppercase tracking-widest font-black text-gray-400 hover:text-rose-500 transition-colors flex items-center gap-1 disabled:opacity-50"
                         >
-                            <Trash2 size={12} /> Delete
+                            {actionLoadingId === msg.id ? (
+                                <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                                <Trash2 size={12} />
+                            )}
+                            Delete
                         </button>
                         <div className="flex gap-2">
                            {msg.status === 'UNREAD' && (
@@ -264,9 +301,14 @@ export default function Messages() {
                                     <div className="flex justify-end">
                                         <button 
                                             onClick={() => handleSendReply(msg.id)}
-                                            className="px-5 py-2 bg-accent text-white rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all active:scale-95 flex items-center gap-2"
+                                            disabled={actionLoadingId === msg.id}
+                                            className="px-5 py-2 bg-accent text-white rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
                                         >
-                                            Send Email <Send size={12} />
+                                            {actionLoadingId === msg.id ? (
+                                                <>Sending Reply <Loader2 size={12} className="animate-spin" /></>
+                                            ) : (
+                                                <>Send Email <Send size={12} /></>
+                                            )}
                                         </button>
                                     </div>
                                 </div>
@@ -327,7 +369,7 @@ export default function Messages() {
                          </div>
 
                          <div className="flex flex-wrap gap-1.5 mt-auto">
-                            {order.items.map((item, idx) => (
+                            {order.items.map((item: any, idx: number) => (
                                 <span key={idx} className="px-2 py-1 bg-gray-50 text-gray-500 border border-gray-100 rounded-md text-[9px] font-black uppercase tracking-wider truncate max-w-full">
                                     {item.quantity}x {item.name}
                                 </span>

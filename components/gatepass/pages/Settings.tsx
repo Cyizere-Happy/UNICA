@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Save, Building } from 'lucide-react';
-import { apiService } from '@/lib/gatepass/api';
+import { apiService } from '@/lib/gatepass/apiService';
 import { toast } from 'sonner';
 
 export default function Settings() {
@@ -23,8 +23,8 @@ export default function Settings() {
   return (
     <div className="p-6 space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-primary-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your House configuration and preferences</p>
+        <h1 className="text-xl font-black text-[#292f36] tracking-tighter uppercase italic">Unicavilla</h1>
+        <p className="text-gray-400 font-medium italic">Unicavilla - Management Console</p>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">

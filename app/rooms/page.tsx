@@ -5,27 +5,32 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Clock } from 'lucide-react';
-import { operationalData } from '@/lib/gatepass/operationalData';
-import { rooms as staticRooms } from '@/lib/data';
+import { apiService } from '@/lib/gatepass/apiService';
+import { Room } from '@/lib/gatepass/types';
+import { Loader2 } from 'lucide-react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { formatPrice } from '@/lib/utils';
-import { Room } from '@/lib/gatepass/types';
+import { formatPrice, resolveImageUrl } from '@/lib/utils';
 
 export default function RoomsPage() {
-    // Initialize with static data for SSR matching
-    const [allRooms, setAllRooms] = React.useState<Room[]>(staticRooms as Room[]);
+    const [allRooms, setAllRooms] = React.useState<Room[]>([]);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
 
-    // Real-time synchronization
     React.useEffect(() => {
-        setAllRooms(operationalData.getRooms());
-        const handleSync = () => setAllRooms(operationalData.getRooms());
-        window.addEventListener('storage', handleSync);
-        window.addEventListener('fica-data-update', handleSync);
-        return () => {
-            window.removeEventListener('storage', handleSync);
-            window.removeEventListener('fica-data-update', handleSync);
+        const fetchRooms = async () => {
+            try {
+                setLoading(true);
+                const rooms = await apiService.getRooms();
+                setAllRooms(rooms);
+            } catch (err) {
+                console.error('Failed to fetch rooms:', err);
+                setError('Unable to load rooms. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
         };
+        fetchRooms();
     }, []);
 
     const featuredRoom = allRooms.find(r => r.id === 'room-3') || (allRooms.length > 0 ? allRooms[0] : null);
@@ -45,8 +50,28 @@ export default function RoomsPage() {
                         Comfort & <span className="italic font-normal">Style.</span>
                     </h1>
 
-                    {/* Featured Room - Large Card */}
-                    {featuredRoom && (
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4">
+                            <Loader2 className="w-12 h-12 text-accent animate-spin" />
+                            <p className="text-muted font-bold tracking-widest uppercase text-[10px]">Fetching available rooms...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="bg-rose-50 border border-rose-100 p-10 rounded-[40px] text-center">
+                            <p className="text-rose-600 font-bold mb-4">{error}</p>
+                            <button 
+                                onClick={() => window.location.reload()}
+                                className="bg-[#292f36] text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest"
+                            >
+                                Try Again
+                            </button>
+                        </div>
+                    ) : allRooms.length === 0 ? (
+                        <div className="bg-zinc-50 border border-zinc-100 p-10 rounded-[40px] text-center">
+                            <p className="text-muted font-bold tracking-widest uppercase text-[10px]">No rooms available at the moment.</p>
+                        </div>
+                    ) : (
+                        <>
+                            {featuredRoom && (
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -60,7 +85,7 @@ export default function RoomsPage() {
                                     </span>
                                 </div>
                                 <Image
-                                    src={featuredRoom.mainImage}
+                                    src={resolveImageUrl(featuredRoom.mainImage)}
                                     alt={featuredRoom.name}
                                     fill
                                     className="object-cover"
@@ -111,7 +136,7 @@ export default function RoomsPage() {
                                         </span>
                                     </div>
                                     <Image
-                                        src={room.mainImage}
+                                        src={resolveImageUrl(room.mainImage)}
                                         alt={room.name}
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-1000"
@@ -149,8 +174,10 @@ export default function RoomsPage() {
                             </motion.div>
                         ))}
                     </div>
-                </div>
-            </section>
+                </>
+            )}
+        </div>
+    </section>
 
             <Footer />
         </main>

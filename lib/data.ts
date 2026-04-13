@@ -108,7 +108,7 @@ export const testimonials = [
         id: 't-1',
         name: 'Sarah Johnson',
         role: 'Business Traveler',
-        content: 'Unica House exceeded all my expectations. The modern design and welcoming atmosphere made my stay truly memorable.',
+        content: 'Unicavilla exceeded all my expectations. The modern design and welcoming atmosphere made my stay truly memorable.',
         avatar: '/Images/UNICA_Bedroom_view.jpg'
     },
     {

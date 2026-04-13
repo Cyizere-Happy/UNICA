@@ -9,15 +9,13 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Unica House Hotel | Premium Stay & Apartments",
-  description: "Experience luxury and comfort at Unica House Hotel. 11 premium bedrooms and 3 fully furnished apartments await you.",
+  title: "Unicavilla | Premium Stay & Apartments",
+  description: "Experience luxury and comfort at Unicavilla. 11 premium bedrooms and 3 fully furnished apartments await you.",
 };
 
 import { CartProvider } from "@/context/CartContext";
 import { GuestAuthProvider } from "@/context/GuestAuthContext";
-import CartDrawer from "@/components/CartDrawer";
-import GuestEntryModal from "@/components/GuestEntryModal";
-import CheckoutModal from "@/components/CheckoutModal";
+import ModalRegistry from "@/components/ModalRegistry";
 
 export default function RootLayout({
   children,
@@ -31,10 +29,10 @@ export default function RootLayout({
       >
         <GuestAuthProvider>
           <CartProvider>
-            {children}
-            <CartDrawer />
-            <GuestEntryModal />
-            <CheckoutModal />
+            <div className="relative min-h-screen flex flex-col">
+              {children}
+            </div>
+            <ModalRegistry />
           </CartProvider>
         </GuestAuthProvider>
         <Toaster position="top-center" richColors />

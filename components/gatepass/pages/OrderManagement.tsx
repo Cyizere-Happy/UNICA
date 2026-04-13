@@ -2,38 +2,49 @@
 
 import React, { useState } from 'react';
 import { ShoppingCart, CheckCircle, Clock, AlertTriangle, Truck, User, Home, ChefHat, ExternalLink, Utensils } from 'lucide-react';
-import { operationalData } from '@/lib/gatepass/operationalData';
-import { FoodOrder } from '@/lib/gatepass/types';
+import { apiService } from '@/lib/gatepass/apiService';
+import { FoodOrder, FoodItem } from '@/lib/gatepass/types';
 import { formatPrice } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 export default function OrderManagement() {
-  const [orders, setOrders] = useState<FoodOrder[]>(operationalData.getOrders());
+  const [orders, setOrders] = useState<FoodOrder[]>([]);
+  const [menu, setMenu] = useState<FoodItem[]>([]);
   const [activeTab, setActiveTab] = useState<'ALL' | 'PENDING' | 'ACTIVE' | 'COMPLETED'>('ALL');
 
   // Real-time synchronization
+  // Real-time synchronization
   React.useEffect(() => {
-    const handleSync = () => {
-        console.log('🔄 Admin Sync Triggered');
-        setOrders(operationalData.getOrders());
+    const fetchData = async () => {
+      try {
+        const [ordersData, menuData] = await Promise.all([
+          apiService.getOrders(),
+          apiService.getMenu()
+        ]);
+        setOrders(ordersData);
+        setMenu(menuData);
+      } catch (err) {
+        console.error('Failed to fetch kitchen data:', err);
+      }
     };
 
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('fica-data-update', handleSync);
-    
-    return () => {
-        window.removeEventListener('storage', handleSync);
-        window.removeEventListener('fica-data-update', handleSync);
-    };
+    fetchData();
+    const interval = setInterval(fetchData, 10000); // Poll every 10s for kitchen
+    return () => clearInterval(interval);
   }, []);
 
-  // Relaxed Filtering: Show everything from 'today' or any PENDING orders
-  const todayStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const filteredOrders = orders.filter(order => {
-    // Always show pending orders, otherwise filter by today for others
-    const isToday = order.orderTime.includes(todayStr) || order.status === 'PENDING';
+    // Robust Date matching
+    const orderDate = new Date(order.orderTime);
+    const today = new Date();
+    const isToday = orderDate.getDate() === today.getDate() &&
+                    orderDate.getMonth() === today.getMonth() &&
+                    orderDate.getFullYear() === today.getFullYear();
     
-    if (!isToday) return false;
+    // Always show pending orders, otherwise filter by today for others
+    const shouldShow = isToday || order.status === 'PENDING';
+    
+    if (!shouldShow) return false;
     if (activeTab === 'ALL') return true;
     if (activeTab === 'PENDING') return order.status === 'PENDING';
     if (activeTab === 'ACTIVE') return ['PREPARING', 'OUT_FOR_DELIVERY'].includes(order.status);
@@ -48,12 +59,16 @@ export default function OrderManagement() {
     { id: 'COMPLETED', label: 'Done', icon: CheckCircle, count: orders.filter(o => ['DELIVERED', 'CANCELLED'].includes(o.status)).length },
   ] as const;
 
-  const handleStatusChange = (orderId: string, status: FoodOrder['status']) => {
-    operationalData.updateOrderStatus(orderId, status);
-    setOrders(operationalData.getOrders());
+  const handleStatusChange = async (orderId: string, status: FoodOrder['status']) => {
+    try {
+      await apiService.updateOrderStatus(orderId, status);
+      const updated = await apiService.getOrders();
+      setOrders(updated);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const menu = operationalData.getMenu();
   const getItemDetails = (itemId: string) => menu.find(m => m.id === itemId);
 
   const getStatusIcon = (status: FoodOrder['status']) => {
@@ -118,8 +133,10 @@ export default function OrderManagement() {
               <div className={cn('lg:w-52 flex-shrink-0 p-5 px-6 border-b lg:border-b-0 lg:border-r border-gray-100 flex flex-col justify-between', status.bg)}>
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-[9px] font-black text-gray-400/60 uppercase tracking-widest">{order.id}</span>
-                    <p className="text-[9px] text-gray-400/60 font-bold uppercase tracking-widest">{order.orderTime.split(',')[1].trim()}</p>
+                    <span className="text-[9px] font-black text-gray-400/60 uppercase tracking-widest">{order.id.split('-')[0]}</span>
+                    <p className="text-[9px] text-gray-400/60 font-bold uppercase tracking-widest">
+                      {new Date(order.orderTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
                   </div>
                   
                   <div className="space-y-3">

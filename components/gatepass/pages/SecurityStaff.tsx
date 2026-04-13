@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Shield, UserCheck, Search, Filter, UserMinus, Clock } from 'lucide-react';
-import { apiService } from '@/lib/gatepass/api';
+import { apiService } from '@/lib/gatepass/apiService';
 import { toast } from 'sonner';
 import ConfirmModal from '@/components/gatepass/ConfirmModal';
 
@@ -26,7 +26,7 @@ export default function SecurityStaff() {
   const fetchStaff = async () => {
     try {
       setLoading(true);
-      const { data } = await apiService.get('/users/security');
+      const data = await apiService.getSecurityStaff();
       setStaff(data);
     } catch (err) {
       console.error('Failed to fetch security staff', err);
@@ -48,7 +48,7 @@ export default function SecurityStaff() {
       type: 'success',
       onConfirm: async () => {
         try {
-          await apiService.patch(`/users/${id}/approve`, {});
+          await apiService.approveUser(id);
           toast.success(`${name} approved successfully`);
           fetchStaff();
         } catch (err: any) {
@@ -66,7 +66,7 @@ export default function SecurityStaff() {
       type: 'danger',
       onConfirm: async () => {
         try {
-          await apiService.delete(`/users/${id}/security`);
+          await apiService.deleteSecurityStaff(id);
           toast.success(`${name} removed successfully`);
           fetchStaff();
         } catch (err: any) {
