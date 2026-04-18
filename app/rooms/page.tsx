@@ -56,18 +56,28 @@ export default function RoomsPage() {
                             <p className="text-muted font-bold tracking-widest uppercase text-[10px]">Fetching available rooms...</p>
                         </div>
                     ) : error ? (
-                        <div className="bg-rose-50 border border-rose-100 p-10 rounded-[40px] text-center">
-                            <p className="text-rose-600 font-bold mb-4">{error}</p>
+                        <div className="bg-white border border-black/5 p-16 rounded-[40px] text-center shadow-bloom max-w-2xl mx-auto">
+                            <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                                <Clock className="w-10 h-10 text-rose-300" />
+                            </div>
+                            <h3 className="text-2xl font-black text-[#292f36] mb-4">Service Temporarily Unavailable</h3>
+                            <p className="text-[#4d5053] text-sm font-medium mb-10 leading-relaxed">
+                                We're currently updating our room availability. Our concierge is working to bring the latest options to your screen.
+                            </p>
                             <button 
                                 onClick={() => window.location.reload()}
-                                className="bg-[#292f36] text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest"
+                                className="bg-[#292f36] text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-black/10 active:scale-95"
                             >
-                                Try Again
+                                Refresh Connection
                             </button>
                         </div>
                     ) : allRooms.length === 0 ? (
-                        <div className="bg-zinc-50 border border-zinc-100 p-10 rounded-[40px] text-center">
-                            <p className="text-muted font-bold tracking-widest uppercase text-[10px]">No rooms available at the moment.</p>
+                        <div className="bg-zinc-50/50 border border-zinc-100 p-16 rounded-[40px] text-center max-w-2xl mx-auto backdrop-blur-sm">
+                             <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-8">
+                                <div className="w-10 h-10 border-2 border-zinc-300 rounded-lg" />
+                            </div>
+                            <h3 className="text-xl font-black text-[#292f36] mb-3">No Vacant Rooms</h3>
+                            <p className="text-muted font-bold tracking-widest uppercase text-[10px]">Please check back later or contact support.</p>
                         </div>
                     ) : (
                         <>

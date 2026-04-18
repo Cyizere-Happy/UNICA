@@ -150,16 +150,16 @@ export default function GuestEntryModal() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-6xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[700px] max-h-[95vh]"
+                className="relative w-full max-w-4xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[550px] max-h-[90vh]"
             >
                 {/* Visual Sidebar */}
-                <div className="w-full md:w-[35%] bg-accent relative flex flex-col p-8 md:p-12 text-white shrink-0 hidden md:flex overflow-hidden">
+                <div className="w-full md:w-[32%] bg-accent relative flex flex-col p-6 md:p-10 text-white shrink-0 hidden md:flex overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl -ml-32 -mb-32" />
                     
                     <div className="relative z-10 flex-1 flex flex-col justify-between py-4">
                         <div className="mb-0">
-                             <div className="relative w-full aspect-square max-w-[240px] mx-auto mb-12 rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/20 group hover:scale-105 transition-transform duration-700">
+                             <div className="relative w-full aspect-square max-w-[180px] mx-auto mb-8 rounded-[38px] overflow-hidden shadow-2xl border-4 border-white/20 group hover:scale-105 transition-transform duration-700">
                                 <Image 
                                     src={step === 1 ? "/unica_mascot_welcome.png" : "/admin_mascot_register.png"}
                                     alt="Mascot"
@@ -167,10 +167,10 @@ export default function GuestEntryModal() {
                                     className="object-cover"
                                 />
                              </div>
-                            <h2 className="text-3xl font-black tracking-tight leading-tight mb-4">
+                            <h2 className="text-2xl font-black tracking-tight leading-tight mb-3">
                                 {step === 1 ? 'Welcome to Unicavilla.' : 'Finalizing Your Stay.'}
                             </h2>
-                            <p className="text-white/80 text-sm font-medium leading-relaxed">
+                            <p className="text-white/80 text-xs font-medium leading-relaxed">
                                 {step === 1 
                                     ? 'Enter your premium stay code to begin your personalized UNICA journey.'
                                     : 'Please provide accurate details as requested by law and for your safety.'}
@@ -199,7 +199,7 @@ export default function GuestEntryModal() {
                                         <item.icon size={18} />
                                     </div>
                                     <span className={cn(
-                                        "text-xs font-black uppercase tracking-[0.15em]",
+                                        "text-[10px] font-black uppercase tracking-[0.15em]",
                                         step === item.s ? "text-white" : "text-white/60"
                                     )}>{item.label}</span>
                                 </div>
@@ -219,7 +219,7 @@ export default function GuestEntryModal() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 p-8 md:p-14 relative flex flex-col bg-white overflow-y-auto CustomScroll">
+                <div className="flex-1 p-6 md:p-10 relative flex flex-col bg-white overflow-y-auto CustomScroll">
                     <button
                         onClick={() => setEntryModalOpen(false)}
                         className="absolute top-6 right-6 p-2.5 bg-gray-50 hover:bg-gray-100 rounded-full transition-all group z-20"

@@ -62,16 +62,33 @@ export default function RoomDetailsClient() {
 
     if (error || !room) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background p-6">
-                <div className="text-center max-w-md">
-                    <h1 className="text-3xl font-black text-[#292f36] mb-4">Room Not Found</h1>
-                    <p className="text-zinc-500 mb-8">{error || "We couldn't find the room you're looking for."}</p>
-                    <Link 
-                        href="/rooms" 
-                        className="inline-block bg-[#292f36] text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-black transition-colors"
-                    >
-                        View All Rooms
-                    </Link>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
+                <Navbar />
+                <div className="text-center max-w-xl bg-white p-12 md:p-16 rounded-[48px] shadow-bloom border border-black/5">
+                    <div className="w-24 h-24 bg-accent/5 rounded-full flex items-center justify-center mx-auto mb-10">
+                        <div className="w-12 h-12 border-2 border-accent/30 rounded-2xl rotate-12" />
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-black text-[#292f36] mb-6 tracking-tight">Room Information Unavailable</h1>
+                    <p className="text-zinc-500 mb-12 text-base font-medium leading-relaxed">
+                        {error ? "Our reservation system is currently undergoing maintenance. We're unable to retrieve these details at the moment." : "This room might have changed or is no longer available in our collection."}
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <Link 
+                            href="/rooms" 
+                            className="w-full sm:w-auto bg-[#292f36] text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-black/10 active:scale-95 flex items-center justify-center gap-2"
+                        >
+                            <ArrowLeft size={14} /> Back to Rooms
+                        </Link>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="w-full sm:w-auto border border-black/10 text-[#292f36] px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all active:scale-95"
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+                <div className="mt-12">
+                    <Footer />
                 </div>
             </div>
         );

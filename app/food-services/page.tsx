@@ -22,9 +22,21 @@ export default function FoodServicesPage() {
     const [menuItems, setMenuItems] = useState<any[]>([]);
     const { cartItems, updateCart } = useCart();
     const { isAuthenticated, isRegistered, guestUser, setEntryModalOpen } = useGuestAuth();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        apiService.getMenu().then(setMenuItems).catch(console.error);
+        setLoading(true);
+        apiService.getMenu()
+            .then(items => {
+                setMenuItems(items);
+                setError(null);
+            })
+            .catch(err => {
+                console.error('Failed to fetch menu:', err);
+                setError('Our kitchen is currently being updated. Please check back soon.');
+            })
+            .finally(() => setLoading(false));
     }, []);
 
     const filteredItems = useMemo(
@@ -83,77 +95,102 @@ export default function FoodServicesPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {filteredItems.map((item) => (
-                            <motion.div
-                                key={item.id}
-                                layoutId={`card-${item.id}`}
-                                initial={{ opacity: 0, y: 16 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.35 }}
-                                onClick={() => setSelectedItem(item)}
-                                className="bg-white rounded-2xl border border-black/5 shadow-[0_10px_24px_rgba(0,0,0,0.07)] overflow-hidden cursor-pointer group"
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4">
+                            <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+                            <p className="text-muted font-bold tracking-widest uppercase text-[10px]">Preparing the menu...</p>
+                        </div>
+                    ) : error || filteredItems.length === 0 ? (
+                        <div className="bg-white border border-black/5 p-12 rounded-[32px] text-center shadow-bloom max-w-2xl mx-auto">
+                            <div className="w-20 h-20 bg-accent/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Leaf className="w-10 h-10 text-accent/40" />
+                            </div>
+                            <h3 className="text-xl font-black text-[#292f36] mb-3">
+                                {error ? 'Kitchen Service Offline' : `No ${activeMeal} items found`}
+                            </h3>
+                            <p className="text-[#4d5053] text-sm font-medium mb-8">
+                                {error || `We don't have any items listed for ${activeMeal} at the moment. Please check our other meal times.`}
+                            </p>
+                            <button 
+                                onClick={() => window.location.reload()}
+                                className="bg-[#0e0e0e] text-white px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all"
                             >
-                                <div className="relative h-44 overflow-hidden">
-                                    <Image 
-                                        src={resolveImageUrl(item.image)} 
-                                        alt={item.name} 
-                                        fill 
-                                        className="object-cover transition-transform duration-700 group-hover:scale-110" 
-                                    />
-                                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <div className="bg-white/90 backdrop-blur-md p-2 rounded-full shadow-lg">
-                                            <Zap className="w-4 h-4 text-accent" />
+                                Refresh Menu
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {filteredItems.map((item) => (
+                                <motion.div
+                                    key={item.id}
+                                    layoutId={`card-${item.id}`}
+                                    initial={{ opacity: 0, y: 16 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.35 }}
+                                    onClick={() => setSelectedItem(item)}
+                                    className="bg-white rounded-2xl border border-black/5 shadow-[0_10px_24px_rgba(0,0,0,0.07)] overflow-hidden cursor-pointer group"
+                                >
+                                    <div className="relative h-44 overflow-hidden">
+                                        <Image 
+                                            src={resolveImageUrl(item.image)} 
+                                            alt={item.name} 
+                                            fill 
+                                            className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                                        />
+                                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="bg-white/90 backdrop-blur-md p-2 rounded-full shadow-lg">
+                                                <Zap className="w-4 h-4 text-accent" />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="text-lg font-black text-[#292f36] mb-1">{item.name}</h3>
-                                    <p className="text-[13px] text-[#4d5053] leading-relaxed mb-4 line-clamp-2">{item.description}</p>
+                                    <div className="p-4">
+                                        <h3 className="text-lg font-black text-[#292f36] mb-1">{item.name}</h3>
+                                        <p className="text-[13px] text-[#4d5053] leading-relaxed mb-4 line-clamp-2">{item.description}</p>
 
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xl font-black text-[#292f36]">{item.price} RWF</span>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xl font-black text-[#292f36]">{item.price} RWF</span>
 
-                                        {canOrderInterface ? (
-                                            isApartmentGuest ? (
-                                                <div className="px-4 py-2 bg-gray-100 text-[#292f36]/40 text-[9px] font-black uppercase tracking-widest rounded-xl border border-black/5">
-                                                    Menu Only
-                                                </div>
+                                            {canOrderInterface ? (
+                                                isApartmentGuest ? (
+                                                    <div className="px-4 py-2 bg-gray-100 text-[#292f36]/40 text-[9px] font-black uppercase tracking-widest rounded-xl border border-black/5">
+                                                        Menu Only
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 bg-[#f5f6f8] rounded-xl p-1" onClick={(e) => e.stopPropagation()}>
+                                                        <button
+                                                            onClick={() => updateCart(item, -1)}
+                                                            className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center transition-colors"
+                                                        >
+                                                            <Minus className="w-4 h-4" />
+                                                        </button>
+                                                        <span className="w-7 text-center text-sm font-bold text-[#292f36]">
+                                                            {getItemQty(item.id)}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => updateCart(item, 1)}
+                                                            className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center transition-colors"
+                                                        >
+                                                            <Plus className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                )
                                             ) : (
-                                                <div className="flex items-center gap-2 bg-[#f5f6f8] rounded-xl p-1" onClick={(e) => e.stopPropagation()}>
-                                                    <button
-                                                        onClick={() => updateCart(item, -1)}
-                                                        className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center transition-colors"
-                                                    >
-                                                        <Minus className="w-4 h-4" />
-                                                    </button>
-                                                    <span className="w-7 text-center text-sm font-bold text-[#292f36]">
-                                                        {getItemQty(item.id)}
-                                                    </span>
-                                                    <button
-                                                        onClick={() => updateCart(item, 1)}
-                                                        className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center transition-colors"
-                                                    >
-                                                        <Plus className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            )
-                                        ) : (
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setEntryModalOpen(true);
-                                                }}
-                                                className="px-4 py-2 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-accent hover:text-white transition-all"
-                                            >
-                                                Member Only
-                                            </button>
-                                        )}
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setEntryModalOpen(true);
+                                                    }}
+                                                    className="px-4 py-2 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-accent hover:text-white transition-all"
+                                                >
+                                                    Member Only
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 

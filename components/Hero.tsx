@@ -79,7 +79,7 @@ export const Hero = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
-                            className="text-[15px] sm:text-base md:text-lg font-medium mt-6 max-w-xl mx-auto leading-relaxed text-white drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)] bg-black/20 backdrop-blur-md rounded-xl px-4 py-2"
+                            className="text-[15px] sm:text-base md:text-lg font-semibold mt-6 max-w-xl mx-auto leading-relaxed text-zinc-50 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] bg-black/30 backdrop-blur-md rounded-xl px-6 py-3"
                         >
                             Experience the zenith of Rwandan hospitality.
                             <br className="hidden sm:block" />
