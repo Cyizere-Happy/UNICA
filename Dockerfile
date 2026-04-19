@@ -12,6 +12,10 @@ RUN npm install
 # Copy source
 COPY . .
 
+# Pass build arguments for environment variables
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Build the app
 RUN npm run build
 

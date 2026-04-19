@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Download, FileText, Bed, MessageSquare, Utensils, XCircle, Search, Calendar, ChevronRight, Users } from 'lucide-react';
 import { apiService } from '@/lib/gatepass/apiService';
+import { API_URL } from '@/lib/gatepass/api';
 import type { FoodOrder, Room, GuestProfile } from '@/lib/gatepass/types';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -47,7 +48,7 @@ export default function PropertyManagementReports() {
     setIsExporting(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/reports/export?type=${selectedReport}`, {
+      const res = await fetch(`${API_URL}/reports/export?type=${selectedReport}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Export failed');
