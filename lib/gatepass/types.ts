@@ -117,6 +117,7 @@ export interface BookingRequest {
   guestAvatar?: string;
   roomName: string;
   roomType: string;
+  roomId: string; // Required for backend creation
   roomPrice: number;
   checkIn: string;
   checkOut: string;

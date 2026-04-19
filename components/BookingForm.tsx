@@ -118,19 +118,19 @@ export const BookingForm = ({ room, onSuccess }: BookingFormProps) => {
                                         guestName: formData.fullName,
                                         guestEmail: formData.email,
                                         guestPhone: formData.phone,
-                                        roomName: room.name,
-                                        roomType: room.type,
-                                        roomPrice: room.price,
+                                        roomId: room.id, // Mandatory field
                                         checkIn: formData.checkIn,
                                         checkOut: formData.checkOut,
                                         guests: Number(formData.guests),
-                                        totalAmount: Number(room.price), // Simplified for now
                                         specialRequests: formData.specialRequests
                                     });
                                     setIsSubmitted(true);
-                                } catch (err) {
+                                } catch (err: any) {
                                     console.error('Booking failed:', err);
-                                    toast.error("Booking failed. Please try again.");
+                                    if (err.response) {
+                                        console.error('Error details:', err.response.data);
+                                    }
+                                    toast.error("Booking failed. Please check your details and try again.");
                                 } finally {
                                     setIsLoading(false);
                                 }

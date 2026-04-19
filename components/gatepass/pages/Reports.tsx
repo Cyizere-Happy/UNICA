@@ -70,7 +70,7 @@ export default function PropertyManagementReports() {
 
   const getReportSummary = () => {
     if (selectedReport === 'food_orders') {
-      const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+      const totalRevenue = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
       return { title: 'Total F&B Revenue', value: `$${totalRevenue.toFixed(2)}` };
     }
     if (selectedReport === 'guests') {

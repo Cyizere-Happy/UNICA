@@ -143,6 +143,7 @@ export const apiService = {
       ...order,
       guestName: order.guest?.name || 'Unknown Guest',
       roomNumber: order.room?.name || 'No Room',
+      totalAmount: Number(order.totalAmount || 0),
       orderTime: order.orderTime, // Keep raw ISO string for reliable parsing
       items: order.items.map((i: any) => ({
         ...i,
@@ -157,6 +158,7 @@ export const apiService = {
       ...order,
       guestName: order.guest?.name || 'Me',
       roomNumber: order.room?.name || 'My Room',
+      totalAmount: Number(order.totalAmount || 0),
       orderTime: order.orderTime,
       items: order.items.map((i: any) => ({
         ...i,
