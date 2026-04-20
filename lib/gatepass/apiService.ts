@@ -29,7 +29,19 @@ export const apiService = {
     return data;
   },
   updateRoom: async (id: string, room: Partial<Room>): Promise<Room> => {
-    const { id: _, ...payload } = room as any;
+    // Purely extract fields that match the backend UpdateRoomDto
+    const allowedFields = [
+      'name', 'type', 'description', 'price', 'capacity', 
+      'size', 'features', 'mainImage', 'gallery', 'status'
+    ];
+    
+    const payload: any = {};
+    Object.entries(room).forEach(([key, value]) => {
+      if (allowedFields.includes(key)) {
+        payload[key] = value;
+      }
+    });
+
     const { data } = await api.patch(`/rooms/${id}`, payload);
     return data;
   },

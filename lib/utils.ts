@@ -19,7 +19,16 @@ export function resolveImageUrl(url: string | undefined | null) {
   
   // Use the API URL from process.env but remove the /api suffix to get base domain
   const apiRoot = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5034/api';
-  const baseUrl = apiRoot.replace(/\/api$/, '').replace(/\/$/, '');
+  
+  // Try to extract the base URL (e.g., https://api.unicavilla.com)
+  let baseUrl = '';
+  try {
+    const urlObj = new URL(apiRoot);
+    baseUrl = `${urlObj.protocol}//${urlObj.host}`;
+  } catch (e) {
+    // Fallback logic if API_URL is just a relative path or invalid
+    baseUrl = apiRoot.replace(/\/api$/, '').replace(/\/$/, '');
+  }
   
   // Ensure the URL starts with a slash for consistent joining
   const cleanUrl = url.startsWith('/') ? url : `/${url}`;
