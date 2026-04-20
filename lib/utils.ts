@@ -13,25 +13,40 @@ export function formatPrice(price: number) {
     }).format(price);
 }
 
-export function resolveImageUrl(url: string | undefined | null) {
-  if (!url) return '/Images/placeholder-dish.jpg'; // fallback
+/**
+ * Resolves a potentially relative image URL to an absolute path.
+ * 
+ * NOTE: This function transforms standard /uploads/ paths to a custom 
+ * /api/upload/view/ proxy endpoint to ensure required Cross-Origin 
+ * security headers (CORP) are attached, bypassing infrastructure blocks.
+ */
+export function resolveImageUrl(url: string | undefined | null): string {
+  if (!url) return '/Images/UNICA_House_Apartment_kitchen.jpg';
   if (url.startsWith('http') || url.startsWith('data:')) return url;
   
-  // Use the API URL from process.env but remove the /api suffix to get base domain
   const apiRoot = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5034/api';
   
-  // Try to extract the base URL (e.g., https://api.unicavilla.com)
-  let baseUrl = '';
-  try {
-    const urlObj = new URL(apiRoot);
-    baseUrl = `${urlObj.protocol}//${urlObj.host}`;
-  } catch (e) {
-    // Fallback logic if API_URL is just a relative path or invalid
-    baseUrl = apiRoot.replace(/\/api$/, '').replace(/\/$/, '');
+  // Transform /uploads/ paths to our forced-header Proxy endpoint
+  if (url.startsWith('/uploads/')) {
+    const proxyPath = url.replace('/uploads/', '/api/upload/view/');
+    try {
+      const origin = new URL(apiRoot).origin;
+      return `${origin}${proxyPath}`;
+    } catch (e) {
+      // Fallback if URL parsing fails
+      const domain = apiRoot.replace(/\/api$/, '').replace(/\/$/, '');
+      return `${domain}${proxyPath}`;
+    }
   }
-  
-  // Ensure the URL starts with a slash for consistent joining
-  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
-    
-  return `${baseUrl}${cleanUrl}`;
+
+  // Handle other relative paths or local images
+  try {
+    const origin = new URL(apiRoot).origin;
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
+    return `${origin}${cleanPath}`;
+  } catch (e) {
+    const domain = apiRoot.replace(/\/api$/, '').replace(/\/$/, '');
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
+    return `${domain}${cleanPath}`;
+  }
 }
