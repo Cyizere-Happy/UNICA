@@ -29,7 +29,7 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
     available: true
   });
 
-  const [newIngredient, setNewIngredient] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const defaults = {
@@ -74,10 +74,13 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
     const file = e.target.files?.[0];
     if (file) {
       try {
+        setIsUploading(true);
         const { url } = await apiService.uploadImage(file, 'food');
         setFormData({ ...formData, image: url });
       } catch (err) {
         console.error('Upload failed:', err);
+      } finally {
+        setIsUploading(false);
       }
     }
   };
@@ -192,18 +195,25 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#292f36] border-l-3 border-accent pl-2">
                       Dish Image
                     </h4>
-                    <div className="relative group cursor-pointer h-32">
+                    <div className={cn(
+                      "relative group h-32",
+                      isUploading && "cursor-wait opacity-70"
+                    )}>
                         <input 
                           type="file"
                           accept="image/*"
                           onChange={handleImageChange}
-                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                          disabled={isUploading}
+                          className="absolute inset-0 opacity-0 cursor-pointer z-10 disabled:cursor-wait"
                         />
                         <div className={cn(
                           "w-full h-full bg-gray-50 border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center text-[11px] font-bold text-[#292f36] transition-all gap-2",
-                          formData.image ? "border-accent/50 bg-accent/5" : "border-gray-100 hover:border-gray-200"
+                          formData.image ? "border-accent/50 bg-accent/5" : "border-gray-100 hover:border-gray-200",
+                          isUploading && "border-accent border-solid"
                         )}>
-                             {formData.image ? (
+                             {isUploading ? (
+                               <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+                             ) : formData.image ? (
                                <div className="w-16 h-16 rounded-xl overflow-hidden border border-white/50 shadow-sm relative shrink-0">
                                  <img src={resolveImageUrl(formData.image)} alt="Preview" className="w-full h-full object-cover" />
                                </div>
@@ -212,8 +222,11 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
                                  <ImageIcon size={20} />
                                </div>
                              )}
-                             <span className={cn(formData.image ? "text-[#292f36]" : "text-gray-400 uppercase tracking-widest text-[9px]")}>
-                               {formData.image ? "Change selected image" : "Drop or click to upload dish image"}
+                             <span className={cn(
+                               (formData.image || isUploading) ? "text-[#292f36]" : "text-gray-400 uppercase tracking-widest text-[9px]",
+                               isUploading && "animate-pulse"
+                             )}>
+                               {isUploading ? "Uploading to kitchen..." : formData.image ? "Change selected image" : "Drop or click to upload dish image"}
                              </span>
                         </div>
                     </div>

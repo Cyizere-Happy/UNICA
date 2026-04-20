@@ -18,6 +18,8 @@ export default function RoomManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'DETAILS' | 'GALLERY'>('DETAILS');
   const [editingRoom, setEditingRoom] = useState<Partial<Room> | null>(null);
+  const [isUploadingMain, setIsUploadingMain] = useState(false);
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
 
   useEffect(() => {
     apiService.getRooms().then(setRooms).catch(console.error);
@@ -323,27 +325,43 @@ export default function RoomManagement() {
                           />
                         </div>
                       </div>
-                        <div className="space-y-1.5">
+                         <div className="space-y-1.5">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Main Cover Image Upload</label>
                           <div className="flex gap-2">
-                             <input 
-                               type="file" 
-                               accept="image/*"
-                               onChange={async (e) => {
-                                 const file = e.target.files?.[0];
-                                 if (file) {
-                                   try {
-                                     const { url } = await apiService.uploadImage(file, 'rooms');
-                                     updateField('mainImage', url);
-                                   } catch (err) {
-                                     console.error('Upload failed:', err);
+                             <div className="flex-1 relative">
+                               <input 
+                                 type="file" 
+                                 accept="image/*"
+                                 disabled={isUploadingMain}
+                                 onChange={async (e) => {
+                                   const file = e.target.files?.[0];
+                                   if (file) {
+                                     try {
+                                       setIsUploadingMain(true);
+                                       const { url } = await apiService.uploadImage(file, 'rooms');
+                                       updateField('mainImage', url);
+                                     } catch (err) {
+                                       console.error('Upload failed:', err);
+                                       toast.error('Failed to upload image');
+                                     } finally {
+                                       setIsUploadingMain(false);
+                                     }
                                    }
-                                 }
-                               }}
-                               className="flex-1 px-5 py-2.5 bg-gray-50 border-2 border-transparent focus:border-accent/10 focus:bg-white rounded-2xl font-bold text-[#292f36] text-[11px] transition-all outline-none"
-                             />
-                             <div className="w-12 h-12 rounded-xl border-2 border-gray-100 overflow-hidden shrink-0">
-                                <img src={resolveImageUrl(editingRoom?.mainImage)} className="w-full h-full object-cover" />
+                                 }}
+                                 className="w-full px-5 py-2.5 bg-gray-50 border-2 border-transparent focus:border-accent/10 focus:bg-white rounded-2xl font-bold text-[#292f36] text-[11px] transition-all outline-none disabled:opacity-50"
+                               />
+                               {isUploadingMain && (
+                                 <div className="absolute inset-y-0 right-4 flex items-center">
+                                   <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                                 </div>
+                               )}
+                             </div>
+                             <div className="w-12 h-12 rounded-xl border-2 border-gray-100 overflow-hidden shrink-0 flex items-center justify-center bg-gray-50">
+                                {isUploadingMain ? (
+                                  <ImageIcon className="text-gray-300 animate-pulse" size={20} />
+                                ) : (
+                                  <img src={resolveImageUrl(editingRoom?.mainImage)} className="w-full h-full object-cover" />
+                                )}
                              </div>
                           </div>
                         </div>
@@ -366,25 +384,35 @@ export default function RoomManagement() {
                           <h5 className="text-[11px] font-black text-accent uppercase tracking-widest mb-4 flex items-center gap-2">
                              <Camera size={14} /> Add to Property Gallery
                           </h5>
-                          <div className="flex gap-3">
+                          <div className="flex gap-3 relative">
                              <input 
                                id="new-gallery-file"
                                type="file" 
                                accept="image/*"
-                               className="flex-1 px-5 py-2 bg-white border-2 border-transparent focus:border-accent/10 rounded-2xl font-bold text-[#292f36] text-[12px] transition-all outline-none shadow-sm"
+                               disabled={isUploadingGallery}
+                               className="flex-1 px-5 py-2 bg-white border-2 border-transparent focus:border-accent/10 rounded-2xl font-bold text-[#292f36] text-[12px] transition-all outline-none shadow-sm disabled:opacity-50"
                                onChange={async (e) => {
                                  const file = e.target.files?.[0];
                                  if (file) {
                                    try {
+                                     setIsUploadingGallery(true);
                                      const { url } = await apiService.uploadImage(file, 'rooms');
                                      addToGallery(url);
                                      e.target.value = '';
                                    } catch (err) {
                                      console.error('Upload failed:', err);
+                                     toast.error('Failed to upload gallery image');
+                                   } finally {
+                                     setIsUploadingGallery(false);
                                    }
                                  }
                                }}
                              />
+                             {isUploadingGallery && (
+                               <div className="absolute inset-y-0 right-4 flex items-center">
+                                 <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                               </div>
+                             )}
                           </div>
                        </div>
 

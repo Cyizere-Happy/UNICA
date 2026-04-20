@@ -17,9 +17,12 @@ export function resolveImageUrl(url: string | undefined | null) {
   if (!url) return '/Images/placeholder-dish.jpg'; // fallback
   if (url.startsWith('http') || url.startsWith('data:')) return url;
   
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL 
-    ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '')
-    : 'http://localhost:3001';
+  // Use the API URL from process.env but remove the /api suffix to get base domain
+  const apiRoot = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5034/api';
+  const baseUrl = apiRoot.replace(/\/api$/, '').replace(/\/$/, '');
+  
+  // Ensure the URL starts with a slash for consistent joining
+  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
     
-  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+  return `${baseUrl}${cleanUrl}`;
 }
