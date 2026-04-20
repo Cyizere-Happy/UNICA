@@ -30,6 +30,7 @@ export default function AddFoodModal({ isOpen, onClose, onSave, editingItem }: A
   });
 
   const [isUploading, setIsUploading] = useState(false);
+  const [newIngredient, setNewIngredient] = useState('');
 
   useEffect(() => {
     const defaults = {
