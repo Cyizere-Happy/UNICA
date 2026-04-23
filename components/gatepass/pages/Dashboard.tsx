@@ -361,7 +361,7 @@ export default function Dashboard() {
                           <span className="text-sm font-bold text-[#292f36]">{stats.lowStockFoodCount} Kitchen items are low</span>
                         </div>
                         <button 
-                          onClick={() => router.push('/management/admin/food-stock')}
+                          onClick={() => router.push('/management/admin/notifications')}
                           className="text-[10px] font-black text-rose-600 uppercase tracking-widest hover:underline"
                         >
                           Refill
@@ -377,7 +377,7 @@ export default function Dashboard() {
                           <span className="text-sm font-bold text-[#292f36]">{stats.lowStockAssetsCount} Asset items are low</span>
                         </div>
                         <button 
-                          onClick={() => router.push('/management/admin/assets-management')}
+                          onClick={() => router.push('/management/admin/notifications')}
                           className="text-[10px] font-black text-rose-600 uppercase tracking-widest hover:underline"
                         >
                           Refill
@@ -416,7 +416,7 @@ export default function Dashboard() {
                               <span className="text-sm font-bold text-[#292f36]">{pendingTasks.orders.length} Kitchen tasks pending</span>
                             </div>
                             <button 
-                              onClick={() => router.push('/management/admin/food-stock')}
+                              onClick={() => router.push('/management/admin/notifications')}
                               className="text-[10px] font-black text-accent uppercase tracking-widest hover:underline"
                             >
                               Update
@@ -429,7 +429,7 @@ export default function Dashboard() {
                               <span className="text-sm font-bold text-[#292f36]">{pendingTasks.services.length} Cleaning tasks pending</span>
                             </div>
                             <button 
-                              onClick={() => router.push('/management/admin/assets-management')}
+                              onClick={() => router.push('/management/admin/notifications')}
                               className="text-[10px] font-black text-accent uppercase tracking-widest hover:underline"
                             >
                               Update

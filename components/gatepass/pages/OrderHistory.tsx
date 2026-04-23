@@ -25,7 +25,7 @@ export default function OrderHistory() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const fetchedOrders = await apiService.getOrders();
+        const fetchedOrders = await apiService.getAllOrders();
         setOrders(fetchedOrders);
         const fetchedMenu = await apiService.getMenu();
         setMenu(fetchedMenu);

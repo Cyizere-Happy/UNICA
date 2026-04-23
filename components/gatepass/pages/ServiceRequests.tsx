@@ -201,8 +201,17 @@ export default function ServiceRequests() {
                                         </button>
                                     )}
                                     {req.status === 'COMPLETED' && (
-                                        <div className="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center border border-emerald-100">
-                                            <CheckCircle2 size={20} />
+                                        <div className="flex items-center gap-3">
+                                            <a 
+                                              href="/management/admin/notifications"
+                                              className="px-5 py-2.5 bg-accent/10 text-accent rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent hover:text-white transition-all border border-accent/20 flex items-center gap-2"
+                                            >
+                                                <Eraser size={14} />
+                                                Deduct Stock
+                                            </a>
+                                            <div className="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center border border-emerald-100">
+                                                <CheckCircle2 size={20} />
+                                            </div>
                                         </div>
                                     )}
                                 </div>

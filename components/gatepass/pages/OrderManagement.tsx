@@ -18,7 +18,7 @@ export default function OrderManagement() {
     const fetchData = async () => {
       try {
         const [ordersData, menuData] = await Promise.all([
-          apiService.getOrders(),
+          apiService.getAllOrders(),
           apiService.getMenu()
         ]);
         setOrders(ordersData);
@@ -259,20 +259,37 @@ export default function OrderManagement() {
                         </button>
                       )}
                       {order.status === 'PREPARING' && (
-                        <button 
-                           onClick={() => handleStatusChange(order.id, 'OUT_FOR_DELIVERY')}
-                           className="px-8 py-3 bg-indigo-600 text-white text-xs font-black tracking-widest uppercase rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-200"
-                        >
-                          Out for Delivery
-                        </button>
+                        <div className="flex gap-2">
+                          <button 
+                             onClick={() => handleStatusChange(order.id, 'OUT_FOR_DELIVERY')}
+                             className="px-6 py-3 bg-indigo-50 text-indigo-600 border border-indigo-100 text-[10px] font-black tracking-widest uppercase rounded-2xl hover:bg-indigo-600 hover:text-white transition-all"
+                          >
+                            Dispatch
+                          </button>
+                          <button 
+                             onClick={() => handleStatusChange(order.id, 'DELIVERED')}
+                             className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black tracking-widest uppercase rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-200"
+                          >
+                            Mark as Done
+                          </button>
+                        </div>
                       )}
                       {order.status === 'OUT_FOR_DELIVERY' && (
                         <button 
                           onClick={() => handleStatusChange(order.id, 'DELIVERED')}
                           className="px-8 py-3 bg-emerald-600 text-white text-xs font-black tracking-widest uppercase rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-200"
                         >
-                          Complete Order
+                          Confirm Delivery
                         </button>
+                      )}
+                      {order.status === 'DELIVERED' && (
+                        <a 
+                          href="/management/admin/notifications"
+                          className="px-6 py-3 bg-accent/10 text-accent text-[10px] font-black tracking-widest uppercase rounded-2xl border border-accent/20 hover:bg-accent hover:text-white transition-all flex items-center gap-2"
+                        >
+                          <ClipboardList size={14} />
+                          Update Stock
+                        </a>
                       )}
                       <button className="p-3 text-gray-400 hover:text-accent hover:bg-gray-50 rounded-2xl border border-gray-100 transition-all">
                         <ExternalLink className="w-5 h-5" />

@@ -137,6 +137,21 @@ export const apiService = {
   },
 
   // Orders
+  getAllOrders: async (): Promise<FoodOrder[]> => {
+    const { data } = await api.get('/orders');
+    return data.map((order: any) => ({
+      ...order,
+      guestName: order.guest?.name || 'Unknown Guest',
+      roomNumber: order.room?.name || 'No Room',
+      totalAmount: Number(order.totalAmount || 0),
+      orderTime: order.orderTime,
+      items: order.items.map((i: any) => ({
+        ...i,
+        itemId: i.menuItemId,
+        price: Number(i.priceAtOrder)
+      }))
+    }));
+  },
   getOrders: async (): Promise<FoodOrder[]> => {
     const { data } = await api.get('/orders/active');
     return data.map((order: any) => ({

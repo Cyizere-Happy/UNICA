@@ -125,8 +125,9 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
     { 
       id: 'notifications', 
       label: 'Notifications', 
-      icon: Bell,
-      badge: (stats.lowStockCount || 0) + (pendingTasks.orders.length || 0) + (pendingTasks.services.length || 0)
+      icon: Bell, 
+      badge: (stats.lowStockCount || 0) + (pendingTasks.orders.length || 0) + (pendingTasks.services.length || 0),
+      color: (stats.lowStockCount || 0) + (pendingTasks.orders.length || 0) + (pendingTasks.services.length || 0) > 0 ? 'text-rose-500' : 'text-gray-400'
     },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
@@ -163,14 +164,10 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
         
         <div className={cn(
           "flex items-center justify-center w-6 h-6 z-10 transition-transform duration-200",
-          isActive ? "text-[#292f36]" : "text-gray-400 group-hover:text-[#292f36]",
+          isActive ? "text-[#292f36]" : (item.color || "text-gray-400 group-hover:text-[#292f36]"),
           collapsed && "group-hover:scale-110"
         )}>
-          {item.color ? (
-            <div className={cn("w-2 h-2 rounded-full", item.color)} />
-          ) : (
-            <Icon size={collapsed ? 20 : 18} strokeWidth={isActive ? 2.5 : 2} />
-          )}
+          <Icon size={collapsed ? 20 : 18} strokeWidth={isActive ? 2.5 : 2} />
         </div>
         
         {!collapsed && (
