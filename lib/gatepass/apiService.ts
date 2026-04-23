@@ -420,6 +420,10 @@ export const apiService = {
     const { data } = await api.post('/stock/food', item);
     return data;
   },
+  updateFoodStock: async (id: string, item: any): Promise<any> => {
+    const { data } = await api.patch(`/stock/food/${id}`, item);
+    return data;
+  },
   recordFoodEntry: async (id: string, log: { quantity: number; unitPrice?: number; reason?: string }): Promise<any> => {
     const { data } = await api.post(`/stock/food/${id}/entry`, log);
     return data;
@@ -439,6 +443,10 @@ export const apiService = {
   },
   createGeneralAsset: async (asset: any): Promise<any> => {
     const { data } = await api.post('/stock/assets', asset);
+    return data;
+  },
+  updateGeneralAsset: async (id: string, asset: any): Promise<any> => {
+    const { data } = await api.patch(`/stock/assets/${id}`, asset);
     return data;
   },
   recordAssetEntry: async (id: string, log: { quantity: number; unitPrice?: number; reason?: string }): Promise<any> => {

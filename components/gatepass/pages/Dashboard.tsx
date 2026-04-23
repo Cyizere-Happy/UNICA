@@ -352,13 +352,13 @@ export default function Dashboard() {
                   </div>
 
                   <div className="space-y-3">
-                    {stats?.lowStockFoodCount > 0 && (
+                    {(stats?.lowStockFoodCount || 0) > 0 && (
                       <div className="flex items-center justify-between p-4 bg-rose-50/50 rounded-2xl border border-rose-100/50">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-rose-500 shadow-sm">
                             <Utensils size={14} />
                           </div>
-                          <span className="text-sm font-bold text-[#292f36]">{stats.lowStockFoodCount} Kitchen items are low</span>
+                          <span className="text-sm font-bold text-[#292f36]">{stats?.lowStockFoodCount} Kitchen items are low</span>
                         </div>
                         <button 
                           onClick={() => router.push('/management/admin/notifications')}
@@ -368,13 +368,13 @@ export default function Dashboard() {
                         </button>
                       </div>
                     )}
-                    {stats?.lowStockAssetsCount > 0 && (
+                    {(stats?.lowStockAssetsCount || 0) > 0 && (
                       <div className="flex items-center justify-between p-4 bg-rose-50/50 rounded-2xl border border-rose-100/50">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-rose-500 shadow-sm">
                             <Package size={14} />
                           </div>
-                          <span className="text-sm font-bold text-[#292f36]">{stats.lowStockAssetsCount} Asset items are low</span>
+                          <span className="text-sm font-bold text-[#292f36]">{stats?.lowStockAssetsCount} Asset items are low</span>
                         </div>
                         <button 
                           onClick={() => router.push('/management/admin/notifications')}
@@ -384,7 +384,7 @@ export default function Dashboard() {
                         </button>
                       </div>
                     )}
-                    {stats?.lowStockFoodCount === 0 && stats?.lowStockAssetsCount === 0 && (
+                    {(stats?.lowStockFoodCount || 0) === 0 && (stats?.lowStockAssetsCount || 0) === 0 && (
                       <div className="text-center py-6">
                         <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mx-auto mb-3">
                           <CheckSquare size={20} />

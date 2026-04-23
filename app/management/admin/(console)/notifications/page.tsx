@@ -151,7 +151,7 @@ export default function NotificationsPage() {
       link: '/management/admin/kitchen-commands',
       time: o.orderTime,
       role: ['ADMIN', 'KITCHEN', 'RECEPTION']
-    })).filter(n => n.role.includes(userRole)),
+    })).filter((n: any) => n.role.includes(userRole)),
     ...services.map((s: any) => ({
       id: `incoming-service-${s.id}`,
       type: 'INCOMING_SERVICE',
@@ -162,7 +162,7 @@ export default function NotificationsPage() {
       link: '/management/admin/service-requests',
       time: s.createdAt,
       role: ['ADMIN', 'RECEPTION']
-    })).filter(n => n.role.includes(userRole)),
+    })).filter((n: any) => n.role.includes(userRole)),
     ...pendingTasks.orders.map((o: any) => ({
       id: `task-order-${o.id}`,
       type: 'TASK',
@@ -174,7 +174,7 @@ export default function NotificationsPage() {
       action: () => handleOpenDeductModal('ORDER', o.id, o.title),
       time: o.createdAt,
       role: ['ADMIN', 'KITCHEN', 'RECEPTION']
-    })).filter(n => n.role.includes(userRole)),
+    })).filter((n: any) => n.role.includes(userRole)),
     ...pendingTasks.services.map((s: any) => ({
       id: `task-service-${s.id}`,
       type: 'TASK',
@@ -186,7 +186,7 @@ export default function NotificationsPage() {
       action: () => handleOpenDeductModal('SERVICE', s.id, s.title),
       time: s.createdAt,
       role: ['ADMIN', 'RECEPTION']
-    })).filter(n => n.role.includes(userRole))
+    })).filter((n: any) => n.role.includes(userRole))
   ];
 
   if (loading && !stats && !selectedTask) {

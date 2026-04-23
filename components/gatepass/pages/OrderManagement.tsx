@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShoppingCart, CheckCircle, Clock, AlertTriangle, Truck, User, Home, ChefHat, ExternalLink, Utensils } from 'lucide-react';
+import { ShoppingCart, CheckCircle, Clock, AlertTriangle, Truck, User, Home, ChefHat, ExternalLink, Utensils, ClipboardList } from 'lucide-react';
 import { apiService } from '@/lib/gatepass/apiService';
 import { FoodOrder, FoodItem } from '@/lib/gatepass/types';
 import { formatPrice } from '@/lib/utils';

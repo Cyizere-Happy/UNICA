@@ -270,6 +270,8 @@ const DEFAULT_STAYS: StayRecord[] = [
     roomType: 'room',
     checkIn: '2026-04-10T09:00:00Z',
     status: 'CHECKED_IN',
+    paymentStatus: 'PAID',
+    totalPaid: 35.00,
     totalAmount: 35.00,
     stayCode: 'UNICA-A9W',
     type: 'ROOM'
@@ -283,6 +285,8 @@ const DEFAULT_STAYS: StayRecord[] = [
     checkIn: '2026-03-01T14:00:00Z',
     checkOut: '2026-03-05T10:00:00Z',
     status: 'CHECKED_OUT',
+    paymentStatus: 'PAID',
+    totalPaid: 400.00,
     totalAmount: 400.00,
     stayCode: 'UNICA-Z2Q',
     type: 'APARTMENT'

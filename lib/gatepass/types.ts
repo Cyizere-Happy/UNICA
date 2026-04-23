@@ -19,6 +19,12 @@ export interface DashboardStats {
   totalRevenue?: number;
   stockExpenses?: number;
   netProfit?: number;
+  totalSpentFood?: number;
+  totalSpentAssets?: number;
+  lowStockFoodCount?: number;
+  lowStockAssetsCount?: number;
+  adr?: number;
+  revPar?: number;
   topDish?: string;
   summaryItems?: { title: string; count: string; color: string }[];
 }
