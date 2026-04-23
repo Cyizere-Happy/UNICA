@@ -18,6 +18,9 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { apiService, UserProfile } from '@/lib/gatepass/apiService';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 const Card = ({ children, className }: { children: React.ReactNode; className?: string }) => (
   <div className={cn("bg-white rounded-2xl shadow-sm border border-gray-100 p-6", className)}>
@@ -63,6 +66,49 @@ const FAQItem = ({ question, answer }: { question: string; answer: React.ReactNo
 export default function HelpCenter() {
   const [searchQuery, setSearchQuery] = useState('');
   const [feedback, setFeedback] = useState<'yes' | 'no' | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    description: ''
+  });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const profile = await apiService.getProfile();
+        if (profile) {
+          setForm(prev => ({
+            ...prev,
+            name: profile.fullName || '',
+            email: profile.username || ''
+          }));
+        }
+      } catch (err) {
+        console.error('Failed to load profile for help center:', err);
+      }
+    })();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.description) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await apiService.submitSupportRequest(form);
+      toast.success('Your support request has been sent! Our team will get back to you shortly.');
+      setForm(prev => ({ ...prev, description: '' }));
+    } catch (err) {
+      toast.error('Failed to send request. Please try again later.');
+      console.error('Support submission error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const steps = [
     {
@@ -267,25 +313,60 @@ export default function HelpCenter() {
 
         <div className="space-y-6">
           <h3 className="text-lg font-bold text-[#292f36]">Report an Issue</h3>
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Name</label>
-                <input type="text" className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:bg-white focus:border-accent transition-all" placeholder="John Doe" />
+                <input 
+                  type="text" 
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:bg-white focus:border-accent transition-all" 
+                  placeholder="John Doe" 
+                  required
+                />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Email</label>
-                <input type="email" className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:bg-white focus:border-accent transition-all" placeholder="john@example.com" />
+                <input 
+                  type="email" 
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:bg-white focus:border-accent transition-all" 
+                  placeholder="john@example.com" 
+                  required
+                />
               </div>
             </div>
             <div className="space-y-1.5">
               <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Description</label>
-              <textarea rows={3} className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:bg-white focus:border-accent transition-all resize-none" placeholder="What happened?"></textarea>
+              <textarea 
+                rows={3} 
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:bg-white focus:border-accent transition-all resize-none" 
+                placeholder="What happened?"
+                required
+              ></textarea>
             </div>
-            <button className="w-full py-3 bg-[#292f36] text-white rounded-xl font-bold text-[14px] hover:bg-black transition-all transform active:scale-[0.98] shadow-lg shadow-black/10">
-              Submit Request
+            <button 
+              type="submit"
+              disabled={loading}
+              className={cn(
+                "w-full py-3 bg-[#292f36] text-white rounded-xl font-bold text-[14px] hover:bg-black transition-all transform active:scale-[0.98] shadow-lg shadow-black/10 flex items-center justify-center gap-2",
+                loading && "opacity-70 cursor-not-allowed"
+              )}
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Submit Request'
+              )}
             </button>
-          </div>
+          </form>
         </div>
       </section>
 

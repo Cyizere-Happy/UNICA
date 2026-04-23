@@ -394,6 +394,11 @@ export const apiService = {
   confirmPayment: async (id: string): Promise<any> => {
     const { data } = await api.post(`/stays/${id}/confirm-payment`);
     return data;
+  },
+  
+  submitSupportRequest: async (payload: { name: string; email: string; description: string }): Promise<any> => {
+    const { data } = await api.post('/support/help', payload);
+    return data;
   }
 };
 
