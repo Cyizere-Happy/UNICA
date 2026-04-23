@@ -208,55 +208,60 @@ export default function RoomManagement() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="w-full max-w-4xl bg-white rounded-[40px] shadow-2xl overflow-hidden relative z-10 flex flex-col md:flex-row h-[90vh] md:h-auto max-h-[800px]"
+              className="w-full max-w-3xl bg-white rounded-[32px] shadow-2xl overflow-hidden relative z-10 flex flex-col md:flex-row h-[90vh] md:h-auto max-h-[85vh]"
             >
               {/* Modal Sidebar (Tabs) */}
-              <div className="w-full md:w-64 bg-gray-50 p-8 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col justify-between">
-                <div className="space-y-8">
+              <div className="w-full md:w-52 bg-gray-50 p-6 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col justify-between">
+                <div className="space-y-6">
                   <div className="flex items-center gap-3">
-                     <div className="w-10 h-10 bg-accent rounded-2xl flex items-center justify-center text-white shadow-lg">
+                     <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-white shadow-lg">
                         <Wand2 size={20} />
                      </div>
                      <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Configuration</p>
-                        <h4 className="font-black text-[#292f36] text-[15px]">Room Engine</h4>
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Config</p>
+                        <h4 className="font-black text-[#292f36] text-[14px]">Room Engine</h4>
                      </div>
                   </div>
 
-                  <nav className="space-y-2">
+                  <nav className="space-y-1.5">
                     <button 
                       onClick={() => setActiveTab('DETAILS')}
                       className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all",
+                        "w-full flex items-center gap-2 px-3 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
                         activeTab === 'DETAILS' ? "bg-white text-accent shadow-sm" : "text-gray-400 hover:text-accent hover:bg-white/50"
                       )}
                     >
-                      <Info size={16} />
-                      Room Details
+                      <Info size={14} />
+                      Details
                     </button>
                     <button 
                       onClick={() => setActiveTab('GALLERY')}
                       className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all",
+                        "w-full flex items-center gap-2 px-3 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
                         activeTab === 'GALLERY' ? "bg-white text-accent shadow-sm" : "text-gray-400 hover:text-accent hover:bg-white/50"
                       )}
                     >
-                      <ImageIcon size={16} />
-                      Media & Gallery
+                      <ImageIcon size={14} />
+                      Media
                     </button>
                   </nav>
                 </div>
 
                 <div className="hidden md:block">
-                   <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
-                     Ensure all metrics like size and capacity are accurate for guest transparency.
+                   <p className="text-[9px] text-gray-400 font-medium leading-tight">
+                     Ensure all metrics are accurate for guest transparency.
                    </p>
                 </div>
               </div>
 
               {/* Modal Content */}
               <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="p-8 overflow-y-auto flex-1">
+                <div className="p-8 overflow-y-auto flex-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                  <style jsx>{`
+                    .scrollbar-hide::-webkit-scrollbar {
+                      display: none;
+                    }
+                  `}</style>
                   {activeTab === 'DETAILS' ? (
                     <div className="space-y-6">
                       <div className="grid grid-cols-2 gap-4">
@@ -477,18 +482,18 @@ export default function RoomManagement() {
                   )}
                 </div>
 
-                <div className="p-8 border-t border-gray-100 flex items-center justify-between bg-white">
+                <div className="p-5 border-t border-gray-100 flex items-center justify-between bg-white">
                   <button 
                     onClick={() => setIsModalOpen(false)}
-                    className="px-6 py-3 text-[11px] font-black text-gray-400 uppercase tracking-widest hover:text-[#292f36] transition-all"
+                    className="px-6 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-[#292f36] transition-all"
                   >
                     Discard Changes
                   </button>
                   <button 
                     onClick={handleSave}
-                    className="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-br from-accent to-[#3a4f6e] text-white rounded-2xl font-black text-[11px] uppercase tracking-widest hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl"
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-accent to-[#3a4f6e] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl"
                   >
-                    <Save size={18} />
+                    <Save size={16} />
                     Deploy to Property
                   </button>
                 </div>
