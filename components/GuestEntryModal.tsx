@@ -65,9 +65,12 @@ export default function GuestEntryModal() {
         setError('');
         const success = await verifyStayCode(code);
         if (success) {
-            // Close the modal immediately after successful verification
-            // Allow the guest to browse the portal before registering
-            setEntryModalOpen(false);
+            // Check if profile is already complete
+            // We use a small timeout to let the context state settle or just check if we should proceed
+            // Actually, the useEffect in this component handles step transition based on isRegistered
+            // So we just need to NOT close the modal if they aren't registered yet.
+            
+            // Note: isRegistered is updated by verifyStayCode in the context
         } else {
             setError('Invalid Stay Code.');
         }
@@ -142,7 +145,10 @@ export default function GuestEntryModal() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={() => setEntryModalOpen(false)}
+                onClick={() => {
+                    if (isAuthenticated && !isRegistered) return;
+                    setEntryModalOpen(false);
+                }}
                 className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
 
@@ -220,12 +226,14 @@ export default function GuestEntryModal() {
 
                 {/* Main Content Area */}
                 <div className="flex-1 p-6 md:p-10 relative flex flex-col bg-white overflow-y-auto CustomScroll">
-                    <button
-                        onClick={() => setEntryModalOpen(false)}
-                        className="absolute top-6 right-6 p-2.5 bg-gray-50 hover:bg-gray-100 rounded-full transition-all group z-20"
-                    >
-                        <X className="w-5 h-5 text-gray-400 group-hover:rotate-90 transition-transform duration-300" />
-                    </button>
+                    {(!isAuthenticated || isRegistered) && (
+                        <button
+                            onClick={() => setEntryModalOpen(false)}
+                            className="absolute top-6 right-6 p-2.5 bg-gray-50 hover:bg-gray-100 rounded-full transition-all group z-20"
+                        >
+                            <X className="w-5 h-5 text-gray-400 group-hover:rotate-90 transition-transform duration-300" />
+                        </button>
+                    )}
 
                     <div className="flex-1 flex flex-col justify-center max-w-xl mx-auto w-full py-4">
                         <AnimatePresence mode="wait">

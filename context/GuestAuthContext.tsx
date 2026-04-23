@@ -59,6 +59,11 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
       setGuestUser(data.user);
       setIsAuthenticated(data.isAuthenticated);
       setIsRegistered(data.isRegistered);
+      
+      // Auto-open modal if not registered
+      if (data.isAuthenticated && !data.isRegistered) {
+        setEntryModalOpen(true);
+      }
     }
   }, []);
 
@@ -82,12 +87,13 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
       const response = await apiService.verifyGuest(cleanCode);
       
       // Backend returns: { access_token, guest, room, stayId }
-      const { access_token, guest, room, stayId } = response;
+      const { access_token, guest, room, stayId, isProfileComplete } = response;
       
       if (access_token && guest) {
         // Store as 'token' — this is what api.ts reads
         localStorage.setItem('token', access_token);
         setIsAuthenticated(true);
+        setIsRegistered(!!isProfileComplete);
         
         const guestObj: GuestUser = {
           id: stayId,

@@ -16,6 +16,9 @@ export interface DashboardStats {
   totalBookings?: number;
   approvedBookings?: number;
   revenueToday?: number;
+  totalRevenue?: number;
+  stockExpenses?: number;
+  netProfit?: number;
   topDish?: string;
   summaryItems?: { title: string; count: string; color: string }[];
 }
@@ -101,6 +104,8 @@ export interface Room {
   type: 'room' | 'apartment' | 'suite' | 'deluxe';
   description: string;
   price: number;
+  priceUsd?: number;
+  exchangeRate?: number;
   capacity: number;
   size: string;
   features: string[];
@@ -211,7 +216,9 @@ export interface StayRecord {
   purposeOfVisit?: string;
   checkInTime?: string;
   checkOutTime?: string;
-  status: 'CHECKED_IN' | 'CHECKED_OUT';
+  status: 'CHECKED_IN' | 'CHECKED_OUT' | 'ACTIVE' | 'COMPLETED';
+  paymentStatus: 'PAID' | 'PARTIAL' | 'PENDING';
+  totalPaid: number;
   totalAmount: number;
   notes?: string;
   companions?: StayCompanion[];

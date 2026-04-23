@@ -26,9 +26,12 @@ import {
   ChefHat,
   Bed,
   Shield,
-  Sparkles
+  Sparkles,
+  Bell,
+  ClipboardList
 } from 'lucide-react';
 import { operationalData } from '@/lib/gatepass/operationalData';
+import { apiService } from '../../lib/gatepass/apiService';
 import { useSidebar } from '@/context/SidebarContext';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,6 +48,8 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
   const { collapsed, setCollapsed } = useSidebar();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<{ label: string, badge?: number, top: number } | null>(null);
+  const [stats, setStats] = useState<any>({ lowStockCount: 0 });
+  const [pendingTasks, setPendingTasks] = useState<any>({ orders: [], services: [] });
 
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
@@ -52,14 +57,34 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
     const handleSync = () => {
       setUnreadMessagesCount(operationalData.getMessages().filter(m => m.status === 'UNREAD').length);
     };
+    
+    const fetchStats = async () => {
+      if (!['ADMIN', 'KITCHEN'].includes(userRole)) return;
+      try {
+        const [s, t] = await Promise.all([
+          apiService.getStockStats(),
+          apiService.getPendingStockTasks()
+        ]);
+        setStats(s);
+        setPendingTasks(t);
+      } catch (e) {
+        console.error('Sidebar stats fetch failed:', e);
+      }
+    };
+
     handleSync();
+    if (userRole) fetchStats();
+
+    const interval = setInterval(fetchStats, 30000); // Polling every 30s for real-time feel
+
     window.addEventListener('storage', handleSync);
     window.addEventListener('fica-data-update', handleSync);
     return () => {
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('fica-data-update', handleSync);
+      clearInterval(interval);
     };
-  }, []);
+  }, [userRole]);
 
   const sections = [
     {
@@ -80,21 +105,29 @@ export default function Sidebar({ currentPage, onNavigate, userRole, onLogout }:
       title: 'Tools',
       items: [
         { id: 'reports', label: 'Reports', icon: FileText },
-        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+        { id: 'financial-intelligence', label: 'Financial Intel', icon: BarChart3 },
+        { id: 'analytics', label: 'Analytics', icon: Zap },
         { id: 'staff-management', label: 'Staff Management', icon: Shield },
       ]
     },
     {
       title: 'Stock Management',
       items: [
-        { id: 'stock-coming-soon', label: 'Coming Soon', icon: Package },
+        { id: 'food-stock', label: 'Food Stock', icon: Utensils },
+        { id: 'assets-management', label: 'Assets Mgmt', icon: Package },
+        { id: 'fixed-assets', label: 'Fixed Assets', icon: Bed },
       ]
     }
   ];
 
   const bottomItems = [
     { id: 'help', label: 'Help center', icon: HelpCircle },
-    { id: 'feedback', label: 'Feedback', icon: MessageSquare },
+    { 
+      id: 'notifications', 
+      label: 'Notifications', 
+      icon: Bell,
+      badge: (stats.lowStockCount || 0) + (pendingTasks.orders.length || 0) + (pendingTasks.services.length || 0)
+    },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 

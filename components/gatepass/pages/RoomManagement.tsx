@@ -295,15 +295,40 @@ export default function RoomManagement() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Price ($)</label>
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Price (USD $)</label>
                           <input 
                             type="number" 
-                            value={editingRoom?.price || ''} 
-                            onChange={(e) => updateField('price', Number(e.target.value))}
+                            value={editingRoom?.priceUsd || ''} 
+                            onChange={(e) => {
+                              const usd = Number(e.target.value);
+                              const rate = editingRoom?.exchangeRate || 1300;
+                              updateField('priceUsd', usd);
+                              updateField('price', usd * rate);
+                            }}
                             className="w-full px-5 py-3.5 bg-gray-50 border-2 border-transparent focus:border-accent/10 focus:bg-white rounded-2xl font-bold text-[#292f36] transition-all outline-none"
                           />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Ex. Rate (RWF/$)</label>
+                          <input 
+                            type="number" 
+                            value={editingRoom?.exchangeRate || 1300} 
+                            onChange={(e) => {
+                              const rate = Number(e.target.value);
+                              const usd = editingRoom?.priceUsd || 0;
+                              updateField('exchangeRate', rate);
+                              if (usd > 0) updateField('price', usd * rate);
+                            }}
+                            className="w-full px-5 py-3.5 bg-gray-50 border-2 border-transparent focus:border-accent/10 focus:bg-white rounded-2xl font-bold text-[#292f36] transition-all outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Price (RWF)</label>
+                          <div className="w-full px-5 py-3.5 bg-gray-100 border-2 border-transparent rounded-2xl font-black text-accent flex items-center">
+                            {formatPrice(editingRoom?.price || 0)}
+                          </div>
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Capacity</label>
@@ -314,6 +339,8 @@ export default function RoomManagement() {
                             className="w-full px-5 py-3.5 bg-gray-50 border-2 border-transparent focus:border-accent/10 focus:bg-white rounded-2xl font-bold text-[#292f36] transition-all outline-none"
                           />
                         </div>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Size (m²)</label>
                           <input 

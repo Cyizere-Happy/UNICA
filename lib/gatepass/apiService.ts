@@ -394,6 +394,87 @@ export const apiService = {
   confirmPayment: async (id: string): Promise<any> => {
     const { data } = await api.post(`/stays/${id}/confirm-payment`);
     return data;
+  },
+
+  // Stock Management
+  getFoodStock: async (): Promise<any[]> => {
+    const { data } = await api.get('/stock/food');
+    return data;
+  },
+  createFoodStock: async (item: any): Promise<any> => {
+    const { data } = await api.post('/stock/food', item);
+    return data;
+  },
+  recordFoodEntry: async (id: string, log: { quantity: number; unitPrice?: number; reason?: string }): Promise<any> => {
+    const { data } = await api.post(`/stock/food/${id}/entry`, log);
+    return data;
+  },
+  recordFoodRemoval: async (id: string, log: { quantity: number; reason?: string }): Promise<any> => {
+    const { data } = await api.post(`/stock/food/${id}/removal`, log);
+    return data;
+  },
+  toggleFoodActive: async (id: string, isActive: boolean): Promise<any> => {
+    const { data } = await api.patch(`/stock/food/${id}/toggle-active`, { isActive });
+    return data;
+  },
+
+  getGeneralAssets: async (): Promise<any[]> => {
+    const { data } = await api.get('/stock/assets');
+    return data;
+  },
+  createGeneralAsset: async (asset: any): Promise<any> => {
+    const { data } = await api.post('/stock/assets', asset);
+    return data;
+  },
+  recordAssetEntry: async (id: string, log: { quantity: number; unitPrice?: number; reason?: string }): Promise<any> => {
+    const { data } = await api.post(`/stock/assets/${id}/entry`, log);
+    return data;
+  },
+  toggleAssetActive: async (id: string, isActive: boolean): Promise<any> => {
+    const { data } = await api.patch(`/stock/assets/${id}/toggle-active`, { isActive });
+    return data;
+  },
+  getPendingStockTasks: async (): Promise<any> => {
+    const { data } = await api.get('/stock/pending-tasks');
+    return data;
+  },
+  recordStockUsage: async (usage: { type: 'ORDER' | 'SERVICE'; id: string; items: any[] }): Promise<any> => {
+    const { data } = await api.post('/stock/record-usage', usage);
+    return data;
+  },
+
+  getFixedAssets: async (): Promise<any[]> => {
+    const { data } = await api.get('/stock/fixed-assets');
+    return data;
+  },
+  createFixedAsset: async (asset: any): Promise<any> => {
+    const { data } = await api.post('/stock/fixed-assets', asset);
+    return data;
+  },
+  updateFixedAsset: async (id: string, asset: any): Promise<any> => {
+    const { data } = await api.patch(`/stock/fixed-assets/${id}`, asset);
+    return data;
+  },
+
+  getStockLogs: async (): Promise<any[]> => {
+    const { data } = await api.get('/stock/logs');
+    return data;
+  },
+  getStockStats: async (): Promise<any> => {
+    const { data } = await api.get('/stock/stats');
+    return data;
+  },
+  getAnalyticsHighlights: async (): Promise<any> => {
+    const { data } = await api.get('/analytics/highlights');
+    return data;
+  },
+  getAnalyticsTrends: async (): Promise<any[]> => {
+    const { data } = await api.get('/analytics/trends');
+    return data;
+  },
+  getFinancialStatement: async (startDate?: string, endDate?: string): Promise<any> => {
+    const { data } = await api.get('/analytics/financial-statement', { params: { startDate, endDate } });
+    return data;
   }
 };
 

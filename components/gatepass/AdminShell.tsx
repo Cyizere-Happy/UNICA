@@ -8,7 +8,10 @@ import { SidebarProvider } from '@/context/SidebarContext';
 import { useInactivityTimer } from '@/lib/gatepass/useInactivityTimer';
 import '@/components/gatepass/gatepass-admin.css';
 
-const ADMIN_ONLY_SEGMENTS = new Set<string>(['staff-management', 'reports', 'analytics']);
+import { toast } from 'sonner';
+import { Bell, Utensils, Sparkles } from 'lucide-react';
+
+const ADMIN_ONLY_SEGMENTS = new Set<string>(['staff-management', 'reports', 'analytics', 'financial-intelligence']);
 
 type UserRole = 'ADMIN' | 'KITCHEN' | 'RECEPTION' | 'SUPER_ADMIN' | 'SECURITY' | null;
 
@@ -17,10 +20,75 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>(null);
+  const [lastCheckedAt, setLastCheckedAt] = useState<Date>(new Date());
 
   const segment = pathname.split('/').filter(Boolean).pop() || 'dashboard';
 
-  // 1-hour inactivity timeout for staff
+  // 1. Real-time Notifications Polling
+  useEffect(() => {
+    if (!ready || !userRole) return;
+
+    const checkNewRequests = async () => {
+      try {
+        const promises: Promise<any>[] = [];
+        const needsKitchen = ['ADMIN', 'KITCHEN'].includes(userRole);
+        const needsServices = ['ADMIN', 'RECEPTION'].includes(userRole);
+
+        if (needsKitchen) promises.push(apiService.getOrders());
+        if (needsServices) promises.push(apiService.getCleaningRequests());
+
+        const results = await Promise.all(promises);
+        let resultIdx = 0;
+
+        if (needsKitchen) {
+          const orders = results[resultIdx++];
+          const newOrders = orders.filter((o: any) => 
+            new Date(o.orderTime) > lastCheckedAt && o.status === 'PENDING'
+          );
+          
+          newOrders.forEach((o: any) => {
+            toast('New Kitchen Order!', {
+              description: `Room ${o.roomNumber}: ${o.items.length} items`,
+              icon: <Utensils className="w-4 h-4 text-accent" />,
+              duration: 10000,
+              action: {
+                label: 'View',
+                onClick: () => router.push('/management/admin/kitchen-commands')
+              }
+            });
+          });
+        }
+
+        if (needsServices) {
+          const services = results[resultIdx++];
+          const newServices = services.filter((s: any) => 
+            new Date(s.createdAt) > lastCheckedAt && s.status === 'PENDING'
+          );
+
+          newServices.forEach((s: any) => {
+            toast('New Service Request!', {
+              description: `Room ${s.room?.name || 'Unknown'}: ${s.type}`,
+              icon: <Sparkles className="w-4 h-4 text-amber-500" />,
+              duration: 10000,
+              action: {
+                label: 'View',
+                onClick: () => router.push('/management/admin/services')
+              }
+            });
+          });
+        }
+
+        setLastCheckedAt(new Date());
+      } catch (err) {
+        console.error('Notification poll failed:', err);
+      }
+    };
+
+    const interval = setInterval(checkNewRequests, 30000); // Poll every 30s
+    return () => clearInterval(interval);
+  }, [ready, userRole, lastCheckedAt, router]);
+
+  // 2. 1-hour inactivity timeout for staff
   useInactivityTimer(() => {
     console.log('Session expired due to inactivity');
     handleLogout();

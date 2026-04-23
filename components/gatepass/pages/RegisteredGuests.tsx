@@ -137,9 +137,12 @@ export default function GuestManagement() {
       const updatedStays = await apiService.getStays();
       setStays(updatedStays);
       toast.success("Guest checked out successfully");
-    } catch (err) {
-        console.error(err);
-        toast.error("Failed to process check-out on server");
+    } catch (err: any) {
+        if (err?.response?.status !== 400) {
+          console.error('Checkout error:', err);
+        }
+        const msg = err?.response?.data?.message || "Failed to process check-out on server";
+        toast.error(msg);
     }
   };
 
@@ -365,17 +368,31 @@ export default function GuestManagement() {
                             </span>
                          </div>
                       </td>
-                      <td className="p-4 pr-8 text-right">
-                         <div className="flex items-center justify-end gap-1.5">
-                            <button 
-                              onClick={() => handleCheckOut(stay.id)}
-                              className="px-2 py-1 bg-red-50 text-red-600 border border-red-100 rounded-md text-[8px] font-black uppercase tracking-tighter hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95 whitespace-nowrap"
-                            >
-                               Check Out
-                            </button>
-                            <button className="p-1.5 text-gray-300 hover:text-[#292f36] transition-colors"><MoreHorizontal size={14} /></button>
-                         </div>
-                      </td>
+                       <td className="p-4 pr-8 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                             <button 
+                               onClick={() => {
+                                 if (stay.paymentStatus !== 'PAID') {
+                                   toast.error("Debt Pending", {
+                                     description: "Settle balance in Guest Dossier first."
+                                   });
+                                   openGuestDossier(stay);
+                                   return;
+                                 }
+                                 handleCheckOut(stay.id);
+                               }}
+                               className={cn(
+                                 "px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-tighter transition-all shadow-sm active:scale-95 whitespace-nowrap",
+                                 stay.paymentStatus === 'PAID' 
+                                   ? "bg-red-50 text-red-600 border border-red-100 hover:bg-red-600 hover:text-white"
+                                   : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
+                               )}
+                             >
+                                {stay.paymentStatus === 'PAID' ? 'Check Out' : 'Debt Pending'}
+                             </button>
+                             <button className="p-1.5 text-gray-300 hover:text-[#292f36] transition-colors"><MoreHorizontal size={14} /></button>
+                          </div>
+                       </td>
                     </motion.tr>
                   ))}
 
@@ -782,15 +799,23 @@ export default function GuestManagement() {
                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Financial Overview</p>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-xs font-bold">
-                        <span className="text-gray-500">Total Bill</span>
-                        <span className="text-[#292f36]">{formatPrice(stayBalance?.totalDue || 0)}</span>
+                        <span className="text-gray-500">Accommodation ({stayBalance?.nights} nights)</span>
+                        <span className="text-[#292f36]">{formatPrice(stayBalance?.roomTotal || 0)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs font-bold">
+                        <span className="text-gray-500">F&B / Services</span>
+                        <span className="text-[#292f36]">{formatPrice(stayBalance?.foodTotal || 0)}</span>
+                      </div>
+                      <div className="pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <span className="text-[10px] font-black text-gray-400 uppercase">Total Bill</span>
+                        <span className="text-sm font-black text-[#292f36]">{formatPrice(stayBalance?.totalDue || 0)}</span>
                       </div>
                       <div className="flex justify-between items-center text-xs font-bold text-emerald-500">
-                        <span>Paid</span>
+                        <span>Paid Confirmation</span>
                         <span>{formatPrice(stayBalance?.totalPaid || 0)}</span>
                       </div>
                       <div className="pt-3 border-t border-gray-50 flex justify-between items-center">
-                        <span className="text-[10px] font-black text-gray-400 uppercase">Balance</span>
+                        <span className="text-[10px] font-black text-gray-400 uppercase">Current Balance</span>
                         <span className={cn(
                           "text-base font-black px-2 py-0.5 rounded-lg",
                           (stayBalance?.balance || 0) > 0 ? "text-rose-600 bg-rose-50" : "text-emerald-600 bg-emerald-50"

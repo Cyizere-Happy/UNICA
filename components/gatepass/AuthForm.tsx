@@ -150,7 +150,7 @@ export default function AuthForm() {
             <Home size={32} className="text-white" />
           </div>
           
-          <div className="relative w-full aspect-square max-w-[320px] mx-auto mb-8">
+          <div className="relative w-full aspect-square max-w-[280px] mx-auto mb-8">
             <AnimatePresence mode="wait">
               <motion.div
                 key={isLogin ? 'signin' : 'register'}
