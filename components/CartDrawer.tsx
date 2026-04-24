@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, ShoppingBag, Trash2, Tag, ChevronRight, CheckCircle2, History, Star, MessageSquare, Timer, Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
-import { cn, resolveImageUrl } from '@/lib/utils';
+import { cn, resolveImageUrl, formatPrice } from '@/lib/utils';
 import { apiService } from '@/lib/gatepass/apiService';
 import { FoodOrder } from '@/lib/gatepass/types';
 
@@ -262,7 +262,7 @@ export default function CartDrawer() {
                           <div className="flex justify-between items-center mt-2">
                              <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-black text-accent">{item.cartQuantity}x</span>
-                                <span className="font-black text-[#292f36] text-[11px] md:text-xs whitespace-nowrap">{item.price * item.cartQuantity} RWF</span>
+                                <span className="font-black text-[#292f36] text-[11px] md:text-xs whitespace-nowrap">{formatPrice(item.price * item.cartQuantity, 'RWF')}</span>
                              </div>
                              <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-0.5">
                                 <button onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white rounded-md transition-colors"><Minus size={9} /></button>
@@ -291,15 +291,15 @@ export default function CartDrawer() {
                   <div className="space-y-4 pt-4 bg-white p-5 md:p-6 rounded-[32px] border border-gray-100 shadow-sm overflow-hidden relative">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">Sub Total</span>
-                      <span className="font-black text-[#292f36]">{subtotal} RWF</span>
+                      <span className="font-black text-[#292f36]">{formatPrice(subtotal, 'RWF')}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">Delivery Charge</span>
-                      <span className="font-black text-[#292f36]">{deliveryCharge} RWF</span>
+                      <span className="font-black text-[#292f36]">{formatPrice(deliveryCharge, 'RWF')}</span>
                     </div>
                     <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                       <span className="text-base font-black text-[#292f36]">Total</span>
-                      <span className="text-xl md:text-2xl font-black text-accent">{total} RWF</span>
+                      <span className="text-xl md:text-2xl font-black text-accent">{formatPrice(total, 'RWF')}</span>
                     </div>
                   </div>
                 </>
@@ -354,14 +354,14 @@ export default function CartDrawer() {
                                     </h4>
                                     <p className="text-[9px] font-bold text-gray-400">{order.orderTime}</p>
                                 </div>
-                                <span className="font-black text-accent text-base md:text-lg">{order.totalAmount} RWF</span>
+                                <span className="font-black text-accent text-base md:text-lg">{formatPrice(order.totalAmount, 'RWF')}</span>
                              </div>
 
                              <div className="bg-gray-50/50 rounded-xl p-3 md:p-4 space-y-1.5 border border-black/[0.02]">
                                 {order.items.map((it, i) => (
                                     <div key={i} className="flex justify-between items-center text-[12px] md:text-[13px] font-bold">
                                         <span className="text-[#292f36] line-clamp-1">{it.quantity}x {it.name}</span>
-                                        <span className="text-gray-400 shrink-0 ml-4">{it.price * it.quantity} RWF</span>
+                                        <span className="text-gray-400 shrink-0 ml-4">{formatPrice(it.price * it.quantity, 'RWF')}</span>
                                     </div>
                                 ))}
                              </div>
@@ -444,21 +444,17 @@ export default function CartDrawer() {
               onClick={() => {
                 if (!isFullGuest) {
                     setEntryModalOpen(true);
-                } else if (guestUser?.stayType !== 'APARTMENT') {
+                } else {
                     handleConfirmOrder();
                 }
               }}
-              disabled={isFullGuest && guestUser?.stayType === 'APARTMENT'}
               className={cn(
                   "w-full py-4 rounded-[20px] font-black text-xs uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2 group",
-                  isFullGuest && guestUser?.stayType === 'APARTMENT' 
-                    ? "bg-gray-100 text-[#292f36]/30 cursor-not-allowed shadow-none" 
-                    : "bg-[#292f36] text-white shadow-black/10 hover:bg-black"
+                  "bg-[#292f36] text-white shadow-black/10 hover:bg-black"
               )}
             >
-              {!isFullGuest ? 'Register to Place Order' : 
-               guestUser?.stayType === 'APARTMENT' ? 'Dining Preview Mode' : 'Confirm Order'}
-              {(!isFullGuest || guestUser?.stayType !== 'APARTMENT') && <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+              {!isFullGuest ? 'Register to Place Order' : 'Confirm Order'}
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         )}

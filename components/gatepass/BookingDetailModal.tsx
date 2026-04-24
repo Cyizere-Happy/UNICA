@@ -128,7 +128,7 @@ export default function BookingDetailModal({ booking, isOpen, onClose, onApprove
                             <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest leading-none mt-1">{booking.roomType} • {booking.guests} Guests</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-black text-accent leading-none">{formatPrice(booking.roomPrice)}</p>
+                            <p className="text-lg font-black text-accent leading-none">{formatPrice(booking.roomPrice, 'RWF')}</p>
                             <p className="text-[8px] text-zinc-600 font-bold uppercase tracking-widest mt-1">per night</p>
                           </div>
                         </div>
@@ -155,7 +155,7 @@ export default function BookingDetailModal({ booking, isOpen, onClose, onApprove
                     <div className="grid grid-cols-5 gap-3">
                        <div className="col-span-2 bg-gray-50 rounded-2xl p-4 border border-gray-200">
                           <p className="text-[9px] font-black uppercase text-gray-400 mb-1">Total Bill</p>
-                          <p className="text-xl font-black text-[#292f36]">{formatPrice(booking.totalAmount)}</p>
+                          <p className="text-xl font-black text-[#292f36]">{formatPrice(booking.totalAmount, 'RWF')}</p>
                        </div>
                        <div className="col-span-3 bg-amber-50 rounded-2xl p-4 border border-amber-100 relative">
                           <p className="text-[9px] font-black uppercase text-amber-700 mb-1">Special Requests</p>

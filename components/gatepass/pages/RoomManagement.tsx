@@ -155,7 +155,7 @@ export default function RoomManagement() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="font-black text-accent text-lg">{formatPrice(room.price)}</span>
+                    <span className="font-black text-accent text-lg">{formatPrice(room.price, 'RWF')}</span>
                     <p className="text-[9px] text-gray-400 font-bold uppercase">/ night</p>
                   </div>
                 </div>
@@ -332,7 +332,7 @@ export default function RoomManagement() {
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Price (RWF)</label>
                           <div className="w-full px-5 py-3.5 bg-gray-100 border-2 border-transparent rounded-2xl font-black text-accent flex items-center">
-                            {formatPrice(editingRoom?.price || 0)}
+                            {formatPrice(editingRoom?.price || 0, 'RWF')}
                           </div>
                         </div>
                         <div className="space-y-1.5">

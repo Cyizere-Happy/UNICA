@@ -14,14 +14,20 @@ export const apiService = {
     const { data } = await api.get('/rooms');
     return data.map((room: any) => ({
       ...room,
-      price: Number(room.price)
+      price: Number(room.price),
+      priceUsd: room.priceUsd ? Number(room.priceUsd) : undefined,
+      exchangeRate: room.exchangeRate ? Number(room.exchangeRate) : undefined,
+      capacity: Number(room.capacity)
     }));
   },
   getRoom: async (id: string): Promise<Room> => {
     const { data } = await api.get(`/rooms/${id}`);
     return {
       ...data,
-      price: Number(data.price)
+      price: Number(data.price),
+      priceUsd: data.priceUsd ? Number(data.priceUsd) : undefined,
+      exchangeRate: data.exchangeRate ? Number(data.exchangeRate) : undefined,
+      capacity: Number(data.capacity)
     };
   },
   createRoom: async (room: Partial<Room>): Promise<Room> => {

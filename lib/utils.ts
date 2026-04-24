@@ -5,7 +5,13 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function formatPrice(price: number) {
+export function formatPrice(price: number, currency: 'USD' | 'RWF' = 'USD') {
+    if (currency === 'RWF') {
+        return new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: 0,
+        }).format(price) + ' RWF';
+    }
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',

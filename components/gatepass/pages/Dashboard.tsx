@@ -244,7 +244,7 @@ export default function Dashboard() {
                       (stats?.totalRevenue?.toString() || "").length > 9 ? "text-xs" :
                       (stats?.totalRevenue?.toString() || "").length > 7 ? "text-sm" : "text-xl"
                     )}>
-                      {stats?.totalRevenue?.toLocaleString()} <span className="text-[10px] opacity-50 ml-1">RWF</span>
+                      {formatPrice(stats?.totalRevenue || 0, 'RWF')}
                     </h3>
                   </div>
                   <div className="mt-3 pt-3 border-t border-gray-50">
@@ -265,13 +265,13 @@ export default function Dashboard() {
                       "font-black text-rose-600",
                       (stats?.stockExpenses?.toString() || "").length > 7 ? "text-base" : "text-xl"
                     )}>
-                      -{stats?.stockExpenses?.toLocaleString()} <span className="text-[10px] opacity-50 ml-1">RWF</span>
+                      -{formatPrice(stats?.stockExpenses || 0, 'RWF')}
                     </h3>
                   </div>
                   <div className="mt-3 pt-3 border-t border-gray-50 flex items-center justify-between">
                     <div>
-                      <p className="text-[8px] text-gray-400 font-bold uppercase">Food: {stats?.totalSpentFood?.toLocaleString()}</p>
-                      <p className="text-[8px] text-gray-400 font-bold uppercase">Assets: {stats?.totalSpentAssets?.toLocaleString()}</p>
+                      <p className="text-[8px] text-gray-400 font-bold uppercase">Food: {formatPrice(stats?.totalSpentFood || 0, 'RWF')}</p>
+                      <p className="text-[8px] text-gray-400 font-bold uppercase">Assets: {formatPrice(stats?.totalSpentAssets || 0, 'RWF')}</p>
                     </div>
                   </div>
                 </Card>
@@ -282,11 +282,11 @@ export default function Dashboard() {
                     <div className="space-y-2 mt-2">
                        <div className="flex justify-between items-center">
                           <span className="text-[10px] font-bold text-gray-400">ADR (Avg Daily Rate)</span>
-                          <span className="text-xs font-black text-[#292f36]">{formatPrice(stats?.adr || 0)}</span>
+                          <span className="text-xs font-black text-[#292f36]">{formatPrice(stats?.adr || 0, 'RWF')}</span>
                        </div>
                        <div className="flex justify-between items-center">
                           <span className="text-[10px] font-bold text-gray-400">RevPAR</span>
-                          <span className="text-xs font-black text-accent">{formatPrice(stats?.revPar || 0)}</span>
+                          <span className="text-xs font-black text-accent">{formatPrice(stats?.revPar || 0, 'RWF')}</span>
                        </div>
                     </div>
                   </div>
@@ -313,7 +313,7 @@ export default function Dashboard() {
                       (stats?.netProfit || 0) > 0 ? "text-emerald-600" : "text-rose-600",
                       (stats?.netProfit?.toString() || "").length > 7 ? "text-base" : "text-xl"
                     )}>
-                      {(stats?.netProfit || 0).toLocaleString()} <span className="text-[10px] opacity-50 ml-1">RWF</span>
+                      {formatPrice(stats?.netProfit || 0, 'RWF')}
                     </h3>
                   </div>
                   <div className="mt-3 pt-3 border-t border-white/50">

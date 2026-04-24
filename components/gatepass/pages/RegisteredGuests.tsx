@@ -427,7 +427,7 @@ export default function GuestManagement() {
                       </td>
                       <td className="p-4">
                          <div className="flex flex-col">
-                            <p className="text-xs font-black text-[#292f36]">{formatPrice(guest.totalSpent)}</p>
+                            <p className="text-xs font-black text-[#292f36]">{formatPrice(guest.totalSpent, 'RWF')}</p>
                             <p className="text-[9px] font-bold text-emerald-500 uppercase">Profitable</p>
                          </div>
                       </td>
@@ -481,7 +481,7 @@ export default function GuestManagement() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <span className="text-sm font-black text-[#292f36]">{formatPrice(stay.totalAmount)}</span>
+                        <span className="text-sm font-black text-[#292f36]">{formatPrice(stay.totalAmount, 'RWF')}</span>
                       </td>
                       <td className="p-4 text-center">
                         <span className="px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-lg text-[9px] font-bold text-gray-400 uppercase">Check-out Complete</span>
@@ -800,19 +800,19 @@ export default function GuestManagement() {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className="text-gray-500">Accommodation ({stayBalance?.nights} nights)</span>
-                        <span className="text-[#292f36]">{formatPrice(stayBalance?.roomTotal || 0)}</span>
+                        <span className="text-[#292f36]">{formatPrice(stayBalance?.roomTotal || 0, 'RWF')}</span>
                       </div>
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className="text-gray-500">F&B / Services</span>
-                        <span className="text-[#292f36]">{formatPrice(stayBalance?.foodTotal || 0)}</span>
+                        <span className="text-[#292f36]">{formatPrice(stayBalance?.foodTotal || 0, 'RWF')}</span>
                       </div>
                       <div className="pt-3 border-t border-gray-100 flex justify-between items-center">
                         <span className="text-[10px] font-black text-gray-400 uppercase">Total Bill</span>
-                        <span className="text-sm font-black text-[#292f36]">{formatPrice(stayBalance?.totalDue || 0)}</span>
+                        <span className="text-sm font-black text-[#292f36]">{formatPrice(stayBalance?.totalDue || 0, 'RWF')}</span>
                       </div>
                       <div className="flex justify-between items-center text-xs font-bold text-emerald-500">
                         <span>Paid Confirmation</span>
-                        <span>{formatPrice(stayBalance?.totalPaid || 0)}</span>
+                        <span>{formatPrice(stayBalance?.totalPaid || 0, 'RWF')}</span>
                       </div>
                       <div className="pt-3 border-t border-gray-50 flex justify-between items-center">
                         <span className="text-[10px] font-black text-gray-400 uppercase">Current Balance</span>
@@ -820,7 +820,7 @@ export default function GuestManagement() {
                           "text-base font-black px-2 py-0.5 rounded-lg",
                           (stayBalance?.balance || 0) > 0 ? "text-rose-600 bg-rose-50" : "text-emerald-600 bg-emerald-50"
                         )}>
-                          {formatPrice(stayBalance?.balance || 0)}
+                          {formatPrice(stayBalance?.balance || 0, 'RWF')}
                         </span>
                       </div>
                     </div>

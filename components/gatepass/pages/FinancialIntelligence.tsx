@@ -36,13 +36,15 @@ export default function FinancialIntelligence() {
     }
   };
 
-  const StatCard = ({ title, value, icon: Icon, trend, color }: any) => (
+  const StatCard = ({ title, value, icon: Icon, trend, color, currency = 'RWF' }: any) => (
     <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm relative overflow-hidden">
       <div className={cn("p-4 rounded-2xl w-fit mb-4", color)}>
         <Icon size={24} />
       </div>
       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{title}</p>
-      <h3 className="text-2xl font-black text-[#292f36] mt-1">{formatPrice(value)}</h3>
+      <h3 className="text-2xl font-black text-[#292f36] mt-1">
+        {typeof value === 'number' ? formatPrice(value, currency) : value}
+      </h3>
       {trend && (
         <div className={cn(
           "mt-2 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest",
@@ -146,7 +148,7 @@ export default function FinancialIntelligence() {
                   <div>
                     <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">
                       <span>Room Bookings</span>
-                      <span className="text-[#292f36]">{formatPrice(statement?.income.rooms)}</span>
+                      <span className="text-[#292f36]">{formatPrice(statement?.income.rooms, 'RWF')}</span>
                     </div>
                     <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
                       <div 
@@ -158,7 +160,7 @@ export default function FinancialIntelligence() {
                   <div>
                     <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">
                       <span>Food & Beverage</span>
-                      <span className="text-[#292f36]">{formatPrice(statement?.income.food)}</span>
+                      <span className="text-[#292f36]">{formatPrice(statement?.income.food, 'RWF')}</span>
                     </div>
                     <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
                       <div 
@@ -180,7 +182,7 @@ export default function FinancialIntelligence() {
                   <div>
                     <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">
                       <span>Inventory (Food)</span>
-                      <span className="text-[#292f36]">{formatPrice(statement?.expenses.foodStock)}</span>
+                      <span className="text-[#292f36]">{formatPrice(statement?.expenses.foodStock, 'RWF')}</span>
                     </div>
                     <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
                       <div 
@@ -192,7 +194,7 @@ export default function FinancialIntelligence() {
                   <div>
                     <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">
                       <span>Assets & Equipment</span>
-                      <span className="text-[#292f36]">{formatPrice(statement?.expenses.assets)}</span>
+                      <span className="text-[#292f36]">{formatPrice(statement?.expenses.assets, 'RWF')}</span>
                     </div>
                     <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
                       <div 
@@ -250,7 +252,7 @@ export default function FinancialIntelligence() {
                              </span>
                           </td>
                           <td className="px-8 py-4 text-right">
-                             <span className="text-xs font-black text-rose-600">-{formatPrice(log.amount)}</span>
+                             <span className="text-xs font-black text-rose-600">-{formatPrice(log.amount, 'RWF')}</span>
                           </td>
                         </tr>
                       ))}

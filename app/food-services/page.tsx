@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Minus, Plus, ShoppingBag, X, Zap, Leaf, Flame, ShieldCheck } from 'lucide-react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { cn, resolveImageUrl } from '@/lib/utils';
+import { cn, resolveImageUrl, formatPrice } from '@/lib/utils';
 import { AnimatePresence } from 'framer-motion';
 import { apiService } from '@/lib/gatepass/apiService';
 
@@ -148,32 +148,26 @@ export default function FoodServicesPage() {
                                         <p className="text-[13px] text-[#4d5053] leading-relaxed mb-4 line-clamp-2">{item.description}</p>
 
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xl font-black text-[#292f36]">{item.price} RWF</span>
+                                            <span className="text-xl font-black text-[#292f36]">{formatPrice(item.price, 'RWF')}</span>
 
                                             {canOrderInterface ? (
-                                                isApartmentGuest ? (
-                                                    <div className="px-4 py-2 bg-gray-100 text-[#292f36]/40 text-[9px] font-black uppercase tracking-widest rounded-xl border border-black/5">
-                                                        Menu Only
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-center gap-2 bg-[#f5f6f8] rounded-xl p-1" onClick={(e) => e.stopPropagation()}>
-                                                        <button
-                                                            onClick={() => updateCart(item, -1)}
-                                                            className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center transition-colors"
-                                                        >
-                                                            <Minus className="w-4 h-4" />
-                                                        </button>
-                                                        <span className="w-7 text-center text-sm font-bold text-[#292f36]">
-                                                            {getItemQty(item.id)}
-                                                        </span>
-                                                        <button
-                                                            onClick={() => updateCart(item, 1)}
-                                                            className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center transition-colors"
-                                                        >
-                                                            <Plus className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                )
+                                                <div className="flex items-center gap-2 bg-[#f5f6f8] rounded-xl p-1" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        onClick={() => updateCart(item, -1)}
+                                                        className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center transition-colors"
+                                                    >
+                                                        <Minus className="w-4 h-4" />
+                                                    </button>
+                                                    <span className="w-7 text-center text-sm font-bold text-[#292f36]">
+                                                        {getItemQty(item.id)}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => updateCart(item, 1)}
+                                                        className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center transition-colors"
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button 
                                                     onClick={(e) => {
@@ -265,36 +259,30 @@ export default function FoodServicesPage() {
                                         <div className="flex flex-col">
                                             <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Price</p>
                                             <span className="text-xl font-black text-[#292f36]">
-                                                {selectedItem.price * Math.max(1, getItemQty(selectedItem.id))} RWF
+                                                {formatPrice(selectedItem.price * Math.max(1, getItemQty(selectedItem.id)), 'RWF')}
                                             </span>
                                         </div>
 
                                         {canOrderInterface ? (
-                                            isApartmentGuest ? (
-                                                <div className="px-6 py-3 bg-gray-100 text-[#292f36]/40 rounded-xl font-black text-[10px] uppercase tracking-widest border border-black/5">
-                                                    Dining Preview Mode
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-2.5 bg-[#f5f6f8] rounded-xl p-1.5">
+                                                    <button
+                                                        onClick={() => updateCart(selectedItem, -1)}
+                                                        className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center shadow-sm transition-all active:scale-90"
+                                                    >
+                                                        <Minus className="w-4 h-4" />
+                                                    </button>
+                                                    <span className="w-6 text-center text-base font-black text-[#292f36]">
+                                                        {getItemQty(selectedItem.id)}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => updateCart(selectedItem, 1)}
+                                                        className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center shadow-md transition-all active:scale-90"
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </button>
                                                 </div>
-                                            ) : (
-                                                <div className="flex items-center gap-4">
-                                                    <div className="flex items-center gap-2.5 bg-[#f5f6f8] rounded-xl p-1.5">
-                                                        <button
-                                                            onClick={() => updateCart(selectedItem, -1)}
-                                                            className="w-8 h-8 rounded-lg bg-white text-[#292f36] hover:bg-zinc-100 flex items-center justify-center shadow-sm transition-all active:scale-90"
-                                                        >
-                                                            <Minus className="w-4 h-4" />
-                                                        </button>
-                                                        <span className="w-6 text-center text-base font-black text-[#292f36]">
-                                                            {getItemQty(selectedItem.id)}
-                                                        </span>
-                                                        <button
-                                                            onClick={() => updateCart(selectedItem, 1)}
-                                                            className="w-8 h-8 rounded-lg bg-[#0e0e0e] text-white hover:bg-black flex items-center justify-center shadow-md transition-all active:scale-90"
-                                                        >
-                                                            <Plus className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            )
+                                            </div>
                                         ) : (
                                             <button 
                                                 onClick={() => setEntryModalOpen(true)}

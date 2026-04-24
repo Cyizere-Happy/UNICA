@@ -41,8 +41,11 @@ export default function OrderManagement() {
                     orderDate.getMonth() === today.getMonth() &&
                     orderDate.getFullYear() === today.getFullYear();
     
-    // Always show pending orders, otherwise filter by today for others
-    const shouldShow = isToday || order.status === 'PENDING';
+    // Show non-terminal statuses regardless of date (Active Queue)
+    const isActiveQueue = ['PENDING', 'PREPARING', 'OUT_FOR_DELIVERY'].includes(order.status);
+    
+    // For completed/cancelled, only show today's activity
+    const shouldShow = isToday || isActiveQueue;
     
     if (!shouldShow) return false;
     if (activeTab === 'ALL') return true;
@@ -62,7 +65,7 @@ export default function OrderManagement() {
   const handleStatusChange = async (orderId: string, status: FoodOrder['status']) => {
     try {
       await apiService.updateOrderStatus(orderId, status);
-      const updated = await apiService.getOrders();
+      const updated = await apiService.getAllOrders();
       setOrders(updated);
     } catch (err) {
       console.error(err);
@@ -246,7 +249,7 @@ export default function OrderManagement() {
                 <div className="mt-8 flex flex-col md:flex-row md:items-center justify-between gap-6 pt-6 border-t border-gray-50">
                    <div className="flex items-baseline gap-2">
                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Estimated Value</span>
-                       <span className="text-2xl font-black text-[#292f36]">{formatPrice(order.totalAmount)}</span>
+                       <span className="text-2xl font-black text-[#292f36]">{formatPrice(order.totalAmount, 'RWF')}</span>
                    </div>
 
                    <div className="flex items-center gap-3">

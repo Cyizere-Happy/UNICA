@@ -230,7 +230,7 @@ export default function BookingManagement() {
                   <td className="px-4 py-3 text-[12px] font-bold text-[#292f36]">{booking.checkIn}</td>
                   <td className="px-4 py-3 text-[12px] font-bold text-[#292f36]">{booking.checkOut}</td>
                   <td className="px-4 py-3">
-                    <span className="text-[12px] font-black text-[#4d668f]">{formatPrice(booking.totalAmount)}</span>
+                    <span className="text-[12px] font-black text-[#4d668f]">{formatPrice(booking.totalAmount, 'RWF')}</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="px-1.5 py-0.5 bg-gray-50 rounded-md inline-flex items-center gap-1 text-[10px] font-black text-gray-500 border border-gray-100">

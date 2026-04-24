@@ -56,7 +56,7 @@ export default function OrderHistory() {
 
   const stats = [
     { label: 'Total Fulfilled', value: totalPreparedCount, icon: ChefHat, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-    { label: 'Kitchen Revenue', value: formatPrice(totalRevenue), icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: 'Kitchen Revenue', value: formatPrice(totalRevenue, 'RWF'), icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50' },
     { label: 'Bestselling Dish', value: bestsellingDish, icon: Star, color: 'text-amber-500', bg: 'bg-amber-50' },
     { label: 'Guest Feedback', value: '4.9/5', icon: ShoppingBag, color: 'text-indigo-500', bg: 'bg-indigo-50' },
   ];
@@ -221,7 +221,7 @@ export default function OrderHistory() {
                     </div>
                   </td>
                   <td className="px-2 lg:px-4 py-3 text-sm font-black text-accent whitespace-nowrap">
-                    {formatPrice(order.totalAmount)}
+                    {formatPrice(order.totalAmount, 'RWF')}
                   </td>
                   <td className="px-2 lg:px-4 py-3">
                     <div className="flex flex-col xl:flex-row xl:items-center gap-2">

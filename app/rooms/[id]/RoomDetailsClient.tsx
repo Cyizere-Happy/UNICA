@@ -203,7 +203,7 @@ export default function RoomDetailsClient() {
                                 <div className="flex items-end justify-between mb-6">
                                     <div>
                                         <span className="text-xs font-medium text-zinc-500 block mb-1">Starting from</span>
-                                        <span className="text-3xl font-bold text-accent">{formatPrice(room.price)}</span>
+                                        <span className="text-3xl font-bold text-accent">{formatPrice(room.price, 'RWF')}</span>
                                         <span className="text-zinc-400 font-medium whitespace-nowrap text-sm"> / night</span>
                                     </div>
                                     <div className="text-right">

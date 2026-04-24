@@ -199,7 +199,7 @@ export default function MenuManagement() {
                   <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
                     <div className="flex flex-col">
                       <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Pricing</span>
-                      <span className="text-base font-black text-[#292f36]">{formatPrice(item.price)}</span>
+                      <span className="text-base font-black text-[#292f36]">{formatPrice(item.price, 'RWF')}</span>
                     </div>
 
                     {userRole === 'ADMIN' && (

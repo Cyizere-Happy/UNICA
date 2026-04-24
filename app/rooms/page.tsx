@@ -167,7 +167,7 @@ export default function RoomsPage() {
                                     <div className="flex items-center justify-between mt-auto pt-5 border-t border-black/5">
                                         <div className="flex flex-col">
                                             <span className="text-lg font-black text-[#292f36] leading-none">
-                                                {formatPrice(room.price)}
+                                                {formatPrice(room.price, 'RWF')}
                                             </span>
                                             <span className="text-[9px] uppercase font-black tracking-widest text-muted/40">
                                                 per night
